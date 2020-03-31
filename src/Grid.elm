@@ -151,7 +151,7 @@ getUsers : Cmd Msg
 getUsers =
     Http.get
         { url = "/static/users.json"
-        , expect = Http.expectJson GotUsers (field "users" userListDecoder)
+        , expect = Http.expectJson GotUsers userListDecoder
         }
 
 

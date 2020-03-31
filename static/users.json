@@ -1,5 +1,4 @@
-{
-  "users": [
+[
     {
       "id": 0,
       "name": "Reh",
@@ -100,5 +99,4 @@
       "name": "Wolfy McWallpaper",
       "avatar": "/static/profile_pics/19.jpg"
     }
-  ]
-}
+]

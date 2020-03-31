@@ -1,4 +1,4 @@
-module Grid exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userListDecoder, userView, view, viewUsers)
+module Grid exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userListDecoder, userView, view)
 
 import Browser
 import Design
@@ -85,32 +85,28 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h2 [] [ text "Random Humans" ]
-        , Design.grid (viewUsers model)
-        ]
-
-
-viewUsers : Model -> List (Html Msg)
-viewUsers model =
     case model of
+        Loaded users ->
+            div []
+                [ h2 [] [ text "Random Humans" ]
+                , Design.grid (List.map userView users)
+                ]
+
         Failure ->
-            [ h2 [] [ text "Something went wrong" ]
-            , button [ onClick GetUsers ] [ text "Try Again" ]
-            ]
+            div []
+                [ h2 [] [ text "Something went wrong" ]
+                , button [ onClick GetUsers ] [ text "Try Again" ]
+                ]
 
         Loading ->
-            [ h2 [] [ text "Loading" ] ]
-
-        Loaded users ->
-            List.map
-                userView
-                users
+            div []
+                [ h2 [] [ text "Loading" ] ]
 
         ProductView user ->
-            [ h2 [] [ text ("Clicked on " ++ user.name ++ "!") ]
-            , button [ onClick GetUsers ] [ text "Go Back" ]
-            ]
+            div []
+                [ h2 [] [ text ("Clicked on " ++ user.name ++ "!") ]
+                , button [ onClick GetUsers ] [ text "Go Back" ]
+                ]
 
 
 userView : User -> Html Msg

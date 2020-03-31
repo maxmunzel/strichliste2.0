@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode exposing (Decoder, field, list, string)
+import Json.Decode exposing (Decoder, field, int, list, string)
 
 
 
@@ -27,7 +27,18 @@ main =
 
 
 type alias User =
-    { name : String }
+    { id : Int
+    , name : String
+    , avatar : String
+    }
+
+
+type alias Product =
+    { id : Int
+    , name : String
+    , description : String
+    , image : String
+    }
 
 
 type Model
@@ -118,10 +129,10 @@ userView user =
         ]
         [ img
             [ style "border-radius" "50%"
-            , style "width" "50px"
-            , style "height" "50px"
+            , style "width" "60px"
+            , style "height" "60px"
             , style "align" "center"
-            , src "https://thispersondoesnotexist.com/image"
+            , src user.avatar
             ]
             []
         , p
@@ -139,14 +150,17 @@ userView user =
 getUsers : Cmd Msg
 getUsers =
     Http.get
-        { url = "http://www.mocky.io/v2/5e8306332f000095c42fc8b9"
+        { url = "/static/users.json"
         , expect = Http.expectJson GotUsers (field "users" userListDecoder)
         }
 
 
 userDecoder : Decoder User
 userDecoder =
-    Json.Decode.map User (field "name" string)
+    Json.Decode.map3 User
+        (field "id" int)
+        (field "name" string)
+        (field "avatar" string)
 
 
 userListDecoder : Decoder (List User)

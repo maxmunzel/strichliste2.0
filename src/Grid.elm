@@ -34,6 +34,7 @@ type Model
     = Failure
     | Loading
     | Loaded (List User)
+    | ProductView User
 
 
 init : () -> ( Model, Cmd Msg )
@@ -47,6 +48,7 @@ init _ =
 
 type Msg
     = GotUsers (Result Http.Error (List User))
+    | ClickedUser User
     | GetUsers
 
 
@@ -63,6 +65,9 @@ update msg model =
 
         GetUsers ->
             ( Loading, getUsers )
+
+        ClickedUser user ->
+            ( ProductView user, Cmd.none )
 
 
 
@@ -102,11 +107,17 @@ viewUsers model =
                 userView
                 users
 
+        ProductView user ->
+            [ h2 [] [ text ("Clicked on " ++ user.name ++ "!") ]
+            , button [ onClick GetUsers ] [ text "Go Back" ]
+            ]
+
 
 userView : User -> Html Msg
 userView user =
     div
-        [ style "margin" "10px"
+        [ onClick (ClickedUser user)
+        , style "margin" "10px"
         , style "text-align" "center"
         ]
         [ img
@@ -132,7 +143,7 @@ userView user =
 getUsers : Cmd Msg
 getUsers =
     Http.get
-        { url = "http://www.mocky.io/v2/5e8303a52f000032c72fc876"
+        { url = "http://www.mocky.io/v2/5e8306332f000095c42fc8b9"
         , expect = Http.expectJson GotUsers (field "users" userListDecoder)
         }
 

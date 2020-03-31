@@ -1,6 +1,7 @@
 module Grid exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userListDecoder, userView, view, viewUsers)
 
 import Browser
+import Design
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -80,35 +81,46 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h2 [] [ text "Random Cats" ]
-        , viewUsers model
+        [ h2 [] [ text "Random Humans" ]
+        , Design.grid (viewUsers model)
         ]
 
 
-viewUsers : Model -> Html Msg
+viewUsers : Model -> List (Html Msg)
 viewUsers model =
     case model of
         Failure ->
-            div []
-                [ h2 [] [ text "Something went wrong" ]
-                , button [ onClick GetUsers ] [ text "Try Again" ]
-                ]
+            [ h2 [] [ text "Something went wrong" ]
+            , button [ onClick GetUsers ] [ text "Try Again" ]
+            ]
 
         Loading ->
-            h2 [] [ text "Loading" ]
+            [ h2 [] [ text "Loading" ] ]
 
         Loaded users ->
-            div []
-                (List.map
-                    userView
-                    users
-                )
+            List.map
+                userView
+                users
 
 
 userView : User -> Html Msg
 userView user =
-    div [ style "margin" "10px" ]
-        [ p [] [ text user.name ]
+    div
+        [ style "margin" "10px"
+        , style "text-align" "center"
+        ]
+        [ img
+            [ style "border-radius" "50%"
+            , style "width" "50px"
+            , style "height" "50px"
+            , style "align" "center"
+            , src "https://thispersondoesnotexist.com/image"
+            ]
+            []
+        , p
+            [ style "align" "center"
+            ]
+            [ text user.name ]
         , br [] []
         ]
 
@@ -120,7 +132,7 @@ userView user =
 getUsers : Cmd Msg
 getUsers =
     Http.get
-        { url = "http://www.mocky.io/v2/5e8258722f00002c002fbb12"
+        { url = "http://www.mocky.io/v2/5e8303a52f000032c72fc876"
         , expect = Http.expectJson GotUsers (field "users" userListDecoder)
         }
 

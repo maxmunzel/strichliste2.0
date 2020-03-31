@@ -1,11 +1,11 @@
-module Grid exposing (Model(..), Msg(..), getRandomCatGif, gifDecoder, init, main, subscriptions, update, view, viewGif)
+module Grid exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userListDecoder, userView, view, viewUsers)
 
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode exposing ((:=), Decoder, field, list, object, string)
+import Json.Decode exposing (Decoder, field, list, string)
 
 
 
@@ -32,12 +32,12 @@ type alias User =
 type Model
     = Failure
     | Loading
-    | Success (List User)
+    | Loaded (List User)
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Loading, GetUsers )
+    ( Loading, getUsers )
 
 
 
@@ -45,23 +45,23 @@ init _ =
 
 
 type Msg
-    = GetUsers
-    | GotUsers (Result Http.Error (List User))
+    = GotUsers (Result Http.Error (List User))
+    | GetUsers
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GetUsers ->
-            ( Loading, GetUsers )
-
         GotUsers result ->
             case result of
                 Ok users ->
-                    ( Success users, Cmd.none )
+                    ( Loaded users, Cmd.none )
 
                 Err _ ->
                     ( Failure, Cmd.none )
+
+        GetUsers ->
+            ( Loading, getUsers )
 
 
 
@@ -91,21 +91,23 @@ viewUsers model =
         Failure ->
             div []
                 [ h2 [] [ text "Something went wrong" ]
-                , button [ onClick getUsers ] [ text "Try Again" ]
+                , button [ onClick GetUsers ] [ text "Try Again" ]
                 ]
 
         Loading ->
             h2 [] [ text "Loading" ]
 
-        Success ->
+        Loaded users ->
             div []
-                [ List.map userView users
-                ]
+                (List.map
+                    userView
+                    users
+                )
 
 
 userView : User -> Html Msg
 userView user =
-    div []
+    div [ style "margin" "10px" ]
         [ p [] [ text user.name ]
         , br [] []
         ]
@@ -115,18 +117,19 @@ userView user =
 -- HTTP
 
 
+getUsers : Cmd Msg
 getUsers =
     Http.get
-        { url = "http://www.mocky.io/v2/5e8221442f0000ac602fb8de"
-        , expect = Http.expectJson GotUser
+        { url = "http://www.mocky.io/v2/5e8258722f00002c002fbb12"
+        , expect = Http.expectJson GotUsers (field "users" userListDecoder)
         }
 
 
 userDecoder : Decoder User
 userDecoder =
-    User (field "name" string)
+    Json.Decode.map User (field "name" string)
 
 
 userListDecoder : Decoder (List User)
 userListDecoder =
-    object ("userser" := list User)
+    Json.Decode.list userDecoder

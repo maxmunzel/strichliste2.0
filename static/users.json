@@ -1,44 +1,102 @@
 [
     {
-        "id": 1,
-        "name": "\u00d6tti Softdrinks",
-        "description": "",
-        "image": "/static/product_pics/A.jpg"
+      "id": 0,
+      "name": "Reh",
+      "avatar": "/static/profile_pics/0.jpg"
     },
     {
-        "id": 2,
-        "name": "\u00d6tti Bier",
-        "description": "",
-        "image": "/static/product_pics/B.jpg"
+      "id": 1,
+      "name": "Bocky McBockface",
+      "avatar": "/static/profile_pics/1.jpg"
     },
     {
-        "id": 3,
-        "name": "Bier 0,3",
-        "description": "Rothaus, Radler",
-        "image": "/static/product_pics/C.jpg"
+      "id": 2,
+      "name": "Hello Kitty",
+      "avatar": "/static/profile_pics/2.jpg"
     },
     {
-        "id": 4,
-        "name": "Bier Premium",
-        "description": "Augustiner, Goldk\u00f6pfle, Bleifrei",
-        "image": "/static/product_pics/D.jpg"
+      "id": 3,
+      "name": "Letztes Whiskasmal",
+      "avatar": "/static/profile_pics/3.jpg"
     },
     {
-        "id": 5,
-        "name": "Mate",
-        "description": "",
-        "image": "/static/product_pics/Mate.jpg"
+      "id": 4,
+      "name": "Bocky McGraßface",
+      "avatar": "/static/profile_pics/4.jpg"
     },
     {
-        "id": 6,
-        "name": "Paulaner Spezi",
-        "description": "",
-        "image": "/static/product_pics/Spezi.png"
+      "id": 5,
+      "name": "Katze McWäscheleine",
+      "avatar": "/static/profile_pics/5.jpg"
     },
     {
-        "id": 7,
-        "name": "Sprudel",
-        "description": "",
-        "image": "/static/product_pics/Sprudel.png"
+      "id": 6,
+      "name": "Schlecki Giraffe",
+      "avatar": "/static/profile_pics/6.jpg"
+    },
+    {
+      "id": 7,
+      "name": "Rippo Harambee",
+      "avatar": "/static/profile_pics/7.jpg"
+    },
+    {
+      "id": 8,
+      "name": "Dackel Krause",
+      "avatar": "/static/profile_pics/8.jpg"
+    },
+    {
+      "id": 9,
+      "name": "Meormychildren Everagain",
+      "avatar": "/static/profile_pics/9.jpg"
+    },
+    {
+      "id": 10,
+      "name": "Concerned Lion",
+      "avatar": "/static/profile_pics/10.jpg"
+    },
+    {
+      "id": 11,
+      "name": "YouWant Sumfuk",
+      "avatar": "/static/profile_pics/11.jpg"
+    },
+    {
+      "id": 12,
+      "name": "Tiger McSadface",
+      "avatar": "/static/profile_pics/12.jpg"
+    },
+    {
+      "id": 13,
+      "name": "Disturbed Tiger",
+      "avatar": "/static/profile_pics/13.jpg"
+    },
+    {
+      "id": 14,
+      "name": "Bocky McGanja",
+      "avatar": "/static/profile_pics/14.jpg"
+    },
+    {
+      "id": 15,
+      "name": "Matthias Ruppert",
+      "avatar": "/static/profile_pics/15.jpg"
+    },
+    {
+      "id": 16,
+      "name": "Wuffer Aporti",
+      "avatar": "/static/profile_pics/16.jpg"
+    },
+    {
+      "id": 17,
+      "name": "Irgendwas mit Mädchen",
+      "avatar": "/static/profile_pics/17.jpg"
+    },
+    {
+      "id": 18,
+      "name": "Scratchy Kopfy",
+      "avatar": "/static/profile_pics/18.jpg"
+    },
+    {
+      "id": 19,
+      "name": "Wolfy McWallpaper",
+      "avatar": "/static/profile_pics/19.jpg"
     }
 ]

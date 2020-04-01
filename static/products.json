@@ -3,13 +3,13 @@
         "id": 1,
         "name": "\u00d6tti Softdrinks",
         "description": "",
-        "image": "/static/product_pics/A.jpg"
+        "image": "/static/product_pics/A.png"
     },
     {
         "id": 2,
         "name": "\u00d6tti Bier",
         "description": "",
-        "image": "/static/product_pics/B.jpg"
+        "image": "/static/product_pics/B.png"
     },
     {
         "id": 3,

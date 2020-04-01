@@ -118,7 +118,7 @@ view model =
     case model of
         Loaded users ->
             div []
-                [ h2 [] [ text "Random Humans" ]
+                [ h1 [] [ text "Strichliste 2.0" ]
                 , Design.grid (List.map userView users)
                 ]
 
@@ -138,7 +138,23 @@ view model =
 
         ProductView user products ->
             div []
-                [ Design.grid (List.map (\p -> productView user p) products)
+                [ div
+                    [ style "flex-direction" "row"
+                    , style "display" "flex"
+                    , style "align-items" "center"
+                    , style "margin" "10px 10px 10px 10px "
+                    ]
+                    [ img
+                        [ src user.avatar
+                        , style "border-radius" "50%"
+                        , style "width" "50px"
+                        , style "height" "50px"
+                        ]
+                        []
+                    , div [ style "width" "20px" ] []
+                    , h1 [] [ text "Produkt wählen" ]
+                    ]
+                , Design.grid (List.map (\p -> productView user p) products)
                 , button [ onClick GetUsers ] [ text "Go Back" ]
                 ]
 
@@ -178,7 +194,8 @@ productView user product =
             , style "height" "200px"
             ]
             []
-        , h3 [] [ text product.name ]
+        , h4 [] [ text product.name ]
+        , p [] [ text product.description ]
         ]
 
 

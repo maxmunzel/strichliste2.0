@@ -1,12 +1,13 @@
 module Main exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userView, view)
 
 import Browser
+import Debug
 import Design
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode exposing (Decoder, field, int, list, string)
+import Json.Decode exposing (Decoder, field, int, list, string, value)
 
 
 
@@ -46,7 +47,13 @@ type Model
     | Loading
     | Loaded (List User)
     | LoadingProducts User
-    | ProductView User (List Product)
+    | ProductView User (List Order)
+
+
+type alias Order =
+    { product : Product
+    , amount : Int
+    }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -62,8 +69,9 @@ type Msg
     = GotUsers (Result Http.Error (List User))
     | GotProducts (Result Http.Error (List Product))
     | ClickedUser User
-    | ClickedProduct User Product
+    | ClickedProduct User Order (List Order)
     | GetUsers
+    | ResetAmounts User (List Order)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,7 +93,7 @@ update msg model =
                 Ok products ->
                     case model of
                         LoadingProducts user ->
-                            ( ProductView user products, Cmd.none )
+                            ( ProductView user (List.map product2order products), Cmd.none )
 
                         _ ->
                             ( Loading, getUsers )
@@ -96,8 +104,23 @@ update msg model =
         ClickedUser user ->
             ( LoadingProducts user, getProducts )
 
-        ClickedProduct user product ->
-            ( Loading, getUsers )
+        ClickedProduct user order orders ->
+            let
+                newOrders =
+                    List.map
+                        (\o ->
+                            if o.product.id == order.product.id then
+                                { o | amount = o.amount + 1 }
+
+                            else
+                                o
+                        )
+                        orders
+            in
+            ( ProductView user newOrders, Cmd.none )
+
+        ResetAmounts user orders ->
+            ( ProductView user (List.map resetAmount orders), Cmd.none )
 
 
 
@@ -136,7 +159,22 @@ view model =
             div []
                 [ h2 [] [ text "Loading Products" ] ]
 
-        ProductView user products ->
+        ProductView user orders ->
+            let
+                confirmText =
+                    if areOrdersEmpty orders then
+                        "Zurück"
+
+                    else
+                        "Bestätigen"
+
+                resetVisible =
+                    if areOrdersEmpty orders then
+                        "hidden"
+
+                    else
+                        "visible"
+            in
             div []
                 [ div
                     [ style "flex-direction" "row"
@@ -152,11 +190,20 @@ view model =
                         ]
                         []
                     , div [ style "width" "20px" ] []
-                    , h1 [] [ text "Produkt wählen" ]
+                    , h1 [] [ text user.name ]
                     ]
-                , Design.grid (List.map (\p -> productView user p) products)
-                , button [ onClick GetUsers ] [ text "Go Back" ]
+                , Design.grid
+                    (List.map (\o -> productView user o orders) orders
+                        ++ [ button [ onClick GetUsers ] [ text confirmText ]
+                           , button [ onClick (ResetAmounts user orders), style "visibility" resetVisible ] [ text "Zurücksetzen" ]
+                           ]
+                    )
                 ]
+
+
+areOrdersEmpty : List Order -> Bool
+areOrdersEmpty orders =
+    List.sum (List.map (\o -> o.amount) orders) == 0
 
 
 userView : User -> Html Msg
@@ -182,20 +229,28 @@ userView user =
         ]
 
 
-productView : User -> Product -> Html Msg
-productView user product =
+productView : User -> Order -> List Order -> Html Msg
+productView user order orders =
+    let
+        productText =
+            if order.amount == 0 then
+                order.product.name
+
+            else
+                order.product.name ++ " x" ++ String.fromInt order.amount
+    in
     div
-        [ onClick (ClickedProduct user product)
+        [ onClick (ClickedProduct user order orders)
         , style "margin" "10px"
         , style "text-align" "center"
         ]
         [ img
-            [ src product.image
+            [ src order.product.image
             , style "height" "200px"
             ]
             []
-        , h4 [] [ text product.name ]
-        , p [] [ text product.description ]
+        , h4 [] [ text productText ]
+        , p [] [ text order.product.description ]
         ]
 
 
@@ -234,3 +289,12 @@ productDecoder =
         (field "name" string)
         (field "description" string)
         (field "image" string)
+
+
+product2order product =
+    Order product 0
+
+
+resetAmount : Order -> Order
+resetAmount order =
+    { order | amount = 0 }

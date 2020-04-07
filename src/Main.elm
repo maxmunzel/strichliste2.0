@@ -8,6 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode exposing (Decoder, field, int, list, string, value)
+import Time
 
 
 
@@ -46,7 +47,7 @@ type Model
     = Failure
     | Loading
     | LoadedUsers (List User)
-    | Loaded (List User) (List Product)
+    | Loaded (List User) (List Product) Bool
     | ProductView User (List Order) (List User)
 
 
@@ -73,6 +74,7 @@ type Msg
     | GetUsers
     | ResetAmounts User (List Order) (List User)
     | CommitOrder User (List Order) (List User) (List Product)
+    | Tick Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -81,30 +83,64 @@ update msg model =
         GotUsers result ->
             case result of
                 Ok users ->
-                    ( LoadedUsers users, getProducts )
+                    case model of
+                        Loading ->
+                            ( LoadedUsers users, getProducts )
+
+                        Loaded _ products networkFailure ->
+                            ( Loaded users products False, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
 
                 Err _ ->
-                    ( Failure, Cmd.none )
+                    case model of
+                        Loading ->
+                            ( Failure, Cmd.none )
+
+                        Loaded users products _ ->
+                            ( Loaded users products True, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
 
         GotProducts result ->
             case result of
                 Err _ ->
-                    ( Failure, Cmd.none )
+                    case model of
+                        Loaded users products _ ->
+                            ( Loaded users products True, Cmd.none )
+
+                        LoadedUsers _ ->
+                            ( Failure, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
 
                 Ok products ->
                     case model of
                         LoadedUsers users ->
-                            ( Loaded users products, Cmd.none )
+                            ( Loaded users products False, Cmd.none )
+
+                        Loaded users _ _ ->
+                            ( Loaded users products False, Cmd.none )
+
+                        ProductView user oldOrders users ->
+                            if areOrdersEmpty oldOrders then
+                                ( ProductView user (List.map product2order products) users, Cmd.none )
+
+                            else
+                                ( model, Cmd.none )
 
                         _ ->
-                            ( Failure, Cmd.none )
+                            ( model, Cmd.none )
 
         GetUsers ->
             ( Loading, getUsers )
 
         ClickedUser user ->
             case model of
-                Loaded users products ->
+                Loaded users products _ ->
                     ( ProductView user (List.map product2order products) users, Cmd.none )
 
                 _ ->
@@ -130,7 +166,10 @@ update msg model =
 
         CommitOrder user orders users products ->
             -- TODO: Send Order to Backend
-            ( Loaded users products, Cmd.none )
+            ( Loaded users products False, Cmd.none )
+
+        Tick timestamp ->
+            ( model, Cmd.batch [ getUsers, getProducts ] )
 
 
 
@@ -139,7 +178,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Time.every 1000 Tick
 
 
 
@@ -149,9 +188,19 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     case model of
-        Loaded users products ->
+        Loaded users products networkFailure ->
             div []
-                [ h1 [] [ text "Strichliste 2.0" ]
+                [ h1 []
+                    [ text
+                        ("Strichliste 2.0"
+                            ++ (if networkFailure then
+                                    " *"
+
+                                else
+                                    ""
+                               )
+                        )
+                    ]
                 , Design.grid (List.map userView users)
                 ]
 

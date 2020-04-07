@@ -45,9 +45,9 @@ type alias Product =
 type Model
     = Failure
     | Loading
-    | Loaded (List User)
-    | LoadingProducts User
-    | ProductView User (List Order)
+    | LoadedUsers (List User)
+    | Loaded (List User) (List Product)
+    | ProductView User (List Order) (List User)
 
 
 type alias Order =
@@ -69,9 +69,10 @@ type Msg
     = GotUsers (Result Http.Error (List User))
     | GotProducts (Result Http.Error (List Product))
     | ClickedUser User
-    | ClickedProduct User Order (List Order)
+    | ClickedProduct User Order (List Order) (List User)
     | GetUsers
-    | ResetAmounts User (List Order)
+    | ResetAmounts User (List Order) (List User)
+    | CommitOrder User (List Order) (List User) (List Product)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -80,7 +81,7 @@ update msg model =
         GotUsers result ->
             case result of
                 Ok users ->
-                    ( Loaded users, Cmd.none )
+                    ( LoadedUsers users, getProducts )
 
                 Err _ ->
                     ( Failure, Cmd.none )
@@ -92,19 +93,24 @@ update msg model =
 
                 Ok products ->
                     case model of
-                        LoadingProducts user ->
-                            ( ProductView user (List.map product2order products), Cmd.none )
+                        LoadedUsers users ->
+                            ( Loaded users products, Cmd.none )
 
                         _ ->
-                            ( Loading, getUsers )
+                            ( Failure, Cmd.none )
 
         GetUsers ->
             ( Loading, getUsers )
 
         ClickedUser user ->
-            ( LoadingProducts user, getProducts )
+            case model of
+                Loaded users products ->
+                    ( ProductView user (List.map product2order products) users, Cmd.none )
 
-        ClickedProduct user order orders ->
+                _ ->
+                    ( Failure, Cmd.none )
+
+        ClickedProduct user order orders users ->
             let
                 newOrders =
                     List.map
@@ -117,10 +123,14 @@ update msg model =
                         )
                         orders
             in
-            ( ProductView user newOrders, Cmd.none )
+            ( ProductView user newOrders users, Cmd.none )
 
-        ResetAmounts user orders ->
-            ( ProductView user (List.map resetAmount orders), Cmd.none )
+        ResetAmounts user orders users ->
+            ( ProductView user (List.map resetAmount orders) users, Cmd.none )
+
+        CommitOrder user orders users products ->
+            -- TODO: Send Order to Backend
+            ( Loaded users products, Cmd.none )
 
 
 
@@ -139,7 +149,7 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     case model of
-        Loaded users ->
+        Loaded users products ->
             div []
                 [ h1 [] [ text "Strichliste 2.0" ]
                 , Design.grid (List.map userView users)
@@ -153,13 +163,13 @@ view model =
 
         Loading ->
             div []
-                [ h2 [] [ text "Loading" ] ]
+                [ h2 [] [ text "Loading Users" ] ]
 
-        LoadingProducts user ->
+        LoadedUsers users ->
             div []
                 [ h2 [] [ text "Loading Products" ] ]
 
-        ProductView user orders ->
+        ProductView user orders users ->
             let
                 confirmText =
                     if areOrdersEmpty orders then
@@ -174,6 +184,9 @@ view model =
 
                     else
                         "visible"
+
+                products =
+                    List.map (\o -> o.product) orders
             in
             div []
                 [ div
@@ -193,9 +206,9 @@ view model =
                     , h1 [] [ text user.name ]
                     ]
                 , Design.grid
-                    (List.map (\o -> productView user o orders) orders
-                        ++ [ button [ onClick GetUsers ] [ text confirmText ]
-                           , button [ onClick (ResetAmounts user orders), style "visibility" resetVisible ] [ text "Zurücksetzen" ]
+                    (List.map (\o -> productView user o orders users) orders
+                        ++ [ button [ onClick (CommitOrder user orders users products) ] [ text confirmText ]
+                           , button [ onClick (ResetAmounts user orders users), style "visibility" resetVisible ] [ text "Zurücksetzen" ]
                            ]
                     )
                 ]
@@ -229,8 +242,8 @@ userView user =
         ]
 
 
-productView : User -> Order -> List Order -> Html Msg
-productView user order orders =
+productView : User -> Order -> List Order -> List User -> Html Msg
+productView user order orders users =
     let
         productText =
             if order.amount == 0 then
@@ -240,7 +253,7 @@ productView user order orders =
                 order.product.name ++ " x" ++ String.fromInt order.amount
     in
     div
-        [ onClick (ClickedProduct user order orders)
+        [ onClick (ClickedProduct user order orders users)
         , style "margin" "10px"
         , style "text-align" "center"
         ]

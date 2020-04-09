@@ -189,7 +189,7 @@ view : Model -> Html Msg
 view model =
     case model of
         Loaded users products networkFailure ->
-            div []
+            div [ style "margin" "10px 10px 10px 10px " ]
                 [ h1 []
                     [ text
                         ("Strichliste 2.0"

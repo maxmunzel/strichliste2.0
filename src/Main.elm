@@ -1,4 +1,4 @@
-module Main exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userView, view)
+port module Main exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userView, view)
 
 import Browser
 import Debug
@@ -360,3 +360,10 @@ product2order product =
 resetAmount : Order -> Order
 resetAmount order =
     { order | amount = 0 }
+
+
+port setJwt : String -> Cmd msg
+
+
+
+-- port cache : Json.Encode.value

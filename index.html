@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Strichliste 2.0</title>
+  <link rel="stylesheet" href="static/style.css">
+  <script src="static/main.js"></script>
+</head>
+
+<body>
+  <div id="elm"></div>
+  <script>
+  var app = Elm.Main.init({
+    node: document.getElementById('elm')
+  });
+
+  app.ports.setJwt.subscribe(function(data){
+      localStorage.setItem("jwt", data);
+  });
+  </script>
+</body>
+</html>

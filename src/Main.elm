@@ -28,6 +28,20 @@ main =
 -- Model
 
 
+type alias State =
+    { users : List User
+    , products : List Product
+    , jwtToken : String
+    , offline : Bool
+    }
+
+
+type alias BuyState =
+    { user : User
+    , orders : List Order
+    }
+
+
 type alias User =
     { id : Int
     , name : String
@@ -47,8 +61,8 @@ type Model
     = Failure
     | Loading
     | LoadedUsers (List User)
-    | Loaded (List User) (List Product) Bool
-    | ProductView User (List Order) (List User)
+    | Loaded State
+    | ProductView State BuyState
 
 
 type alias Order =
@@ -70,10 +84,10 @@ type Msg
     = GotUsers (Result Http.Error (List User))
     | GotProducts (Result Http.Error (List Product))
     | ClickedUser User
-    | ClickedProduct User Order (List Order) (List User)
+    | ClickedProduct State BuyState Order
     | GetUsers
-    | ResetAmounts User (List Order) (List User)
-    | CommitOrder User (List Order) (List User) (List Product)
+    | ResetAmounts State BuyState
+    | CommitOrder State BuyState
     | Tick Time.Posix
 
 
@@ -87,8 +101,8 @@ update msg model =
                         Loading ->
                             ( LoadedUsers users, getProducts )
 
-                        Loaded _ products networkFailure ->
-                            ( Loaded users products False, Cmd.none )
+                        Loaded state ->
+                            ( Loaded { state | offline = False, users = users }, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
@@ -98,8 +112,8 @@ update msg model =
                         Loading ->
                             ( Failure, Cmd.none )
 
-                        Loaded users products _ ->
-                            ( Loaded users products True, Cmd.none )
+                        Loaded state ->
+                            ( Loaded { state | offline = True }, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
@@ -108,8 +122,8 @@ update msg model =
             case result of
                 Err _ ->
                     case model of
-                        Loaded users products _ ->
-                            ( Loaded users products True, Cmd.none )
+                        Loaded state ->
+                            ( Loaded { state | offline = True }, Cmd.none )
 
                         LoadedUsers _ ->
                             ( Failure, Cmd.none )
@@ -120,14 +134,24 @@ update msg model =
                 Ok products ->
                     case model of
                         LoadedUsers users ->
-                            ( Loaded users products False, Cmd.none )
+                            ( Loaded
+                                { users = users
+                                , products = products
+                                , jwtToken = "foobar" -- TODO: Implement Secret Handling
+                                , offline = False
+                                }
+                            , Cmd.none
+                            )
 
-                        Loaded users _ _ ->
-                            ( Loaded users products False, Cmd.none )
+                        Loaded state ->
+                            ( Loaded { state | offline = False }, Cmd.none )
 
-                        ProductView user oldOrders users ->
-                            if areOrdersEmpty oldOrders then
-                                ( ProductView user (List.map product2order products) users, Cmd.none )
+                        ProductView state buyState ->
+                            if areOrdersEmpty buyState.orders then
+                                ( ProductView state
+                                    { buyState | orders = List.map product2order products }
+                                , Cmd.none
+                                )
 
                             else
                                 ( model, Cmd.none )
@@ -140,13 +164,13 @@ update msg model =
 
         ClickedUser user ->
             case model of
-                Loaded users products _ ->
-                    ( ProductView user (List.map product2order products) users, Cmd.none )
+                Loaded state ->
+                    ( ProductView state { user = user, orders = List.map product2order state.products }, Cmd.none )
 
                 _ ->
                     ( Failure, Cmd.none )
 
-        ClickedProduct user order orders users ->
+        ClickedProduct state buyState order ->
             let
                 newOrders =
                     List.map
@@ -157,16 +181,16 @@ update msg model =
                             else
                                 o
                         )
-                        orders
+                        buyState.orders
             in
-            ( ProductView user newOrders users, Cmd.none )
+            ( ProductView state { buyState | orders = newOrders }, Cmd.none )
 
-        ResetAmounts user orders users ->
-            ( ProductView user (List.map resetAmount orders) users, Cmd.none )
+        ResetAmounts state buyState ->
+            ( ProductView state { buyState | orders = List.map resetAmount buyState.orders }, Cmd.none )
 
-        CommitOrder user orders users products ->
+        CommitOrder state buyState ->
             -- TODO: Send Order to Backend
-            ( Loaded users products False, Cmd.none )
+            ( Loaded state, Cmd.none )
 
         Tick timestamp ->
             ( model, Cmd.batch [ getUsers, getProducts ] )
@@ -188,20 +212,18 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     case model of
-        Loaded users products networkFailure ->
-            div [ style "margin" "10px 10px 10px 10px " ]
-                [ h1 []
-                    [ text
-                        ("Strichliste 2.0"
-                            ++ (if networkFailure then
-                                    " *"
+        Loaded state ->
+            let
+                title =
+                    if state.offline then
+                        "Strichliste *"
 
-                                else
-                                    ""
-                               )
-                        )
-                    ]
-                , Design.grid (List.map userView users)
+                    else
+                        "Strichliste"
+            in
+            div [ style "margin" "10px 10px 10px 10px " ]
+                [ h1 [] [ text title ]
+                , Design.grid (List.map userView state.users)
                 ]
 
         Failure ->
@@ -218,24 +240,21 @@ view model =
             div []
                 [ h2 [] [ text "Loading Products" ] ]
 
-        ProductView user orders users ->
+        ProductView state buyState ->
             let
                 confirmText =
-                    if areOrdersEmpty orders then
+                    if areOrdersEmpty buyState.orders then
                         "Zurück"
 
                     else
                         "Bestätigen"
 
                 resetVisible =
-                    if areOrdersEmpty orders then
+                    if areOrdersEmpty buyState.orders then
                         "hidden"
 
                     else
                         "visible"
-
-                products =
-                    List.map (\o -> o.product) orders
             in
             div []
                 [ div
@@ -245,20 +264,19 @@ view model =
                     , style "margin" "10px 10px 10px 10px "
                     ]
                     [ img
-                        [ src user.avatar
+                        [ src buyState.user.avatar
                         , style "border-radius" "50%"
                         , style "width" "50px"
                         , style "height" "50px"
                         ]
                         []
                     , div [ style "width" "20px" ] []
-                    , h1 [] [ text user.name ]
+                    , h1 [] [ text buyState.user.name ]
                     ]
                 , Design.grid
-                    (List.map (\o -> productView user o orders users) orders
-                        ++ [ button [ onClick (CommitOrder user orders users products) ] [ text confirmText ]
-                           , button [ onClick (ResetAmounts user orders users), style "visibility" resetVisible ] [ text "Zurücksetzen" ]
-                           ]
+                    (List.map (productView state buyState) buyState.orders
+                        ++ [ button [ onClick (CommitOrder state buyState) ] [ text confirmText ] ]
+                        ++ [ button [ onClick (ResetAmounts state buyState), style "visibility" resetVisible ] [ text "Zurücksetzen" ] ]
                     )
                 ]
 
@@ -291,8 +309,8 @@ userView user =
         ]
 
 
-productView : User -> Order -> List Order -> List User -> Html Msg
-productView user order orders users =
+productView : State -> BuyState -> Order -> Html Msg
+productView state buyState order =
     let
         productText =
             if order.amount == 0 then
@@ -302,7 +320,7 @@ productView user order orders users =
                 order.product.name ++ " x" ++ String.fromInt order.amount
     in
     div
-        [ onClick (ClickedProduct user order orders users)
+        [ onClick (ClickedProduct state buyState order)
         , style "margin" "10px"
         , style "text-align" "center"
         ]

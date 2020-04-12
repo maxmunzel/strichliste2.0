@@ -341,7 +341,7 @@ productView state buyState order =
 getUsers : Cmd Msg
 getUsers =
     Http.get
-        { url = "/static/users.json"
+        { url = "http://localhost:3000/users?active=eq.true&order=name.asc"
         , expect = Http.expectJson GotUsers (Json.Decode.list userDecoder)
         }
 
@@ -349,7 +349,7 @@ getUsers =
 getProducts : Cmd Msg
 getProducts =
     Http.get
-        { url = "/static/products.json"
+        { url = "http://localhost:3000/products?order=prize.asc"
         , expect = Http.expectJson GotProducts (Json.Decode.list productDecoder)
         }
 

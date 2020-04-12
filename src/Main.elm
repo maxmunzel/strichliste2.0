@@ -349,7 +349,7 @@ getUsers =
 getProducts : Cmd Msg
 getProducts =
     Http.get
-        { url = "http://localhost:3000/products?order=prize.asc"
+        { url = "http://localhost:3000/products?order=price.asc"
         , expect = Http.expectJson GotProducts (Json.Decode.list productDecoder)
         }
 

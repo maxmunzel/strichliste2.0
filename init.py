@@ -21,7 +21,6 @@ def get_postgrest_config(secret: str, db_rest_password: str) -> str:
     return conf
 
 
-
 if __name__ == "__main__":
     db_pass = generate_password()  # password for the postgres superuser
     jwt_secret = generate_password()
@@ -34,22 +33,33 @@ if __name__ == "__main__":
     run(
         f"sed 's/$PASSWORD/{db_rest_password}/g' postgres_schema.sql | psql -U postgres -h localhost -p 5433",
         shell=True,
-        env=dict(os.environ, PGPASSWORD=db_pass, PGTIMEOUT="10")
+        env=dict(os.environ, PGPASSWORD=db_pass, PGTIMEOUT="10"),
     )
     with open("postgREST.conf", "w", os.O_CREAT) as f:
         f.write(get_postgrest_config(jwt_secret, db_rest_password))
-    
+
     tokens = []
     try:
         import jwt
-        tokens = [jwt.encode({"role":"order_user"}, jwt_secret, algorithm="HS256").decode() for _ in range(10)]
+
+        tokens = [
+            jwt.encode({"role": "order_user"}, jwt_secret, algorithm="HS256").decode()
+            for _ in range(10)
+        ]
     except ModuleNotFoundError:
-        print("Error! Could not create JWT Tokens for you - run `pip3 install pyjwt` and try again") 
+        print(
+            "Error! Could not create JWT Tokens for you - run `pip3 install pyjwt` and try again"
+        )
     with open("secrets.json", "w", os.O_CREAT) as f:
-        f.write(json.dumps({
-            "jwt_secret":jwt_secret,
-            "db_pass": db_pass,
-            "db_rest_password": db_rest_password,
-            "tokens": tokens}))
+        f.write(
+            json.dumps(
+                {
+                    "jwt_secret": jwt_secret,
+                    "db_pass": db_pass,
+                    "db_rest_password": db_rest_password,
+                    "tokens": tokens,
+                }
+            )
+        )
 
     print(" Congig generation successful! Secrets stored in 'secrets.json'.")

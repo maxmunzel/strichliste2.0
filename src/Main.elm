@@ -31,8 +31,8 @@ main =
 type alias State =
     { users : List User
     , products : List Product
-    , jwtToken : String
     , offline : Bool
+    , persistance : Persistance
     }
 
 
@@ -58,9 +58,10 @@ type alias Product =
 
 
 type Model
-    = Failure
-    | Loading
-    | LoadedUsers (List User)
+    = Failure Persistance
+    | AskForJwt Persistance
+    | LoadingUsers Persistance
+    | LoadingProducts Persistance (List User)
     | Loaded State
     | ProductView State BuyState
 
@@ -71,9 +72,20 @@ type alias Order =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Loading, getUsers )
+type alias Persistance =
+    -- Everything we want to be in LocalStorage
+    { jwtToken : String
+    , orders : List Order
+    }
+
+
+init : Persistance -> ( Model, Cmd Msg )
+init persistance =
+    if persistance.jwtToken == "" then
+        ( AskForJwt persistance, Cmd.none )
+
+    else
+        ( LoadingUsers persistance, getUsers )
 
 
 
@@ -83,12 +95,14 @@ init _ =
 type Msg
     = GotUsers (Result Http.Error (List User))
     | GotProducts (Result Http.Error (List Product))
-    | ClickedUser User
+    | ClickedUser State User
     | ClickedProduct State BuyState Order
-    | GetUsers
+    | GetUsers Persistance
     | ResetAmounts State BuyState
     | CommitOrder State BuyState
     | Tick Time.Posix
+    | AskForJwtTextUpdate String
+    | SetPersistance Persistance
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -98,8 +112,8 @@ update msg model =
             case result of
                 Ok users ->
                     case model of
-                        Loading ->
-                            ( LoadedUsers users, getProducts )
+                        LoadingUsers persistance ->
+                            ( LoadingProducts persistance users, getProducts )
 
                         Loaded state ->
                             ( Loaded { state | offline = False, users = users }, Cmd.none )
@@ -109,8 +123,8 @@ update msg model =
 
                 Err _ ->
                     case model of
-                        Loading ->
-                            ( Failure, Cmd.none )
+                        LoadingUsers persistance ->
+                            ( Failure persistance, Cmd.none )
 
                         Loaded state ->
                             ( Loaded { state | offline = True }, Cmd.none )
@@ -125,19 +139,19 @@ update msg model =
                         Loaded state ->
                             ( Loaded { state | offline = True }, Cmd.none )
 
-                        LoadedUsers _ ->
-                            ( Failure, Cmd.none )
+                        LoadingProducts persistance _ ->
+                            ( Failure persistance, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
 
                 Ok products ->
                     case model of
-                        LoadedUsers users ->
+                        LoadingProducts persistance users ->
                             ( Loaded
                                 { users = users
                                 , products = products
-                                , jwtToken = "foobar" -- TODO: Implement Secret Handling
+                                , persistance = persistance
                                 , offline = False
                                 }
                             , Cmd.none
@@ -159,16 +173,16 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
 
-        GetUsers ->
-            ( Loading, getUsers )
+        GetUsers persistance ->
+            ( LoadingUsers persistance, getUsers )
 
-        ClickedUser user ->
+        ClickedUser state user ->
             case model of
-                Loaded state ->
+                Loaded _ ->
                     ( ProductView state { user = user, orders = List.map product2order state.products }, Cmd.none )
 
                 _ ->
-                    ( Failure, Cmd.none )
+                    ( Failure state.persistance, Cmd.none )
 
         ClickedProduct state buyState order ->
             let
@@ -195,6 +209,17 @@ update msg model =
         Tick timestamp ->
             ( model, Cmd.batch [ getUsers, getProducts ] )
 
+        AskForJwtTextUpdate text ->
+            case model of
+                AskForJwt persistance ->
+                    ( AskForJwt { persistance | jwtToken = text }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        SetPersistance persistance ->
+            ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers ] )
+
 
 
 -- Subscriptions
@@ -212,6 +237,14 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     case model of
+        AskForJwt persistance ->
+            div []
+                [ h2 [] [ text "Please Enter JWT. If you set up using init.py you will find some in secrets.json" ]
+                , input [ onInput AskForJwtTextUpdate ] []
+                , button [ onClick (SetPersistance persistance) ]
+                    [ text "Save" ]
+                ]
+
         Loaded state ->
             let
                 title =
@@ -223,20 +256,20 @@ view model =
             in
             div [ style "margin" "10px 10px 10px 10px " ]
                 [ h1 [] [ text title ]
-                , Design.grid (List.map userView state.users)
+                , Design.grid (List.map (userView state) state.users)
                 ]
 
-        Failure ->
+        Failure persistance ->
             div []
                 [ h2 [] [ text "Something went wrong" ]
-                , button [ onClick GetUsers ] [ text "Try Again" ]
+                , button [ onClick (GetUsers persistance) ] [ text "Try Again" ]
                 ]
 
-        Loading ->
+        LoadingUsers persistance ->
             div []
                 [ h2 [] [ text "Loading Users" ] ]
 
-        LoadedUsers users ->
+        LoadingProducts persistance users ->
             div []
                 [ h2 [] [ text "Loading Products" ] ]
 
@@ -286,10 +319,10 @@ areOrdersEmpty orders =
     List.sum (List.map (\o -> o.amount) orders) == 0
 
 
-userView : User -> Html Msg
-userView user =
+userView : State -> User -> Html Msg
+userView state user =
     div
-        [ onClick (ClickedUser user)
+        [ onClick (ClickedUser state user)
         , style "margin" "10px"
         , style "text-align" "center"
         ]
@@ -380,8 +413,4 @@ resetAmount order =
     { order | amount = 0 }
 
 
-port setJwt : String -> Cmd msg
-
-
-
--- port cache : Json.Encode.value
+port setPersistance : Persistance -> Cmd msg

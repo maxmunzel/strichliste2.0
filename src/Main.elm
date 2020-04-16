@@ -1,4 +1,4 @@
-port module Main exposing (Model(..), Msg(..), User, getUsers, init, main, subscriptions, update, userDecoder, userView, view)
+port module Main exposing (Model(..), Msg(..), User, getUsers, init, main, setPersistance, subscriptions, update, userDecoder, userView, view)
 
 import Browser
 import Debug
@@ -76,6 +76,7 @@ type alias Persistance =
     -- Everything we want to be in LocalStorage
     { jwtToken : String
     , orders : List Order
+    , location : String
     }
 
 
@@ -102,6 +103,7 @@ type Msg
     | CommitOrder State BuyState
     | Tick Time.Posix
     | AskForJwtTextUpdate String
+    | AskForJwtLocationUpdate String
     | SetPersistance Persistance
 
 
@@ -204,7 +206,17 @@ update msg model =
 
         CommitOrder state buyState ->
             -- TODO: Send Order to Backend
-            ( Loaded state, Cmd.none )
+            let
+                new_orders =
+                    List.filter (\o -> o.amount > 0) buyState.orders
+
+                persistance =
+                    state.persistance
+
+                new_persistance =
+                    { persistance | orders = persistance.orders ++ new_orders }
+            in
+            ( Loaded { state | persistance = new_persistance }, setPersistance new_persistance )
 
         Tick timestamp ->
             ( model, Cmd.batch [ getUsers, getProducts ] )
@@ -213,6 +225,14 @@ update msg model =
             case model of
                 AskForJwt persistance ->
                     ( AskForJwt { persistance | jwtToken = text }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        AskForJwtLocationUpdate text ->
+            case model of
+                AskForJwt persistance ->
+                    ( AskForJwt { persistance | location = text }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -241,6 +261,8 @@ view model =
             div []
                 [ h2 [] [ text "Please Enter JWT. If you set up using init.py you will find some in secrets.json" ]
                 , input [ onInput AskForJwtTextUpdate ] []
+                , h2 [] [ text "Please enter location (e.g. \"Bar\", \"Kühlschrank\", …)" ]
+                , input [ onInput AskForJwtLocationUpdate ] []
                 , button [ onClick (SetPersistance persistance) ]
                     [ text "Save" ]
                 ]
@@ -411,6 +433,14 @@ product2order product =
 resetAmount : Order -> Order
 resetAmount order =
     { order | amount = 0 }
+
+
+type alias Request =
+    { user_id : Int
+    , product_id : Int
+    , amount : Int
+    , location : String
+    }
 
 
 port setPersistance : Persistance -> Cmd msg

@@ -6,6 +6,7 @@ import Design
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Keyed
 import Http
 import Json.Decode exposing (Decoder, field, int, list, string, value)
 import Json.Encode
@@ -429,7 +430,7 @@ view model =
             in
             div [ style "margin" "10px 10px 10px 10px " ]
                 [ h1 [] [ text title ]
-                , Design.grid (List.map (userView state) state.users)
+                , Html.Keyed.node "div" Design.gridStyle (List.map (\u -> ( user2str u, userView state u )) state.users)
                 ]
 
         Failure persistance ->
@@ -584,6 +585,10 @@ product2order user product =
 resetAmount : Order -> Order
 resetAmount order =
     { order | amount = 0 }
+
+
+user2str user =
+    user.name ++ "$" ++ user.avatar ++ "$" ++ String.fromInt user.id
 
 
 port setPersistance : Persistance -> Cmd msg

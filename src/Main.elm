@@ -479,12 +479,12 @@ view model =
                         []
                     , div [ style "width" "20px" ] []
                     , h1 [] [ text buyState.user.name ]
+                    , div [ style "width" "20px" ] []
+                    , button [ onClick (CommitOrder state buyState) ] [ text confirmText ]
+                    , button [ onClick (ResetAmounts state buyState), style "visibility" resetVisible ] [ text "Zurücksetzen" ]
                     ]
                 , Design.grid
-                    (List.map (productView state buyState) buyState.orders
-                        ++ [ button [ onClick (CommitOrder state buyState) ] [ text confirmText ] ]
-                        ++ [ button [ onClick (ResetAmounts state buyState), style "visibility" resetVisible ] [ text "Zurücksetzen" ] ]
-                    )
+                    (List.map (productView state buyState) buyState.orders)
                 ]
 
 

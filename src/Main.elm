@@ -8,6 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode exposing (Decoder, field, int, list, string, value)
+import Json.Encode
 import Time
 
 
@@ -33,7 +34,15 @@ type alias State =
     , products : List Product
     , offline : Bool
     , persistance : Persistance
+    , sync : SyncState
     }
+
+
+type
+    SyncState
+    -- Tracks, if we are currently attempting to commit an order
+    = Idle -- no, we are not
+    | Sending -- yes, we are
 
 
 type alias BuyState =
@@ -67,7 +76,8 @@ type Model
 
 
 type alias Order =
-    { product : Product
+    { user : User
+    , product : Product
     , amount : Int
     }
 
@@ -102,9 +112,11 @@ type Msg
     | ResetAmounts State BuyState
     | CommitOrder State BuyState
     | Tick Time.Posix
+    | SyncTick Time.Posix
     | AskForJwtTextUpdate String
     | AskForJwtLocationUpdate String
     | SetPersistance Persistance
+    | SentOrder (Result Http.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -155,6 +167,7 @@ update msg model =
                                 , products = products
                                 , persistance = persistance
                                 , offline = False
+                                , sync = Idle -- we start idle – the next SyncTick may begin working on old orders
                                 }
                             , Cmd.none
                             )
@@ -165,7 +178,7 @@ update msg model =
                         ProductView state buyState ->
                             if areOrdersEmpty buyState.orders then
                                 ( ProductView state
-                                    { buyState | orders = List.map product2order products }
+                                    { buyState | orders = List.map (product2order buyState.user) products }
                                 , Cmd.none
                                 )
 
@@ -181,7 +194,7 @@ update msg model =
         ClickedUser state user ->
             case model of
                 Loaded _ ->
-                    ( ProductView state { user = user, orders = List.map product2order state.products }, Cmd.none )
+                    ( ProductView state { user = user, orders = List.map (product2order user) state.products }, Cmd.none )
 
                 _ ->
                     ( Failure state.persistance, Cmd.none )
@@ -221,6 +234,76 @@ update msg model =
         Tick timestamp ->
             ( model, Cmd.batch [ getUsers, getProducts ] )
 
+        SyncTick timestamp ->
+            let
+                {--type alias Request =
+                    { user_id : Int
+                    , product_id : Int
+                    , amount : Int
+                    , location : String
+                    } --}
+                packOrder : Persistance -> Order -> Json.Encode.Value
+                packOrder persistance order =
+                    Json.Encode.object
+                        [ ( "user_id", Json.Encode.int order.user.id )
+                        , ( "product_id", Json.Encode.int order.product.id )
+                        , ( "amount", Json.Encode.int order.amount )
+                        , ( "location", Json.Encode.string persistance.location )
+                        ]
+
+                updateSync : State -> ( State, Cmd Msg )
+                updateSync state =
+                    case state.sync of
+                        Sending ->
+                            ( state, Cmd.none )
+
+                        -- wait for the current order to finish
+                        Idle ->
+                            case state.persistance.orders of
+                                [] ->
+                                    ( state, Cmd.none )
+
+                                order :: _ ->
+                                    ( { state | sync = Sending }
+                                    , Http.request
+                                        { url = "http://localhost:3000/orders"
+                                        , method = "POST"
+                                        , headers = [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken) ]
+                                        , body = Http.jsonBody <| packOrder state.persistance <| order
+                                        , expect = Http.expectWhatever SentOrder
+                                        , timeout = Nothing
+                                        , tracker = Nothing
+                                        }
+                                    )
+
+                -- are we in a model with a `State`? If not, ignore this tick...
+            in
+            case model of
+                LoadingUsers _ ->
+                    ( model, Cmd.none )
+
+                LoadingProducts _ _ ->
+                    ( model, Cmd.none )
+
+                Failure _ ->
+                    ( model, Cmd.none )
+
+                AskForJwt _ ->
+                    ( model, Cmd.none )
+
+                Loaded state ->
+                    ( Loaded
+                        (Tuple.first <| updateSync <| state)
+                    , Tuple.second <| updateSync <| state
+                    )
+
+                ProductView state buyState ->
+                    ( ProductView
+                        (Tuple.first <| updateSync <| state)
+                        buyState
+                    , Tuple.second <| updateSync <| state
+                    )
+
         AskForJwtTextUpdate text ->
             case model of
                 AskForJwt persistance ->
@@ -240,6 +323,71 @@ update msg model =
         SetPersistance persistance ->
             ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers ] )
 
+        SentOrder result ->
+            let
+                persistance =
+                    case model of
+                        Failure persistance_ ->
+                            persistance_
+
+                        AskForJwt persistance_ ->
+                            persistance_
+
+                        LoadingUsers persistance_ ->
+                            persistance_
+
+                        LoadingProducts persistance_ users ->
+                            persistance_
+
+                        Loaded state ->
+                            state.persistance
+
+                        ProductView state buyState ->
+                            state.persistance
+
+                new_orders =
+                    case result of
+                        Ok _ ->
+                            case persistance.orders of
+                                [] ->
+                                    []
+
+                                _ :: tail ->
+                                    tail
+
+                        Err _ ->
+                            persistance.orders
+
+                new_persistance =
+                    { persistance | orders = new_orders }
+
+                offline =
+                    case result of
+                        Ok _ ->
+                            False
+
+                        Err _ ->
+                            True
+            in
+            case model of
+                Failure _ ->
+                    ( Failure new_persistance, setPersistance new_persistance )
+
+                AskForJwt _ ->
+                    ( AskForJwt new_persistance, setPersistance new_persistance )
+
+                LoadingUsers _ ->
+                    ( LoadingUsers new_persistance, setPersistance new_persistance )
+
+                LoadingProducts _ users ->
+                    ( LoadingProducts new_persistance users, setPersistance new_persistance )
+
+                Loaded state ->
+                    ( Loaded { state | persistance = new_persistance, sync = Idle }, setPersistance new_persistance )
+
+                ProductView state buyState ->
+                    ( ProductView { state | persistance = new_persistance, sync = Idle } buyState, setPersistance new_persistance )
+
 
 
 -- Subscriptions
@@ -247,7 +395,10 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every 1000 Tick
+    Sub.batch
+        [ Time.every 10000 Tick
+        , Time.every 1000 SyncTick
+        ]
 
 
 
@@ -426,21 +577,13 @@ productDecoder =
         (field "image" string)
 
 
-product2order product =
-    Order product 0
+product2order user product =
+    Order user product 0
 
 
 resetAmount : Order -> Order
 resetAmount order =
     { order | amount = 0 }
-
-
-type alias Request =
-    { user_id : Int
-    , product_id : Int
-    , amount : Int
-    , location : String
-    }
 
 
 port setPersistance : Persistance -> Cmd msg

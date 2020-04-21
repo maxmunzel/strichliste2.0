@@ -20,6 +20,7 @@ create table orders (
     creation_date timestamptz default NOW() not null,
     product_id int references products(id),
     user_id int references users(id),
+    amount int not null,
     undone boolean not null default false,
     location TEXT not null
 );
@@ -36,7 +37,8 @@ grant web_anon to rest;
 create role order_user nologin;
 grant order_user to rest;
 grant usage on schema strichliste to order_user;
-grant insert on orders to order_user;
+grant insert, select on orders to order_user;
+grant usage, select on sequence orders_id_seq to order_user;
 --
 -- Data for Name: products; Type: TABLE DATA; Schema: strichliste; Owner: postgres
 --

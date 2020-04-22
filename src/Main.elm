@@ -1,6 +1,7 @@
-port module Main exposing (Model(..), Msg(..), User, getUsers, init, main, setPersistance, subscriptions, update, userDecoder, userView, view)
+port module Main exposing (BuyState, Model(..), Msg(..), Persistance, State, SyncState(..), areOrdersEmpty, init, main, productView, setPersistance, subscriptions, update, userView, view)
 
 import Browser
+import Common exposing (Order, Product, User, getProducts, getUsers, product2order, resetAmount, user2str, userDecoder)
 import Debug
 import Design
 import Html exposing (..)
@@ -52,21 +53,6 @@ type alias BuyState =
     }
 
 
-type alias User =
-    { id : Int
-    , name : String
-    , avatar : String
-    }
-
-
-type alias Product =
-    { id : Int
-    , name : String
-    , description : String
-    , image : String
-    }
-
-
 type Model
     = Failure Persistance
     | AskForJwt Persistance
@@ -74,13 +60,6 @@ type Model
     | LoadingProducts Persistance (List User)
     | Loaded State
     | ProductView State BuyState
-
-
-type alias Order =
-    { user : User
-    , product : Product
-    , amount : Int
-    }
 
 
 type alias Persistance =
@@ -97,7 +76,7 @@ init persistance =
         ( AskForJwt persistance, Cmd.none )
 
     else
-        ( LoadingUsers persistance, getUsers )
+        ( LoadingUsers persistance, getUsers GotUsers )
 
 
 
@@ -128,7 +107,7 @@ update msg model =
                 Ok users ->
                     case model of
                         LoadingUsers persistance ->
-                            ( LoadingProducts persistance users, getProducts )
+                            ( LoadingProducts persistance users, getProducts GotProducts )
 
                         Loaded state ->
                             ( Loaded { state | offline = False, users = users }, Cmd.none )
@@ -190,7 +169,7 @@ update msg model =
                             ( model, Cmd.none )
 
         GetUsers persistance ->
-            ( LoadingUsers persistance, getUsers )
+            ( LoadingUsers persistance, getUsers GotUsers )
 
         ClickedUser state user ->
             case model of
@@ -233,7 +212,7 @@ update msg model =
             ( Loaded { state | persistance = new_persistance }, setPersistance new_persistance )
 
         Tick timestamp ->
-            ( model, Cmd.batch [ getUsers, getProducts ] )
+            ( model, Cmd.batch [ getUsers GotUsers, getProducts GotProducts ] )
 
         SyncTick timestamp ->
             let
@@ -322,7 +301,7 @@ update msg model =
                     ( model, Cmd.none )
 
         SetPersistance persistance ->
-            ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers ] )
+            ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers GotUsers ] )
 
         SentOrder result ->
             let
@@ -539,56 +518,6 @@ productView state buyState order =
         , h4 [] [ text productText ]
         , p [] [ text order.product.description ]
         ]
-
-
-
--- HTTP
-
-
-getUsers : Cmd Msg
-getUsers =
-    Http.get
-        { url = "http://localhost:3000/users?active=eq.true&order=name.asc"
-        , expect = Http.expectJson GotUsers (Json.Decode.list userDecoder)
-        }
-
-
-getProducts : Cmd Msg
-getProducts =
-    Http.get
-        { url = "http://localhost:3000/products?order=price.asc"
-        , expect = Http.expectJson GotProducts (Json.Decode.list productDecoder)
-        }
-
-
-userDecoder : Decoder User
-userDecoder =
-    Json.Decode.map3 User
-        (field "id" int)
-        (field "name" string)
-        (field "avatar" string)
-
-
-productDecoder : Decoder Product
-productDecoder =
-    Json.Decode.map4 Product
-        (field "id" int)
-        (field "name" string)
-        (field "description" string)
-        (field "image" string)
-
-
-product2order user product =
-    Order user product 0
-
-
-resetAmount : Order -> Order
-resetAmount order =
-    { order | amount = 0 }
-
-
-user2str user =
-    user.name ++ "$" ++ user.avatar ++ "$" ++ String.fromInt user.id
 
 
 port setPersistance : Persistance -> Cmd msg

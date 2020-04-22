@@ -1,6 +1,6 @@
 .PHONY: fmt all
 
-static/main.js: src/Main.elm src/Design.elm
+static/main.js: src/Main.elm src/Design.elm src/Common.elm
 	elm-format src --yes
 	elm make src/Main.elm --optimize --output=static/main.js
 

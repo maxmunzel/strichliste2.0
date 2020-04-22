@@ -409,7 +409,10 @@ view model =
             in
             div [ style "margin" "10px 10px 10px 10px " ]
                 [ h1 [] [ text title ]
-                , Html.Keyed.node "div" Design.gridStyle (List.map (\u -> ( user2str u, userView state u )) state.users)
+                , state.users
+                    |> List.filter .active
+                    |> List.map (\u -> ( user2str u, userView state u ))
+                    |> Html.Keyed.node "div" Design.gridStyle
                 ]
 
         Failure persistance ->

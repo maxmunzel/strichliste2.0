@@ -42,10 +42,10 @@ if __name__ == "__main__":
     try:
         import jwt
 
-        tokens = [
-            jwt.encode({"role": "order_user"}, jwt_secret, algorithm="HS256").decode()
-            for _ in range(10)
-        ]
+        tokens = {
+            user: jwt.encode({"role": user}, jwt_secret, algorithm="HS256").decode()
+            for user in ["order_user", "xxxx_user"]
+        }
     except ModuleNotFoundError:
         print(
             "Error! Could not create JWT Tokens for you - run `pip3 install pyjwt` and try again"

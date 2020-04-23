@@ -31,6 +31,7 @@ grant usage on schema strichliste to web_anon;
 
 grant select on users to web_anon;
 grant select on products to web_anon;
+grant select on orders to web_anon;
 
 create role rest login noinherit password '$PASSWORD';
 grant web_anon to rest;
@@ -49,6 +50,8 @@ grant select, update, insert on users to xxxx_user;
 grant usage, select on sequence users_id_seq to xxxx_user;
 grant select, update, insert on products to xxxx_user;
 grant usage, select on sequence products_id_seq to xxxx_user;
+grant select, update on orders to xxxx_user;
+grant usage, select on sequence orders_id_seq to xxxx_user;
 
 --
 -- Data for Name: products; Type: TABLE DATA; Schema: strichliste; Owner: postgres

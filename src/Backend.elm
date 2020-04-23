@@ -1,7 +1,7 @@
 module Backend exposing (Model, Msg(..), View(..), main, update, view)
 
 import Browser
-import Common exposing (NewProduct, NewUser, Order, Product, User, createProduct, createUser, getProducts, getUsers, updateProduct, updateUser)
+import Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, orderSetUndone, updateProduct, updateUser)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -43,7 +43,9 @@ type Msg
     | NewProductImageChange String
     | NewProductPriceChange String
     | NewProductDescriptionChange String
-
+    | GotOrders (Result Http.Error (List Order))
+    | SetUndone Order Bool
+    | UnDoneSet (Result Http.Error ())
 
 
 type View
@@ -58,6 +60,7 @@ type alias Model =
     , view : View
     , users : List User
     , products : List Product
+    , orders : List Order
     , new_user : NewUser
     , new_product : NewProduct
     , new_product_price : String
@@ -70,11 +73,12 @@ init _ =
       , view = EditOrders
       , products = []
       , users = []
+      , orders = []
       , new_user = NewUser "" ""
       , new_product = NewProduct "" "" "" 0
       , new_product_price = ""
       }
-    , Cmd.batch [ getUsers GotUsers, getProducts GotProducts ]
+    , Cmd.batch [ getUsers GotUsers, getProducts GotProducts, getOrders GotOrders ]
     )
 
 
@@ -90,10 +94,10 @@ update msg model =
             ( { model | view = EditUsers }, getUsers GotUsers )
 
         ShowProducts ->
-            ( { model | view = EditProducts }, Cmd.none )
+            ( { model | view = EditProducts }, getProducts GotProducts )
 
         ShowOrders ->
-            ( { model | view = EditOrders }, Cmd.none )
+            ( { model | view = EditOrders }, getOrders GotOrders )
 
         JwtUpdate text ->
             ( { model | jwtToken = text }, Cmd.none )
@@ -178,11 +182,13 @@ update msg model =
 
                 new_product =
                     model.new_product
-                dummyProduct = NewProduct "" "" "" 0
+
+                dummyProduct =
+                    NewProduct "" "" "" 0
             in
             case price of
                 Ok price_f ->
-                    ( {model | new_product = dummyProduct, new_product_price = ""}, createProduct model.jwtToken { new_product | price = price_f } NewProductCreated )
+                    ( { model | new_product = dummyProduct, new_product_price = "" }, createProduct model.jwtToken { new_product | price = price_f } NewProductCreated )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -215,6 +221,7 @@ update msg model =
 
         NewProductPriceChange text ->
             ( { model | new_product_price = text }, Cmd.none )
+
         NewProductDescriptionChange text ->
             let
                 new_product =
@@ -224,6 +231,21 @@ update msg model =
                     { new_product | description = text }
             in
             ( { model | new_product = new_product_updated }, Cmd.none )
+
+        GotOrders (Err _) ->
+            ( { model | view = Failure }, Cmd.none )
+
+        GotOrders (Ok orders) ->
+            ( { model | orders = orders }, Cmd.none )
+
+        SetUndone order unDone ->
+            ( model, orderSetUndone model.jwtToken order unDone UnDoneSet )
+
+        UnDoneSet (Ok _) ->
+            ( model, getOrders GotOrders )
+
+        UnDoneSet (Err _) ->
+            ( { model | view = Failure }, Cmd.none )
 
 
 
@@ -260,8 +282,52 @@ view model =
             EditProducts ->
                 viewProducts model
 
-            _ ->
-                h2 [] [ text "Dummy" ]
+            EditOrders ->
+                viewOrders model
+
+            Failure ->
+                p [] [ text "Something went wrong. Maybe you have forgotten to fill in the `jwtToken` field in the upper right?\n" ]
+        ]
+
+
+viewOrders model =
+    div []
+        [ table []
+            ([ tr []
+                [ th [] [ text "Time" ], th [] [ text "User" ], th [] [ text "Product" ], th [] [ text "Amount" ], th [] [ text "Undone" ], th [] [] ]
+             ]
+                ++ List.map orderRow model.orders
+            )
+        ]
+
+
+orderRow : Order -> Html Msg
+orderRow order =
+    tr []
+        [ td [] [ text <| String.left 19 <| order.creation_date ]
+        , td [] [ text order.user.name ]
+        , td [] [ text order.product.name ]
+        , td [] [ text <| String.fromInt order.amount ]
+        , td []
+            [ text
+                (if order.unDone then
+                    "Yes"
+
+                 else
+                    "No"
+                )
+            ]
+        , td []
+            [ button [ onClick <| SetUndone order <| not order.unDone ]
+                [ text
+                    (if order.unDone then
+                        "Redo"
+
+                     else
+                        "Undo"
+                    )
+                ]
+            ]
         ]
 
 
@@ -330,7 +396,7 @@ viewProducts model =
     div []
         [ table []
             ([ tr []
-                [ th [] [ text "Name" ], th [] [text "Description"], th [] [ text "Image" ], th [] [ text "Active" ], th [] [ text "Price" ], th [] [] ]
+                [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ], th [] [ text "Active" ], th [] [ text "Price" ], th [] [] ]
              , tr []
                 [ td [] [ input [ placeholder "Name", value model.new_product.name, onInput NewProductNameChange ] [] ]
                 , td [] [ input [ placeholder "Description", value model.new_product.description, onInput NewProductDescriptionChange ] [] ]

@@ -1,7 +1,7 @@
-port module Main exposing (BuyState, Model(..), Msg(..), Persistance, State, SyncState(..), areOrdersEmpty, init, main, productView, setPersistance, subscriptions, update, userView, view)
+port module Main exposing (BuyState, Model(..), Msg(..), Persistance, State, SyncState(..), areNewOrdersEmpty, init, main, productView, setPersistance, subscriptions, update, userView, view)
 
 import Browser
-import Common exposing (Order, Product, User, getProducts, getUsers, product2order, resetAmount, user2str, userDecoder)
+import Common exposing (NewOrder, Product, User, getProducts, getUsers, hostname, product2order, resetAmount, user2str, userDecoder)
 import Debug
 import Design
 import Html exposing (..)
@@ -49,7 +49,7 @@ type
 
 type alias BuyState =
     { user : User
-    , orders : List Order
+    , orders : List NewOrder
     }
 
 
@@ -65,7 +65,7 @@ type Model
 type alias Persistance =
     -- Everything we want to be in LocalStorage
     { jwtToken : String
-    , orders : List Order
+    , orders : List NewOrder
     , location : String
     }
 
@@ -87,16 +87,16 @@ type Msg
     = GotUsers (Result Http.Error (List User))
     | GotProducts (Result Http.Error (List Product))
     | ClickedUser State User
-    | ClickedProduct State BuyState Order
+    | ClickedProduct State BuyState NewOrder
     | GetUsers Persistance
     | ResetAmounts State BuyState
-    | CommitOrder State BuyState
+    | CommitNewOrder State BuyState
     | Tick Time.Posix
     | SyncTick Time.Posix
     | AskForJwtTextUpdate String
     | AskForJwtLocationUpdate String
     | SetPersistance Persistance
-    | SentOrder (Result Http.Error ())
+    | SentNewOrder (Result Http.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -156,7 +156,7 @@ update msg model =
                             ( Loaded { state | offline = False }, Cmd.none )
 
                         ProductView state buyState ->
-                            if areOrdersEmpty buyState.orders then
+                            if areNewOrdersEmpty buyState.orders then
                                 ( ProductView state
                                     { buyState | orders = List.map (product2order buyState.user) products }
                                 , Cmd.none
@@ -181,7 +181,7 @@ update msg model =
 
         ClickedProduct state buyState order ->
             let
-                newOrders =
+                newNewOrders =
                     List.map
                         (\o ->
                             if o.product.id == order.product.id then
@@ -192,13 +192,13 @@ update msg model =
                         )
                         buyState.orders
             in
-            ( ProductView state { buyState | orders = newOrders }, Cmd.none )
+            ( ProductView state { buyState | orders = newNewOrders }, Cmd.none )
 
         ResetAmounts state buyState ->
             ( ProductView state { buyState | orders = List.map resetAmount buyState.orders }, Cmd.none )
 
-        CommitOrder state buyState ->
-            -- TODO: Send Order to Backend
+        CommitNewOrder state buyState ->
+            -- TODO: Send NewOrder to Backend
             let
                 new_orders =
                     List.filter (\o -> o.amount > 0) buyState.orders
@@ -216,14 +216,8 @@ update msg model =
 
         SyncTick timestamp ->
             let
-                {--type alias Request =
-                    { user_id : Int
-                    , product_id : Int
-                    , amount : Int
-                    , location : String
-                    } --}
-                packOrder : Persistance -> Order -> Json.Encode.Value
-                packOrder persistance order =
+                packNewOrder : Persistance -> NewOrder -> Json.Encode.Value
+                packNewOrder persistance order =
                     Json.Encode.object
                         [ ( "user_id", Json.Encode.int order.user.id )
                         , ( "product_id", Json.Encode.int order.product.id )
@@ -249,8 +243,8 @@ update msg model =
                                         { url = "http://localhost:3000/orders"
                                         , method = "POST"
                                         , headers = [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken) ]
-                                        , body = Http.jsonBody <| packOrder state.persistance <| order
-                                        , expect = Http.expectWhatever SentOrder
+                                        , body = Http.jsonBody <| packNewOrder state.persistance <| order
+                                        , expect = Http.expectWhatever SentNewOrder
                                         , timeout = Nothing
                                         , tracker = Nothing
                                         }
@@ -303,7 +297,7 @@ update msg model =
         SetPersistance persistance ->
             ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers GotUsers ] )
 
-        SentOrder result ->
+        SentNewOrder result ->
             let
                 persistance =
                     case model of
@@ -432,14 +426,14 @@ view model =
         ProductView state buyState ->
             let
                 confirmText =
-                    if areOrdersEmpty buyState.orders then
+                    if areNewOrdersEmpty buyState.orders then
                         "Zurück"
 
                     else
                         "Bestätigen"
 
                 resetVisible =
-                    if areOrdersEmpty buyState.orders then
+                    if areNewOrdersEmpty buyState.orders then
                         "hidden"
 
                     else
@@ -462,7 +456,7 @@ view model =
                     , div [ style "width" "20px" ] []
                     , h1 [] [ text buyState.user.name ]
                     , div [ style "width" "20px" ] []
-                    , button [ onClick (CommitOrder state buyState) ] [ text confirmText ]
+                    , button [ onClick (CommitNewOrder state buyState) ] [ text confirmText ]
                     , button [ onClick (ResetAmounts state buyState), style "visibility" resetVisible ] [ text "Zurücksetzen" ]
                     ]
                 , Design.grid
@@ -470,8 +464,8 @@ view model =
                 ]
 
 
-areOrdersEmpty : List Order -> Bool
-areOrdersEmpty orders =
+areNewOrdersEmpty : List NewOrder -> Bool
+areNewOrdersEmpty orders =
     List.sum (List.map (\o -> o.amount) orders) == 0
 
 
@@ -498,7 +492,7 @@ userView state user =
         ]
 
 
-productView : State -> BuyState -> Order -> Html Msg
+productView : State -> BuyState -> NewOrder -> Html Msg
 productView state buyState order =
     let
         productText =

@@ -1,4 +1,4 @@
-module Common exposing (NewProduct, NewUser, Order, Product, User, createProduct, createUser, getProducts, getUsers, product2order, productDecoder, resetAmount, updateProduct, updateUser, user2str, userDecoder)
+module Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, hostname, orderSetUndone, product2order, productDecoder, resetAmount, updateProduct, updateUser, user2str, userDecoder)
 
 import Http
 import Json.Decode exposing (Decoder, bool, field, float, int, list, string, value)
@@ -48,6 +48,18 @@ type alias NewProduct =
 
 
 type alias Order =
+    -- Model for an order used for display
+    { id : Int
+    , creation_date : String
+    , product : Product
+    , user : User
+    , amount : Int
+    , unDone : Bool
+    , location : String
+    }
+
+
+type alias NewOrder =
     { user : User
     , product : Product
     , amount : Int
@@ -69,6 +81,13 @@ getProducts msg =
     Http.get
         { url = hostname ++ "/products?order=price.asc"
         , expect = Http.expectJson msg (Json.Decode.list productDecoder)
+        }
+
+
+getOrders msg =
+    Http.get
+        { url = hostname ++ "/orders?select=*,user:users(*),product:products(*)&limit=200&order=creation_date.desc"
+        , expect = Http.expectJson msg (Json.Decode.list orderDecoder)
         }
 
 
@@ -168,11 +187,23 @@ createProduct jwtToken product msg =
         }
 
 
+orderDecoder : Decoder Order
+orderDecoder =
+    Json.Decode.map7 Order
+        (field "id" int)
+        (field "creation_date" string)
+        (field "product" productDecoder)
+        (field "user" userDecoder)
+        (field "amount" int)
+        (field "undone" bool)
+        (field "location" string)
+
+
 product2order user product =
-    Order user product 0
+    NewOrder user product 0
 
 
-resetAmount : Order -> Order
+resetAmount : NewOrder -> NewOrder
 resetAmount order =
     { order | amount = 0 }
 
@@ -187,6 +218,22 @@ createUser jwtToken user msg =
         , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
         , url = hostname ++ "/users"
         , body = Http.jsonBody <| newUserEncoder <| user
+        , expect = Http.expectWhatever msg
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+
+orderSetUndone jwtToken order unDone msg =
+    let
+        payload =
+            Json.Encode.object [ ( "undone", Json.Encode.bool unDone ) ]
+    in
+    Http.request
+        { method = "PATCH"
+        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
+        , url = hostname ++ "/orders?id=eq." ++ String.fromInt order.id
+        , body = Http.jsonBody payload
         , expect = Http.expectWhatever msg
         , timeout = Nothing
         , tracker = Nothing

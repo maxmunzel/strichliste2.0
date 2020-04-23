@@ -1,11 +1,12 @@
 module Backend exposing (Model, Msg(..), View(..), main, update, view)
 
 import Browser
-import Common exposing (NewUser, Order, Product, User, createUser, getProducts, getUsers, updateUser)
+import Common exposing (NewProduct, NewUser, Order, Product, User, createProduct, createUser, getProducts, getUsers, updateProduct, updateUser)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
+import Parser
 
 
 hostname =
@@ -28,12 +29,19 @@ type Msg
     | JwtUpdate String
     | UpdateUser User
     | UpdatedUser (Result Http.Error ())
+    | UpdateProduct Product
+    | UpdatedProduct (Result Http.Error ())
     | GotUsers (Result Http.Error (List User))
     | GotProducts (Result Http.Error (List Product))
     | CreateNewUser
+    | CreateNewProduct
     | NewUserCreated (Result Http.Error ())
     | NewUserNameChange String
     | NewUserAvatarChange String
+    | NewProductCreated (Result Http.Error ())
+    | NewProductNameChange String
+    | NewProductImageChange String
+    | NewProductPriceChange String
 
 
 type View
@@ -49,12 +57,23 @@ type alias Model =
     , users : List User
     , products : List Product
     , new_user : NewUser
+    , new_product : NewProduct
+    , new_product_price : String
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { jwtToken = "", view = EditOrders, products = [], users = [], new_user = NewUser "" "" }, Cmd.batch [ getUsers GotUsers, getProducts GotProducts ] )
+    ( { jwtToken = ""
+      , view = EditOrders
+      , products = []
+      , users = []
+      , new_user = NewUser "" ""
+      , new_product = NewProduct "" "" "" 0
+      , new_product_price = ""
+      }
+    , Cmd.batch [ getUsers GotUsers, getProducts GotProducts ]
+    )
 
 
 
@@ -64,6 +83,7 @@ init _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        -- General
         ShowUsers ->
             ( { model | view = EditUsers }, getUsers GotUsers )
 
@@ -92,8 +112,9 @@ update msg model =
                 Ok products ->
                     ( { model | products = products }, Cmd.none )
 
+        -- User View
         UpdateUser user ->
-            ( model, Cmd.batch [ updateUser model.jwtToken user UpdatedUser ] )
+            ( model, updateUser model.jwtToken user UpdatedUser )
 
         UpdatedUser (Err _) ->
             ( { model | view = Failure }, Cmd.none )
@@ -106,6 +127,7 @@ update msg model =
 
         NewUserCreated (Ok _) ->
             ( model, getUsers GotUsers )
+
         NewUserAvatarChange text ->
             let
                 new_user =
@@ -127,7 +149,69 @@ update msg model =
             ( { model | new_user = new_user_updated }, Cmd.none )
 
         CreateNewUser ->
-            ( {model | new_user ={name= "", avatar= ""} }, createUser model.jwtToken model.new_user NewUserCreated )
+            ( { model | new_user = { name = "", avatar = "" } }, createUser model.jwtToken model.new_user NewUserCreated )
+
+        -- Product View
+        UpdateProduct product ->
+            ( model, updateProduct model.jwtToken product UpdatedProduct )
+
+        UpdatedProduct (Ok _) ->
+            ( model, getProducts GotProducts )
+
+        UpdatedProduct (Err _) ->
+            ( { model | view = Failure }, Cmd.none )
+
+        CreateNewProduct ->
+            let
+                stripZero string =
+                    -- Elm doesn't parse leading 0s in numbers
+                    if String.startsWith "0" string then
+                        stripZero <| String.dropLeft 1 string
+
+                    else
+                        string
+
+                price =
+                    Parser.run Parser.float <| String.replace "," "." <| stripZero <| model.new_product_price
+
+                new_product =
+                    model.new_product
+            in
+            case price of
+                Ok price_f ->
+                    ( model, createProduct model.jwtToken { new_product | price = price_f } NewProductCreated )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        NewProductCreated (Ok _) ->
+            ( model, getProducts GotProducts )
+
+        NewProductCreated (Err _) ->
+            ( { model | view = Failure }, Cmd.none )
+
+        NewProductNameChange text ->
+            let
+                new_product =
+                    model.new_product
+
+                new_product_updated =
+                    { new_product | name = text }
+            in
+            ( { model | new_product = new_product_updated }, Cmd.none )
+
+        NewProductImageChange text ->
+            let
+                new_product =
+                    model.new_product
+
+                new_product_updated =
+                    { new_product | image = text }
+            in
+            ( { model | new_product = new_product_updated }, Cmd.none )
+
+        NewProductPriceChange text ->
+            ( { model | new_product_price = text }, Cmd.none )
 
 
 
@@ -160,6 +244,9 @@ view model =
         , case model.view of
             EditUsers ->
                 viewUsers model
+
+            EditProducts ->
+                viewProducts model
 
             _ ->
                 h2 [] [ text "Dummy" ]
@@ -201,6 +288,69 @@ userRow user =
             [ button [ onClick <| UpdateUser { user | active = not user.active } ]
                 [ text
                     (if user.active then
+                        " Deactivate"
+
+                     else
+                        "Activate"
+                    )
+                ]
+            ]
+        ]
+
+
+viewProducts : Model -> Html Msg
+viewProducts model =
+    let
+        products_ordered =
+            model.products
+                |> List.sortBy .id
+                |> List.sortBy .name
+                |> List.sortBy .price
+                |> List.sortBy
+                    (\p ->
+                        if p.active then
+                            0
+
+                        else
+                            1
+                    )
+    in
+    div []
+        [ table []
+            ([ tr []
+                [ th [] [ text "Name" ], th [] [ text "Image" ], th [] [ text "Active" ], th [] [ text "Price" ], th [] [] ]
+             , tr []
+                [ td [] [ input [ placeholder "Name", value model.new_product.name, onInput NewProductNameChange ] [] ]
+                , td [] [ input [ placeholder "Image", value model.new_product.image, onInput NewProductImageChange ] [] ]
+                , td [] []
+                , td [] [ input [ placeholder "Price", value model.new_product_price, onInput NewProductPriceChange ] [] ]
+                , td [] [ button [ onClick CreateNewProduct ] [ text "Create new" ] ]
+                ]
+             ]
+                ++ List.map productRow products_ordered
+            )
+        ]
+
+
+productRow : Product -> Html Msg
+productRow product =
+    tr []
+        [ td [] [ text product.name ]
+        , td [] [ text product.image ]
+        , td []
+            [ text
+                (if product.active then
+                    "Yes"
+
+                 else
+                    "No"
+                )
+            ]
+        , td [] [ text <| String.fromFloat <| product.price ]
+        , td []
+            [ button [ onClick <| UpdateProduct { product | active = not product.active } ]
+                [ text
+                    (if product.active then
                         " Deactivate"
 
                      else

@@ -12,7 +12,8 @@ create table products (
     name text not null,
     description text default '' not null,
     image text not null,
-    price numeric not null
+    price numeric not null,
+    active boolean not null default true
 );
 
 create table orders (
@@ -42,9 +43,13 @@ grant usage, select on sequence orders_id_seq to order_user;
 
 create role xxxx_user nologin;
 grant usage on schema strichliste to xxxx_user;
+grant xxxx_user to rest;
+
 grant select, update, insert on users to xxxx_user;
 grant usage, select on sequence users_id_seq to xxxx_user;
-grant xxxx_user to rest;
+grant select, update, insert on products to xxxx_user;
+grant usage, select on sequence products_id_seq to xxxx_user;
+
 --
 -- Data for Name: products; Type: TABLE DATA; Schema: strichliste; Owner: postgres
 --

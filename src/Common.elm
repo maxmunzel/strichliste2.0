@@ -1,7 +1,7 @@
-module Common exposing (NewUser, Order, Product, User, createUser, getProducts, getUsers, product2order, productDecoder, resetAmount, updateUser, user2str, userDecoder)
+module Common exposing (NewProduct, NewUser, Order, Product, User, createProduct, createUser, getProducts, getUsers, product2order, productDecoder, resetAmount, updateProduct, updateUser, user2str, userDecoder)
 
 import Http
-import Json.Decode exposing (Decoder, bool, field, int, list, string, value)
+import Json.Decode exposing (Decoder, bool, field, float, int, list, string, value)
 import Json.Encode
 
 
@@ -33,6 +33,17 @@ type alias Product =
     , name : String
     , description : String
     , image : String
+    , active : Bool
+    , price : Float
+    }
+
+
+type alias NewProduct =
+    -- Model for a product we want to create. It therefor lacks technical fields like `id`
+    { name : String
+    , description : String
+    , image : String
+    , price : Float
     }
 
 
@@ -73,6 +84,18 @@ updateUser jwtToken user msg =
         }
 
 
+updateProduct jwtToken product msg =
+    Http.request
+        { method = "PATCH"
+        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
+        , url = hostname ++ "/products?id=eq." ++ String.fromInt product.id
+        , body = Http.jsonBody <| productEncoder <| product
+        , expect = Http.expectWhatever msg
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+
 userDecoder : Decoder User
 userDecoder =
     Json.Decode.map4 User
@@ -102,11 +125,47 @@ newUserEncoder user =
 
 productDecoder : Decoder Product
 productDecoder =
-    Json.Decode.map4 Product
+    Json.Decode.map6 Product
         (field "id" int)
         (field "name" string)
         (field "description" string)
         (field "image" string)
+        (field "active" bool)
+        (field "price" float)
+
+
+productEncoder : Product -> Json.Encode.Value
+productEncoder product =
+    Json.Encode.object
+        [ ( "id", Json.Encode.int product.id )
+        , ( "name", Json.Encode.string product.name )
+        , ( "description", Json.Encode.string product.description )
+        , ( "image", Json.Encode.string product.image )
+        , ( "active", Json.Encode.bool product.active )
+        , ( "price", Json.Encode.float product.price )
+        ]
+
+
+newProductEncoder : NewProduct -> Json.Encode.Value
+newProductEncoder product =
+    Json.Encode.object
+        [ ( "name", Json.Encode.string product.name )
+        , ( "description", Json.Encode.string product.description )
+        , ( "image", Json.Encode.string product.image )
+        , ( "price", Json.Encode.float product.price )
+        ]
+
+
+createProduct jwtToken product msg =
+    Http.request
+        { method = "POST"
+        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
+        , url = hostname ++ "/products"
+        , body = Http.jsonBody <| newProductEncoder <| product
+        , expect = Http.expectWhatever msg
+        , timeout = Nothing
+        , tracker = Nothing
+        }
 
 
 product2order user product =

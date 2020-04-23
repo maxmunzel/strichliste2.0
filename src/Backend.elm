@@ -42,6 +42,8 @@ type Msg
     | NewProductNameChange String
     | NewProductImageChange String
     | NewProductPriceChange String
+    | NewProductDescriptionChange String
+
 
 
 type View
@@ -165,7 +167,7 @@ update msg model =
             let
                 stripZero string =
                     -- Elm doesn't parse leading 0s in numbers
-                    if String.startsWith "0" string then
+                    if String.startsWith "0" string && String.length string > 1 then
                         stripZero <| String.dropLeft 1 string
 
                     else
@@ -176,10 +178,11 @@ update msg model =
 
                 new_product =
                     model.new_product
+                dummyProduct = NewProduct "" "" "" 0
             in
             case price of
                 Ok price_f ->
-                    ( model, createProduct model.jwtToken { new_product | price = price_f } NewProductCreated )
+                    ( {model | new_product = dummyProduct, new_product_price = ""}, createProduct model.jwtToken { new_product | price = price_f } NewProductCreated )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -212,6 +215,15 @@ update msg model =
 
         NewProductPriceChange text ->
             ( { model | new_product_price = text }, Cmd.none )
+        NewProductDescriptionChange text ->
+            let
+                new_product =
+                    model.new_product
+
+                new_product_updated =
+                    { new_product | description = text }
+            in
+            ( { model | new_product = new_product_updated }, Cmd.none )
 
 
 
@@ -318,9 +330,10 @@ viewProducts model =
     div []
         [ table []
             ([ tr []
-                [ th [] [ text "Name" ], th [] [ text "Image" ], th [] [ text "Active" ], th [] [ text "Price" ], th [] [] ]
+                [ th [] [ text "Name" ], th [] [text "Description"], th [] [ text "Image" ], th [] [ text "Active" ], th [] [ text "Price" ], th [] [] ]
              , tr []
                 [ td [] [ input [ placeholder "Name", value model.new_product.name, onInput NewProductNameChange ] [] ]
+                , td [] [ input [ placeholder "Description", value model.new_product.description, onInput NewProductDescriptionChange ] [] ]
                 , td [] [ input [ placeholder "Image", value model.new_product.image, onInput NewProductImageChange ] [] ]
                 , td [] []
                 , td [] [ input [ placeholder "Price", value model.new_product_price, onInput NewProductPriceChange ] [] ]
@@ -336,6 +349,7 @@ productRow : Product -> Html Msg
 productRow product =
     tr []
         [ td [] [ text product.name ]
+        , td [] [ text product.description ]
         , td [] [ text product.image ]
         , td []
             [ text

@@ -343,24 +343,30 @@ update msg model =
                         Err _ ->
                             True
             in
-            case model of
-                Failure _ ->
-                    ( Failure new_persistance, setPersistance new_persistance )
+            case result of
+                Err (Http.BadStatus 401) ->
+                    -- 401: Unauthorized
+                    ( AskForJwt persistance, Cmd.none )
 
-                AskForJwt _ ->
-                    ( AskForJwt new_persistance, setPersistance new_persistance )
+                _ ->
+                    case model of
+                        Failure _ ->
+                            ( Failure new_persistance, setPersistance new_persistance )
 
-                LoadingUsers _ ->
-                    ( LoadingUsers new_persistance, setPersistance new_persistance )
+                        AskForJwt _ ->
+                            ( AskForJwt new_persistance, setPersistance new_persistance )
 
-                LoadingProducts _ users ->
-                    ( LoadingProducts new_persistance users, setPersistance new_persistance )
+                        LoadingUsers _ ->
+                            ( LoadingUsers new_persistance, setPersistance new_persistance )
 
-                Loaded state ->
-                    ( Loaded { state | persistance = new_persistance, sync = Idle }, setPersistance new_persistance )
+                        LoadingProducts _ users ->
+                            ( LoadingProducts new_persistance users, setPersistance new_persistance )
 
-                ProductView state buyState ->
-                    ( ProductView { state | persistance = new_persistance, sync = Idle } buyState, setPersistance new_persistance )
+                        Loaded state ->
+                            ( Loaded { state | persistance = new_persistance, sync = Idle }, setPersistance new_persistance )
+
+                        ProductView state buyState ->
+                            ( ProductView { state | persistance = new_persistance, sync = Idle } buyState, setPersistance new_persistance )
 
 
 

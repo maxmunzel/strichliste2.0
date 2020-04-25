@@ -396,7 +396,7 @@ viewProducts model =
     div []
         [ table []
             ([ tr []
-                [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ], th [] [ text "Active" ], th [] [ text "Price" ], th [] [] ]
+                [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ],  th [] [ text "Price" ], th [] [] ]
              , tr []
                 [ td [] [ input [ placeholder "Name", value model.new_product.name, onInput NewProductNameChange ] [] ]
                 , td [] [ input [ placeholder "Description", value model.new_product.description, onInput NewProductDescriptionChange ] [] ]
@@ -417,15 +417,6 @@ productRow product =
         [ td [] [ text product.name ]
         , td [] [ text product.description ]
         , td [] [ text product.image ]
-        , td []
-            [ text
-                (if product.active then
-                    "Yes"
-
-                 else
-                    "No"
-                )
-            ]
         , td [] [ text <| String.fromFloat <| product.price ]
         , td []
             [ button [ onClick <| UpdateProduct { product | active = not product.active } ]

@@ -79,7 +79,7 @@ getUsers msg =
 
 getProducts msg =
     Http.get
-        { url = hostname ++ "/products?order=price.asc"
+        { url = hostname ++ "/products?order=price.asc&active=eq.true"
         , expect = Http.expectJson msg (Json.Decode.list productDecoder)
         }
 

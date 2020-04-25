@@ -13,6 +13,8 @@ create table products (
     description text default '' not null,
     image text not null,
     price numeric not null,
+    volume_in_ml float not null,
+    alcohol_content float not null,
     active boolean not null default true
 );
 
@@ -57,14 +59,14 @@ grant usage, select on sequence orders_id_seq to xxxx_user;
 -- Data for Name: products; Type: TABLE DATA; Schema: strichliste; Owner: postgres
 --
 
-COPY products (name, description, image, price) FROM stdin;
-Ötti Softdrinks		/static/product_pics/A.png	0.35
-Ötti Bier		/static/product_pics/B.png	0.40
-Bier 0,3	Rothaus, Radler	/static/product_pics/C.jpg	0.8
-Bier Premium	Augustiner, Goldköpfle, Bleifrei	/static/product_pics/D.jpg	1.1
-Paulaner Spezi		/static/product_pics/Spezi.png	0.8
-Sprudel		/static/product_pics/Sprudel.png	0.4
-Mate		/static/product_pics/Mate.jpg	1.1
+COPY products (name, description, image, price, volume_in_ml, alcohol_content) FROM stdin;
+Ötti Softdrinks		/static/product_pics/A.png	0.35	500	0.0
+Ötti Bier		/static/product_pics/B.png	0.40	500	0.05
+Bier 0,3	Rothaus, Radler	/static/product_pics/C.jpg	0.8	300	0.05
+Bier Premium	Augustiner, Goldköpfle, Bleifrei	/static/product_pics/D.jpg	1.1	500	0.05
+Paulaner Spezi		/static/product_pics/Spezi.png	0.8	500	0.0
+Sprudel		/static/product_pics/Sprudel.png	0.4	750	0.0
+Mate		/static/product_pics/Mate.jpg	1.1	500	0.0
 \.
 
 

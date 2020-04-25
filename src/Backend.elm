@@ -42,6 +42,8 @@ type Msg
     | NewProductNameChange String
     | NewProductImageChange String
     | NewProductPriceChange String
+    | NewProductAlcoholChange String
+    | NewProductVolumeChange String
     | NewProductDescriptionChange String
     | GotOrders (Result Http.Error (List Order))
     | SetUndone Order Bool
@@ -64,6 +66,8 @@ type alias Model =
     , new_user : NewUser
     , new_product : NewProduct
     , new_product_price : String
+    , new_product_volume : String
+    , new_product_alcohol_content : String
     }
 
 
@@ -75,8 +79,10 @@ init _ =
       , users = []
       , orders = []
       , new_user = NewUser "" ""
-      , new_product = NewProduct "" "" "" 0
+      , new_product = NewProduct "" "" "" 0 0 0
       , new_product_price = ""
+      , new_product_alcohol_content = ""
+      , new_product_volume = ""
       }
     , Cmd.batch [ getUsers GotUsers, getProducts GotProducts, getOrders GotOrders ]
     )
@@ -180,17 +186,36 @@ update msg model =
                 price =
                     Parser.run Parser.float <| String.replace "," "." <| stripZero <| model.new_product_price
 
+                alcohol_content =
+                    Parser.run Parser.float <| String.replace "," "." <| stripZero <| model.new_product_alcohol_content
+
+                volume_in_ml =
+                    Parser.run Parser.float <| String.replace "," "." <| stripZero <| model.new_product_volume
+
                 new_product =
                     model.new_product
 
                 dummyProduct =
-                    NewProduct "" "" "" 0
+                    NewProduct "" "" "" 0 0 0
             in
-            case price of
-                Ok price_f ->
-                    ( { model | new_product = dummyProduct, new_product_price = "" }, createProduct model.jwtToken { new_product | price = price_f } NewProductCreated )
+            case ( price, volume_in_ml, alcohol_content ) of
+                ( Ok price_f, Ok volume_in_ml_f, Ok alcohol_content_f ) ->
+                    ( { model
+                        | new_product = dummyProduct
+                        , new_product_price = ""
+                        , new_product_volume = ""
+                        , new_product_alcohol_content = ""
+                      }
+                    , createProduct model.jwtToken
+                        { new_product
+                            | price = price_f
+                            , volume_in_ml = volume_in_ml_f
+                            , alcohol_content = alcohol_content_f
+                        }
+                        NewProductCreated
+                    )
 
-                Err _ ->
+                _ ->
                     ( model, Cmd.none )
 
         NewProductCreated (Ok _) ->
@@ -221,6 +246,12 @@ update msg model =
 
         NewProductPriceChange text ->
             ( { model | new_product_price = text }, Cmd.none )
+
+        NewProductAlcoholChange text ->
+            ( { model | new_product_alcohol_content = text }, Cmd.none )
+
+        NewProductVolumeChange text ->
+            ( { model | new_product_volume = text }, Cmd.none )
 
         NewProductDescriptionChange text ->
             let
@@ -396,13 +427,14 @@ viewProducts model =
     div []
         [ table []
             ([ tr []
-                [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ],  th [] [ text "Price" ], th [] [] ]
+                [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ], th [] [ text "Price" ], th [] [ text "Volume in Milliliters" ], th [] [ text "Alcohol Content" ] ]
              , tr []
                 [ td [] [ input [ placeholder "Name", value model.new_product.name, onInput NewProductNameChange ] [] ]
                 , td [] [ input [ placeholder "Description", value model.new_product.description, onInput NewProductDescriptionChange ] [] ]
                 , td [] [ input [ placeholder "Image", value model.new_product.image, onInput NewProductImageChange ] [] ]
-                , td [] []
                 , td [] [ input [ placeholder "Price", value model.new_product_price, onInput NewProductPriceChange ] [] ]
+                , td [] [ input [ placeholder "Volume in Milliliters", value model.new_product_volume, onInput NewProductVolumeChange ] [] ]
+                , td [] [ input [ placeholder "Alcohol Content", value model.new_product_alcohol_content, onInput NewProductAlcoholChange ] [] ]
                 , td [] [ button [ onClick CreateNewProduct ] [ text "Create new" ] ]
                 ]
              ]
@@ -418,6 +450,8 @@ productRow product =
         , td [] [ text product.description ]
         , td [] [ text product.image ]
         , td [] [ text <| String.fromFloat <| product.price ]
+        , td [] [ text <| String.fromFloat <| product.volume_in_ml ]
+        , td [] [ text <| String.fromFloat <| product.alcohol_content ]
         , td []
             [ button [ onClick <| UpdateProduct { product | active = not product.active } ]
                 [ text

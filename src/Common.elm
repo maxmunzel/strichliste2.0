@@ -35,6 +35,8 @@ type alias Product =
     , image : String
     , active : Bool
     , price : Float
+    , alcohol_content : Float
+    , volume_in_ml : Float
     }
 
 
@@ -44,6 +46,8 @@ type alias NewProduct =
     , description : String
     , image : String
     , price : Float
+    , alcohol_content : Float
+    , volume_in_ml : Float
     }
 
 
@@ -144,13 +148,15 @@ newUserEncoder user =
 
 productDecoder : Decoder Product
 productDecoder =
-    Json.Decode.map6 Product
+    Json.Decode.map8 Product
         (field "id" int)
         (field "name" string)
         (field "description" string)
         (field "image" string)
         (field "active" bool)
         (field "price" float)
+        (field "alcohol_content" float)
+        (field "volume_in_ml" float)
 
 
 productEncoder : Product -> Json.Encode.Value
@@ -162,6 +168,8 @@ productEncoder product =
         , ( "image", Json.Encode.string product.image )
         , ( "active", Json.Encode.bool product.active )
         , ( "price", Json.Encode.float product.price )
+        , ( "volume_in_ml", Json.Encode.float product.volume_in_ml )
+        , ( "alcohol_content", Json.Encode.float product.alcohol_content )
         ]
 
 
@@ -172,6 +180,8 @@ newProductEncoder product =
         , ( "description", Json.Encode.string product.description )
         , ( "image", Json.Encode.string product.image )
         , ( "price", Json.Encode.float product.price )
+        , ( "volume_in_ml", Json.Encode.float product.volume_in_ml )
+        , ( "alcohol_content", Json.Encode.float product.alcohol_content )
         ]
 
 

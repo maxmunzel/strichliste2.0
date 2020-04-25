@@ -7,3 +7,4 @@ static/main.js
 postgRest.conf
 secrets.json
 static/backend.html
+.idea/

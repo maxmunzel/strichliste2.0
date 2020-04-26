@@ -456,19 +456,19 @@ view model =
 
         ProductView state buyState ->
             let
-                confirmText =
+                confirmButton =
                     if areNewOrdersEmpty buyState.orders then
-                        "Zurück"
+                        Design.button Design.red "Zurück" (CommitNewOrder state buyState)
 
                     else
-                        "Bestätigen"
+                        Design.button Design.green "Eintragen" (CommitNewOrder state buyState)
 
-                resetVisible =
+                resetButton =
                     if areNewOrdersEmpty buyState.orders then
-                        "hidden"
+                        div [] []
 
                     else
-                        "visible"
+                        Design.button Design.yellow "Zurücksetzen" (ResetAmounts state buyState)
             in
             div []
                 [ div
@@ -487,8 +487,9 @@ view model =
                     , div [ style "width" "20px" ] []
                     , h1 [] [ text buyState.user.name ]
                     , div [ style "width" "20px" ] []
-                    , button [ onClick (CommitNewOrder state buyState) ] [ text confirmText ]
-                    , button [ onClick (ResetAmounts state buyState), style "visibility" resetVisible ] [ text "Zurücksetzen" ]
+                    , confirmButton
+                    , div [ style "width" "30px" ] []
+                    , resetButton
                     ]
                 , Design.grid
                     (List.map (productView state buyState) buyState.orders)

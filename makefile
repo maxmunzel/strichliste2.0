@@ -9,8 +9,8 @@ static/main.js: src/Main.elm src/Design.elm src/Common.elm
 static/backend.html: src/Common.elm src/Backend.elm
 	elm make src/Backend.elm --optimize --output=static/backend.html
 
-fmt: index.html static/style.css init.py static/main.js
-	prettier --write index.html
+fmt: static/index.html static/style.css init.py static/main.js
+	prettier --write static/index.html
 	prettier --write static/style.css
 	black .
 

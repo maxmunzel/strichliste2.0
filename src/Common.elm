@@ -6,7 +6,7 @@ import Json.Encode
 
 
 hostname =
-    "http://localhost:3000"
+    "api"
 
 
 
@@ -21,6 +21,14 @@ type alias User =
     , cost_last_30_days : Float
     , cost_this_month : Float
     , cost_last_month : Float
+    }
+
+
+type alias UserNoStat =
+    { id : Int
+    , name : String
+    , avatar : String
+    , active : Bool
     }
 
 
@@ -59,7 +67,7 @@ type alias Order =
     { id : Int
     , creation_date : String
     , product : Product
-    , user : User
+    , user : UserNoStat
     , amount : Int
     , unDone : Bool
     , location : String
@@ -132,6 +140,15 @@ userDecoder =
         (field "cost_last_30_days" float)
         (field "cost_this_month" float)
         (field "cost_last_month" float)
+
+
+userNoStatDecoder : Decoder UserNoStat
+userNoStatDecoder =
+    Json.Decode.map4 UserNoStat
+        (field "id" int)
+        (field "name" string)
+        (field "avatar" string)
+        (field "active" bool)
 
 
 userEncoder : User -> Json.Encode.Value
@@ -209,7 +226,7 @@ orderDecoder =
         (field "id" int)
         (field "creation_date" string)
         (field "product" productDecoder)
-        (field "user" userDecoder)
+        (field "user" userNoStatDecoder)
         (field "amount" int)
         (field "undone" bool)
         (field "location" string)

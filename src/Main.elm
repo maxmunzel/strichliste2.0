@@ -263,7 +263,7 @@ update msg model =
                                 order :: _ ->
                                     ( { state | sync = Sending }
                                     , Http.request
-                                        { url = "http://localhost:3000/orders"
+                                        { url = hostname ++ "/orders"
                                         , method = "POST"
                                         , headers = [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken) ]
                                         , body = Http.jsonBody <| packNewOrder state.persistance <| order

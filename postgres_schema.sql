@@ -114,13 +114,13 @@ grant usage, select on sequence orders_id_seq to xxxx_user;
 --
 
 COPY products (name, description, image, price, volume_in_ml, alcohol_content) FROM stdin;
-Ötti Softdrinks		/static/product_pics/A.png	0.35	500	0.0
-Ötti Bier		/static/product_pics/B.png	0.40	500	0.05
-Bier 0,3	Rothaus, Radler	/static/product_pics/C.jpg	0.8	300	0.05
-Bier Premium	Augustiner, Goldköpfle, Bleifrei	/static/product_pics/D.jpg	1.1	500	0.05
-Paulaner Spezi		/static/product_pics/Spezi.png	0.8	500	0.0
-Sprudel		/static/product_pics/Sprudel.png	0.4	750	0.0
-Mate		/static/product_pics/Mate.jpg	1.1	500	0.0
+Ötti Softdrinks		/product_pics/A.png	0.35	500	0.0
+Ötti Bier		/product_pics/B.png	0.40	500	0.05
+Bier 0,3	Rothaus, Radler	/product_pics/C.jpg	0.8	300	0.05
+Bier Premium	Augustiner, Goldköpfle, Bleifrei	/product_pics/D.jpg	1.1	500	0.05
+Paulaner Spezi		/product_pics/Spezi.png	0.8	500	0.0
+Sprudel		/product_pics/Sprudel.png	0.4	750	0.0
+Mate		/product_pics/Mate.jpg	1.1	500	0.0
 \.
 
 
@@ -129,24 +129,24 @@ Mate		/static/product_pics/Mate.jpg	1.1	500	0.0
 --
 
 COPY users (name, avatar, active) FROM stdin;
-Bocky McBockface	/static/profile_pics/1.jpg	t
-Hello Kitty	/static/profile_pics/2.jpg	t
-Letztes Whiskasmal	/static/profile_pics/3.jpg	t
-Bocky McGraßface	/static/profile_pics/4.jpg	t
-Katze McWäscheleine	/static/profile_pics/5.jpg	t
-Schlecki Giraffe	/static/profile_pics/6.jpg	t
-Rippo Harambee	/static/profile_pics/7.jpg	t
-Dackel Krause	/static/profile_pics/8.jpg	t
-Meormychildren Everagain	/static/profile_pics/9.jpg	t
-Concerned Lion	/static/profile_pics/10.jpg	t
-YouWant Sumfuk	/static/profile_pics/11.jpg	t
-Tiger McSadface	/static/profile_pics/12.jpg	t
-Disturbed Tiger	/static/profile_pics/13.jpg	t
-Bocky McGanja	/static/profile_pics/14.jpg	t
-Matthias Ruppert	/static/profile_pics/15.jpg	t
-Wuffer Aporti	/static/profile_pics/16.jpg	t
-Irgendwas mit Mädchen	/static/profile_pics/17.jpg	t
-Scratchy Kopfy	/static/profile_pics/18.jpg	t
-Wolfy McWallpaper	/static/profile_pics/19.jpg	t
-Reh	/static/profile_pics/0.jpg	t
+Bocky McBockface	/profile_pics/1.jpg	t
+Hello Kitty	/profile_pics/2.jpg	t
+Letztes Whiskasmal	/profile_pics/3.jpg	t
+Bocky McGraßface	/profile_pics/4.jpg	t
+Katze McWäscheleine	/profile_pics/5.jpg	t
+Schlecki Giraffe	/profile_pics/6.jpg	t
+Rippo Harambee	/profile_pics/7.jpg	t
+Dackel Krause	/profile_pics/8.jpg	t
+Meormychildren Everagain	/profile_pics/9.jpg	t
+Concerned Lion	/profile_pics/10.jpg	t
+YouWant Sumfuk	/profile_pics/11.jpg	t
+Tiger McSadface	/profile_pics/12.jpg	t
+Disturbed Tiger	/profile_pics/13.jpg	t
+Bocky McGanja	/profile_pics/14.jpg	t
+Matthias Ruppert	/profile_pics/15.jpg	t
+Wuffer Aporti	/profile_pics/16.jpg	t
+Irgendwas mit Mädchen	/profile_pics/17.jpg	t
+Scratchy Kopfy	/profile_pics/18.jpg	t
+Wolfy McWallpaper	/profile_pics/19.jpg	t
+Reh	/profile_pics/0.jpg	t
 \.

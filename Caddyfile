@@ -1,0 +1,7 @@
+0.0.0.0 {
+    proxy /api localhost:3000 {
+        transparent
+        without /api
+    }
+    root static
+}

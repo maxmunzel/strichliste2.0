@@ -11,6 +11,7 @@ import Html.Keyed
 import Http
 import Json.Decode exposing (Decoder, field, int, list, string, value)
 import Json.Encode
+import Round exposing (round)
 import Time
 
 
@@ -542,8 +543,12 @@ productView state buyState order =
             , style "height" "200px"
             ]
             []
-        , h4 [] [ text productText ]
-        , p [] [ text order.product.description ]
+        , br [] []
+        , b [] [ text productText ]
+        , br [] []
+        , text (Round.round 2 order.product.price ++ "€")
+        , br [] []
+        , text order.product.description
         ]
 
 

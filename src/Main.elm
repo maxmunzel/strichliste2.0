@@ -175,7 +175,7 @@ update msg model =
         ClickedUser state user ->
             case model of
                 Loaded _ ->
-                    ( ProductView state { user = user, orders = List.map (product2order user) state.products }, Cmd.none )
+                    ( ProductView state { user = user, orders = List.map (product2order user) state.products }, scrollToTop () )
 
                 _ ->
                     ( Failure state.persistance, Cmd.none )
@@ -559,3 +559,6 @@ productView state buyState order =
 
 
 port setPersistance : Persistance -> Cmd msg
+
+
+port scrollToTop : () -> Cmd msg

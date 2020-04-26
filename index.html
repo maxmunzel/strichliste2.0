@@ -31,6 +31,9 @@
       app.ports.setPersistance.subscribe(function (data) {
         localStorage.setItem("persistance", JSON.stringify(data));
       });
+      app.ports.scrollToTop.subscribe(function (_) {
+        window.scrollTo(0, 0);
+      });
     </script>
   </body>
 </html>

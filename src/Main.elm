@@ -513,7 +513,7 @@ userView state user =
         [ onClick (ClickedUser state user)
         , style "margin" "10px"
         , style "text-align" "center"
-        , style "touch-action" "none"
+        , style "touch-action" "manipulation"
         ]
         [ img
             [ style "border-radius" "50%"
@@ -545,7 +545,7 @@ productView state buyState order =
         [ onClick (ClickedProduct state buyState order)
         , style "margin" "10px"
         , style "text-align" "center"
-        , style "touch-action" "none"
+        , style "touch-action" "manipulation"
         ]
         [ img
             [ src order.product.image

@@ -1,31 +1,34 @@
 create schema strichliste;
 set search_path to strichliste;
-create table users(
-    id serial primary key,
-    name text not null,
-    avatar text not null,
-    active boolean not null default true 
-);
-
-create table products (
-    id serial primary key,
-    name text not null,
-    description text default '' not null,
-    image text not null,
-    price numeric not null,
-    volume_in_ml float not null,
-    alcohol_content float not null,
+create table users
+(
+    id     serial primary key,
+    name   text    not null,
+    avatar text    not null,
     active boolean not null default true
 );
 
-create table orders (
-    id serial primary key,
-    creation_date timestamptz default NOW() not null,
-    product_id int references products(id),
-    user_id int references users(id),
-    amount int not null,
-    undone boolean not null default false,
-    location TEXT not null
+create table products
+(
+    id              serial primary key,
+    name            text    not null,
+    description     text             default '' not null,
+    image           text    not null,
+    price           numeric not null,
+    volume_in_ml    float   not null,
+    alcohol_content float   not null,
+    active          boolean not null default true
+);
+
+create table orders
+(
+    id            serial primary key,
+    creation_date timestamptz      default NOW() not null,
+    product_id    int references products (id),
+    user_id       int references users (id),
+    amount        int     not null,
+    undone        boolean not null default false,
+    location      TEXT    not null
 );
 
 create view history as

@@ -28,12 +28,63 @@ create table orders (
     location TEXT not null
 );
 
+create view history as
+select u.name                       as "user_name",
+       o.*,
+       p.name                       as "product_name",
+       p.price * o.amount           as "cost",
+       p.alcohol_content * o.amount as "ml_alcohol"
+from users u
+         join orders o on u.id = o.user_id
+         join products p on o.product_id = p.id
+where o.undone = false
+order by o.creation_date desc;
+
+-- Create supporting views for users_and_costs
+
+create view cost_last_30_days as
+select o.user_id, sum(o.amount * p.price) as cost_last_30_days
+from orders o
+         join products p on o.product_id = p.id
+where undone = false
+  and creation_date between now() - interval '1 month' and now()
+group by o.user_id;
+
+create view cost_this_month as
+select o.user_id, sum(o.amount * p.price) as cost_this_month
+from orders o
+         join products p on o.product_id = p.id
+where undone = false
+  and creation_date between date_trunc('month', now()) and now()
+group by o.user_id;
+
+create or replace view cost_last_month as
+select o.user_id, sum(o.amount * p.price) as cost_last_month
+from orders o
+         join products p on o.product_id = p.id
+where undone = false
+  and creation_date between date_trunc('month', now()) - interval '1 month' and date_trunc('month', now())
+group by o.user_id;
+
+-- Create main statistics view for basic metrics
+
+create or replace view users_and_costs as
+select u.*,
+       coalesce(c.cost_last_30_days, 0) as cost_last_30_days,
+       coalesce(t.cost_this_month, 0)   as cost_this_month,
+       coalesce(l.cost_last_month, 0)   as cost_last_month
+from users u
+         left join cost_last_30_days c on u.id = c.user_id
+         left join cost_this_month t on u.id = t.user_id
+         left join cost_last_month l on u.id = l.user_id;
+
 create role web_anon nologin;
 grant usage on schema strichliste to web_anon;
 
 grant select on users to web_anon;
 grant select on products to web_anon;
 grant select on orders to web_anon;
+grant select on users_and_costs to web_anon;
 
 create role rest login noinherit password '$PASSWORD';
 grant web_anon to rest;

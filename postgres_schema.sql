@@ -53,6 +53,14 @@ where undone = false
   and creation_date between now() - interval '1 month' and now()
 group by o.user_id;
 
+create view alc_ml_last_30_days as
+select o.user_id, sum(o.amount * p.alcohol_content * p.volume_in_ml) as alc_ml_last_30_days
+from orders o
+         join products p on o.product_id = p.id
+where undone = false
+  and creation_date between now() - interval '1 month' and now()
+group by o.user_id;
+
 create view cost_this_month as
 select o.user_id, sum(o.amount * p.price) as cost_this_month
 from orders o
@@ -73,13 +81,15 @@ group by o.user_id;
 
 create or replace view users_and_costs as
 select u.*,
-       coalesce(c.cost_last_30_days, 0) as cost_last_30_days,
-       coalesce(t.cost_this_month, 0)   as cost_this_month,
-       coalesce(l.cost_last_month, 0)   as cost_last_month
+       coalesce(c.cost_last_30_days, 0)   as cost_last_30_days,
+       coalesce(t.cost_this_month, 0)     as cost_this_month,
+       coalesce(l.cost_last_month, 0)     as cost_last_month,
+       coalesce(a.alc_ml_last_30_days, 0) as alc_ml_last_30_days
 from users u
          left join cost_last_30_days c on u.id = c.user_id
          left join cost_this_month t on u.id = t.user_id
-         left join cost_last_month l on u.id = l.user_id;
+         left join cost_last_month l on u.id = l.user_id
+         left join alc_ml_last_30_days a on u.id = a.user_id;
 
 create role web_anon nologin;
 grant usage on schema strichliste to web_anon;
@@ -128,25 +138,25 @@ Mate		/product_pics/Mate.jpg	1.1	500	0.0
 -- Data for Name: users; Type: TABLE DATA; Schema: strichliste; Owner: postgres
 --
 
-COPY users (name, avatar, active) FROM stdin;
-Bocky McBockface	/profile_pics/1.jpg	t
-Hello Kitty	/profile_pics/2.jpg	t
-Letztes Whiskasmal	/profile_pics/3.jpg	t
-Bocky McGraßface	/profile_pics/4.jpg	t
-Katze McWäscheleine	/profile_pics/5.jpg	t
-Schlecki Giraffe	/profile_pics/6.jpg	t
-Rippo Harambee	/profile_pics/7.jpg	t
-Dackel Krause	/profile_pics/8.jpg	t
-Meormychildren Everagain	/profile_pics/9.jpg	t
-Concerned Lion	/profile_pics/10.jpg	t
-YouWant Sumfuk	/profile_pics/11.jpg	t
-Tiger McSadface	/profile_pics/12.jpg	t
-Disturbed Tiger	/profile_pics/13.jpg	t
-Bocky McGanja	/profile_pics/14.jpg	t
-Matthias Ruppert	/profile_pics/15.jpg	t
-Wuffer Aporti	/profile_pics/16.jpg	t
-Irgendwas mit Mädchen	/profile_pics/17.jpg	t
-Scratchy Kopfy	/profile_pics/18.jpg	t
-Wolfy McWallpaper	/profile_pics/19.jpg	t
-Reh	/profile_pics/0.jpg	t
+--COPY users (name, avatar, active) FROM stdin;
+--Bocky McBockface	/profile_pics/1.jpg	t
+--Hello Kitty	/profile_pics/2.jpg	t
+--Letztes Whiskasmal	/profile_pics/3.jpg	t
+--Bocky McGraßface	/profile_pics/4.jpg	t
+--Katze McWäscheleine	/profile_pics/5.jpg	t
+--Schlecki Giraffe	/profile_pics/6.jpg	t
+--Rippo Harambee	/profile_pics/7.jpg	t
+--Dackel Krause	/profile_pics/8.jpg	t
+--Meormychildren Everagain	/profile_pics/9.jpg	t
+--Concerned Lion	/profile_pics/10.jpg	t
+--YouWant Sumfuk	/profile_pics/11.jpg	t
+--Tiger McSadface	/profile_pics/12.jpg	t
+--Disturbed Tiger	/profile_pics/13.jpg	t
+--Bocky McGanja	/profile_pics/14.jpg	t
+--Matthias Ruppert	/profile_pics/15.jpg	t
+--Wuffer Aporti	/profile_pics/16.jpg	t
+--Irgendwas mit Mädchen	/profile_pics/17.jpg	t
+--Scratchy Kopfy	/profile_pics/18.jpg	t
+--Wolfy McWallpaper	/profile_pics/19.jpg	t
+--Reh	/profile_pics/0.jpg	t
 \.

@@ -21,6 +21,7 @@ type alias User =
     , cost_last_30_days : Float
     , cost_this_month : Float
     , cost_last_month : Float
+    , alc_ml_last_30_days : Float
     }
 
 
@@ -132,7 +133,7 @@ updateProduct jwtToken product msg =
 
 userDecoder : Decoder User
 userDecoder =
-    Json.Decode.map7 User
+    Json.Decode.map8 User
         (field "id" int)
         (field "name" string)
         (field "avatar" string)
@@ -140,6 +141,7 @@ userDecoder =
         (field "cost_last_30_days" float)
         (field "cost_this_month" float)
         (field "cost_last_month" float)
+        (field "alc_ml_last_30_days" float)
 
 
 userNoStatDecoder : Decoder UserNoStat

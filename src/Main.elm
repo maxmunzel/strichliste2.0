@@ -113,6 +113,9 @@ update msg model =
                         Loaded state ->
                             ( Loaded { state | offline = False, users = users }, Cmd.none )
 
+                        ProductView state buyState ->
+                            ( ProductView { state | users = users, offline = False } buyState, Cmd.none )
+
                         _ ->
                             ( model, Cmd.none )
 
@@ -218,8 +221,13 @@ update msg model =
                         |> List.map (\o -> o.product.price * toFloat o.amount)
                         |> List.sum
 
+                alcohol =
+                    new_orders
+                        |> List.map (\o -> o.product.volume_in_ml * o.product.alcohol_content * toFloat o.amount)
+                        |> List.sum
+
                 user_updated =
-                    { user | cost_last_30_days = user.cost_last_30_days + cost, cost_this_month = user.cost_this_month + cost }
+                    { user | cost_last_30_days = user.cost_last_30_days + cost, cost_this_month = user.cost_this_month + cost, alc_ml_last_30_days = user.alc_ml_last_30_days + alcohol }
 
                 users_updates =
                     state.users
@@ -499,6 +507,8 @@ view model =
                 , p [] [ text <| Round.round 2 buyState.user.cost_this_month ++ "€" ]
                 , h2 [] [ text "Kosten im vergangenen Monat" ]
                 , p [] [ text <| Round.round 2 buyState.user.cost_last_month ++ "€" ]
+                , h2 [] [ text "Liter Bieräquivalent in den letzten 30 Tagen" ]
+                , p [] [ text <| Round.round 2 ((buyState.user.alc_ml_last_30_days / 0.05) / 1000) ]
                 ]
 
 

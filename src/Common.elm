@@ -18,6 +18,9 @@ type alias User =
     , name : String
     , avatar : String
     , active : Bool
+    , cost_last_30_days : Float
+    , cost_this_month : Float
+    , cost_last_month : Float
     }
 
 
@@ -76,7 +79,7 @@ type alias NewOrder =
 
 getUsers msg =
     Http.get
-        { url = hostname ++ "/users?order=name.asc"
+        { url = hostname ++ "/users_and_costs?order=name.asc"
         , expect = Http.expectJson msg (Json.Decode.list userDecoder)
         }
 
@@ -121,11 +124,14 @@ updateProduct jwtToken product msg =
 
 userDecoder : Decoder User
 userDecoder =
-    Json.Decode.map4 User
+    Json.Decode.map7 User
         (field "id" int)
         (field "name" string)
         (field "avatar" string)
         (field "active" bool)
+        (field "cost_last_30_days" float)
+        (field "cost_this_month" float)
+        (field "cost_last_month" float)
 
 
 userEncoder : User -> Json.Encode.Value

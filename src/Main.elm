@@ -208,8 +208,30 @@ update msg model =
 
                 new_persistance =
                     { persistance | orders = persistance.orders ++ new_orders }
+
+                user =
+                    buyState.user
+
+                cost =
+                    new_orders
+                        |> List.map (\o -> o.product.price * toFloat o.amount)
+                        |> List.sum
+
+                user_updated =
+                    { user | cost_last_30_days = user.cost_last_30_days + cost, cost_this_month = user.cost_this_month + cost }
+
+                users_updates =
+                    state.users
+                        |> List.map
+                            (\u ->
+                                if u.id == user.id then
+                                    user_updated
+
+                                else
+                                    u
+                            )
             in
-            ( Loaded { state | persistance = new_persistance }, setPersistance new_persistance )
+            ( Loaded { state | persistance = new_persistance, users = users_updates }, setPersistance new_persistance )
 
         Tick timestamp ->
             ( model, Cmd.batch [ getUsers GotUsers, getProducts GotProducts ] )
@@ -411,6 +433,8 @@ view model =
                 [ h1 [] [ text title ]
                 , state.users
                     |> List.filter .active
+                    |> List.sortBy .name
+                    |> List.sortBy (\u -> -u.cost_last_30_days)
                     |> List.map (\u -> ( user2str u, userView state u ))
                     |> Html.Keyed.node "div" Design.gridStyle
                 ]

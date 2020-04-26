@@ -492,6 +492,12 @@ view model =
                     ]
                 , Design.grid
                     (List.map (productView state buyState) buyState.orders)
+                , h2 [] [ text "Kosten in den letzten 30 Tagen" ]
+                , p [] [ text <| Round.round 2 buyState.user.cost_last_30_days ++ "€" ]
+                , h2 [] [ text "Kosten in diesem Monat" ]
+                , p [] [ text <| Round.round 2 buyState.user.cost_this_month ++ "€" ]
+                , h2 [] [ text "Kosten im vergangenen Monat" ]
+                , p [] [ text <| Round.round 2 buyState.user.cost_last_month ++ "€" ]
                 ]
 
 

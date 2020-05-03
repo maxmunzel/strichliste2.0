@@ -443,7 +443,7 @@ view model =
                 , state.users
                     |> List.filter .active
                     |> List.sortBy .name
-                    |> List.sortBy (\u -> -u.cost_last_30_days)
+                    |> List.sortBy (\u -> -u.alc_ml_last_30_days)
                     |> List.map (\u -> ( user2str u, userView state u ))
                     |> Html.Keyed.node "div" Design.gridStyle
                 ]

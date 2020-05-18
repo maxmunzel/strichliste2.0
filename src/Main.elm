@@ -157,7 +157,7 @@ update msg model =
                             )
 
                         Loaded state ->
-                            ( Loaded { state | offline = False }, Cmd.none )
+                            ( Loaded { state | offline = False, products = products }, Cmd.none )
 
                         ProductView state buyState ->
                             if areNewOrdersEmpty buyState.orders then

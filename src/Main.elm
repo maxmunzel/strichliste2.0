@@ -488,8 +488,8 @@ view model =
                     [ img
                         [ src buyState.user.avatar
                         , style "border-radius" "50%"
-                        , style "width" "50px"
-                        , style "height" "50px"
+                        , style "width" "100px"
+                        , style "height" "100px"
                         ]
                         []
                     , div [ style "width" "20px" ] []
@@ -527,8 +527,8 @@ userView state user =
         ]
         [ img
             [ style "border-radius" "50%"
-            , style "width" "60px"
-            , style "height" "60px"
+            , style "width" "80px"
+            , style "height" "80px"
             , style "align" "center"
             , src user.avatar
             ]

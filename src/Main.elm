@@ -276,7 +276,7 @@ update msg model =
                                         , headers = [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken) ]
                                         , body = Http.jsonBody <| packNewOrder state.persistance <| order
                                         , expect = Http.expectWhatever SentNewOrder
-                                        , timeout = Nothing
+                                        , timeout = Just 1000.0
                                         , tracker = Nothing
                                         }
                                     )

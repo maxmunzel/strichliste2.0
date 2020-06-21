@@ -31,18 +31,18 @@ create table orders
     location      TEXT    not null
 );
 
-create view history as
+create or replace view history as
 select u.name                       as "user_name",
        o.*,
        p.name                       as "product_name",
        p.price * o.amount           as "cost",
-       p.alcohol_content * o.amount as "ml_alcohol"
+       p.alcohol_content * p.volume_in_ml * o.amount as "ml_alcohol",
+       p.alcohol_content * p.volume_in_ml * o.amount * 0.02 as "liters_beer"
 from users u
          join orders o on u.id = o.user_id
          join products p on o.product_id = p.id
 where o.undone = false
 order by o.creation_date desc;
-
 -- Create supporting views for users_and_costs
 
 create view cost_last_30_days as

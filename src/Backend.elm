@@ -154,9 +154,10 @@ update msg model =
             let
                 new_user =
                     model.new_user
-
+                default_avatar = 
+                    "/profile_pics/" ++ (String.toLower text) ++ ".jpg"
                 new_user_updated =
-                    { new_user | name = text }
+                    { new_user | name = text, avatar=default_avatar }
             in
             ( { model | new_user = new_user_updated }, Cmd.none )
 

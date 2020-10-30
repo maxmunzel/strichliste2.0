@@ -161,8 +161,14 @@ update msg model =
 
                         ProductView state buyState ->
                             if areNewOrdersEmpty buyState.orders then
+                                let
+                                    orders =
+                                        products
+                                            |> List.filter (showProduct state.persistance.location)
+                                            |> List.map (product2order buyState.user)
+                                in
                                 ( ProductView state
-                                    { buyState | orders = List.map (product2order buyState.user) products }
+                                    { buyState | orders = orders }
                                 , Cmd.none
                                 )
 
@@ -178,7 +184,13 @@ update msg model =
         ClickedUser state user ->
             case model of
                 Loaded _ ->
-                    ( ProductView state { user = user, orders = List.map (product2order user) state.products }, scrollToTop () )
+                    let
+                        orders =
+                            state.products
+                                |> List.filter (showProduct state.persistance.location)
+                                |> List.map (product2order user)
+                    in
+                    ( ProductView state { user = user, orders = orders }, scrollToTop () )
 
                 _ ->
                     ( Failure state.persistance, Cmd.none )
@@ -510,6 +522,40 @@ view model =
                 , h2 [] [ text "Liter Bieräquivalent in den letzten 30 Tagen" ]
                 , p [] [ text <| Round.round 2 ((buyState.user.alc_ml_last_30_days / 0.05) / 1000) ]
                 ]
+
+
+strip : String -> String
+strip string =
+    -- strips spaces from both sides
+    string
+        |> stripLeft
+        |> stripRight
+
+
+stripLeft string =
+    if String.startsWith " " string then
+        string |> String.dropLeft 1 |> stripLeft
+
+    else
+        string
+
+
+stripRight string =
+    if String.endsWith " " string then
+        string |> String.dropRight 1 |> stripRight
+
+    else
+        string
+
+
+showProduct : String -> Product -> Bool
+showProduct location product =
+    -- whether or not to show a product at a given location
+    product.location
+        |> String.split ","
+        |> List.map strip
+        |> List.map String.toLower
+        |> List.member (location |> String.toLower |> strip)
 
 
 areNewOrdersEmpty : List NewOrder -> Bool

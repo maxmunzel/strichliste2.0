@@ -2,6 +2,7 @@ module Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, cre
 
 import Http
 import Json.Decode exposing (Decoder, bool, field, float, int, list, string, value)
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode
 
 
@@ -49,6 +50,7 @@ type alias Product =
     , price : Float
     , alcohol_content : Float
     , volume_in_ml : Float
+    , location : String
     }
 
 
@@ -60,6 +62,7 @@ type alias NewProduct =
     , price : Float
     , alcohol_content : Float
     , volume_in_ml : Float
+    , location : String
     }
 
 
@@ -173,15 +176,16 @@ newUserEncoder user =
 
 productDecoder : Decoder Product
 productDecoder =
-    Json.Decode.map8 Product
-        (field "id" int)
-        (field "name" string)
-        (field "description" string)
-        (field "image" string)
-        (field "active" bool)
-        (field "price" float)
-        (field "alcohol_content" float)
-        (field "volume_in_ml" float)
+    Json.Decode.succeed Product
+        |> required "id" int
+        |> required "name" string
+        |> required "description" string
+        |> required "image" string
+        |> required "active" bool
+        |> required "price" float
+        |> required "alcohol_content" float
+        |> required "volume_in_ml" float
+        |> required "location" string
 
 
 productEncoder : Product -> Json.Encode.Value

@@ -326,7 +326,7 @@ viewOrders model =
     div []
         [ table []
             ([ tr []
-                [ th [] [ text "Time" ], th [] [ text "User" ], th [] [ text "Product" ], th [] [ text "Amount" ], th [] [ text "Undone" ], th [] [] ]
+                [ th [] [ text "Time" ], th [] [ text "User" ], th [] [ text "Product" ], th [] [ text "Amount" ], th [] [ text "Location" ], th [] [ text "Undone" ], th [] [] ]
              ]
                 ++ List.map orderRow model.orders
             )
@@ -340,6 +340,7 @@ orderRow order =
         , td [] [ text order.user.name ]
         , td [] [ text order.product.name ]
         , td [] [ text <| String.fromInt order.amount ]
+        , td [] [ text order.location ]
         , td []
             [ text
                 (if order.unDone then

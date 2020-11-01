@@ -1,7 +1,7 @@
 module Backend exposing (Model, Msg(..), View(..), main, update, view)
 
 import Browser
-import Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, orderSetUndone, updateProduct, updateUser)
+import Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -45,6 +45,7 @@ type Msg
     | NewProductAlcoholChange String
     | NewProductVolumeChange String
     | NewProductDescriptionChange String
+    | NewProductLocationChange String
     | GotOrders (Result Http.Error (List Order))
     | SetUndone Order Bool
     | UnDoneSet (Result Http.Error ())
@@ -79,7 +80,7 @@ init _ =
       , users = []
       , orders = []
       , new_user = NewUser "" ""
-      , new_product = NewProduct "" "" "" 0 0 0
+      , new_product = NewProduct "" "" "" 0 0 0 productDefaultLocation
       , new_product_price = ""
       , new_product_alcohol_content = ""
       , new_product_volume = ""
@@ -154,10 +155,12 @@ update msg model =
             let
                 new_user =
                     model.new_user
-                default_avatar = 
-                    "/profile_pics/" ++ (String.toLower text) ++ ".jpg"
+
+                default_avatar =
+                    "/profile_pics/" ++ String.toLower text ++ ".jpg"
+
                 new_user_updated =
-                    { new_user | name = text, avatar=default_avatar }
+                    { new_user | name = text, avatar = default_avatar }
             in
             ( { model | new_user = new_user_updated }, Cmd.none )
 
@@ -197,7 +200,7 @@ update msg model =
                     model.new_product
 
                 dummyProduct =
-                    NewProduct "" "" "" 0 0 0
+                    NewProduct "" "" "" 0 0 0 productDefaultLocation
             in
             case ( price, volume_in_ml, alcohol_content ) of
                 ( Ok price_f, Ok volume_in_ml_f, Ok alcohol_content_f ) ->
@@ -263,6 +266,16 @@ update msg model =
                     { new_product | description = text }
             in
             ( { model | new_product = new_product_updated }, Cmd.none )
+
+        NewProductLocationChange text ->
+            let
+                new_product =
+                    model.new_product
+
+                updated_new_product =
+                    { new_product | location = text }
+            in
+            ( { model | new_product = updated_new_product }, Cmd.none )
 
         GotOrders (Err _) ->
             ( { model | view = Failure }, Cmd.none )
@@ -429,7 +442,7 @@ viewProducts model =
     div []
         [ table []
             ([ tr []
-                [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ], th [] [ text "Price" ], th [] [ text "Volume in Milliliters" ], th [] [ text "Alcohol Content" ] ]
+                [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ], th [] [ text "Price" ], th [] [ text "Volume in Milliliters" ], th [] [ text "Alcohol Content" ], th [] [ text "Location" ] ]
              , tr []
                 [ td [] [ input [ placeholder "Name", value model.new_product.name, onInput NewProductNameChange ] [] ]
                 , td [] [ input [ placeholder "Description", value model.new_product.description, onInput NewProductDescriptionChange ] [] ]
@@ -437,6 +450,7 @@ viewProducts model =
                 , td [] [ input [ placeholder "Price", value model.new_product_price, onInput NewProductPriceChange ] [] ]
                 , td [] [ input [ placeholder "Volume in Milliliters", value model.new_product_volume, onInput NewProductVolumeChange ] [] ]
                 , td [] [ input [ placeholder "Alcohol Content", value model.new_product_alcohol_content, onInput NewProductAlcoholChange ] [] ]
+                , td [] [ input [ placeholder "Location", value model.new_product.location, onInput NewProductLocationChange ] [] ]
                 , td [] [ button [ onClick CreateNewProduct ] [ text "Create new" ] ]
                 ]
              ]
@@ -454,6 +468,7 @@ productRow product =
         , td [] [ text <| String.fromFloat <| product.price ]
         , td [] [ text <| String.fromFloat <| product.volume_in_ml ]
         , td [] [ text <| String.fromFloat <| product.alcohol_content ]
+        , td [] [ text product.location ]
         , td []
             [ button [ onClick <| UpdateProduct { product | active = not product.active } ]
                 [ text

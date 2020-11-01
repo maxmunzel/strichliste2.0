@@ -1,4 +1,4 @@
-module Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, hostname, orderSetUndone, product2order, productDecoder, resetAmount, updateProduct, updateUser, user2str, userDecoder)
+module Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, hostname, orderSetUndone, product2order, productDecoder, productDefaultLocation, resetAmount, updateProduct, updateUser, user2str, userDecoder)
 
 import Http
 import Json.Decode exposing (Decoder, bool, field, float, int, list, string, value)
@@ -52,6 +52,11 @@ type alias Product =
     , volume_in_ml : Float
     , location : String
     }
+
+
+productDefaultLocation : String
+productDefaultLocation =
+    "Bar, Kühlschrank EG"
 
 
 type alias NewProduct =
@@ -211,6 +216,7 @@ newProductEncoder product =
         , ( "price", Json.Encode.float product.price )
         , ( "volume_in_ml", Json.Encode.float product.volume_in_ml )
         , ( "alcohol_content", Json.Encode.float product.alcohol_content )
+        , ( "location", Json.Encode.string product.location )
         ]
 
 

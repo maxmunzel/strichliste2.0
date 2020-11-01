@@ -17,8 +17,8 @@ create table products
     price           numeric not null,
     volume_in_ml    float   not null,
     alcohol_content float   not null,
-    active          boolean not null default true
-    location        text    not null default 'Bar, Kühlschrank EG';
+    active          boolean not null default true,
+    location        text    not null default 'Bar, Kühlschrank EG'
 );
 --  ALTER TABLE products ADD location text not null default 'Bar, Kühlschrank EG';
 

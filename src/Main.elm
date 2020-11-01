@@ -458,6 +458,8 @@ view model =
                     |> List.sortBy (\u -> -u.alc_ml_last_30_days)
                     |> List.map (\u -> ( user2str u, userView state u ))
                     |> Html.Keyed.node "div" Design.gridStyle
+                , br [] []
+                , p [] [ text <| "Ort dieses Tablets: " ++ state.persistance.location ]
                 ]
 
         Failure persistance ->

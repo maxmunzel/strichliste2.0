@@ -60,6 +60,7 @@ type Model
     | LoadingUsers Persistance
     | LoadingProducts Persistance (List User)
     | Loaded State
+    | Blank State -- Flush Screen before showing Loaded State (because the Fire Tables are slow)
     | ProductView State BuyState
 
 
@@ -296,6 +297,12 @@ update msg model =
                 -- are we in a model with a `State`? If not, ignore this tick...
             in
             case model of
+                Blank state ->
+                    ( Loaded
+                        (Tuple.first <| updateSync <| state)
+                    , Tuple.second <| updateSync <| state
+                    )
+
                 LoadingUsers _ ->
                     ( model, Cmd.none )
 
@@ -356,6 +363,9 @@ update msg model =
                         LoadingProducts persistance_ users ->
                             persistance_
 
+                        Blank state ->
+                            state.persistance
+
                         Loaded state ->
                             state.persistance
 
@@ -405,6 +415,9 @@ update msg model =
                         LoadingProducts _ users ->
                             ( LoadingProducts new_persistance users, setPersistance new_persistance )
 
+                        Blank state ->
+                            ( Loaded { state | persistance = new_persistance, sync = Idle }, setPersistance new_persistance )
+
                         Loaded state ->
                             ( Loaded { state | persistance = new_persistance, sync = Idle }, setPersistance new_persistance )
 
@@ -440,6 +453,9 @@ view model =
                 , button [ onClick (SetPersistance persistance) ]
                     [ text "Save" ]
                 ]
+
+        Blank _ ->
+            h1 [] [ text "Loading..." ]
 
         Loaded state ->
             let

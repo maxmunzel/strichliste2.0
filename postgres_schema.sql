@@ -161,4 +161,4 @@ Mate		/product_pics/Mate.jpg	1.1	500	0.0
 --Scratchy Kopfy	/profile_pics/18.jpg	t
 --Wolfy McWallpaper	/profile_pics/19.jpg	t
 --Reh	/profile_pics/0.jpg	t
-\.
+--\.

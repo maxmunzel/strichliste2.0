@@ -9,3 +9,5 @@ secrets.json
 static/backend.html
 .idea/
 setup_*.html
+caddy_data/
+pgdata/

@@ -11,10 +11,10 @@ services:
       - 3000:3000
     networks:
       - database
-      - default # TODO: Remove once we add caddy
+      - caddy_api
     
   db:
-    image: postgres
+    image: postgres:13-alpine
     ports:
       - "5432:5432"
     environment:
@@ -27,8 +27,22 @@ services:
       - "./postgres_schema.sql:/docker-entrypoint-initdb.d/schema.sql"
     networks:
       - database
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "./caddy_data:/data"
+      - "./Caddyfile:/etc/caddy/Caddyfile"
+      - "./static:/static"
+    networks:
+      - caddy_api
+      - default
 networks:
   database:
+    internal: true
+  caddy_api:
     internal: true
 
 

@@ -1,0 +1,5 @@
+#! /bin/sh
+# This script is used by the db_backup container to create regular backups
+# of the postgres database. 
+
+pg_dump -U postgres postgres://db:5432 | gzip -9 > /db_backups/`date +%Y-%m-%dT%H:%M:%S`.sql.gz

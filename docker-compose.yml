@@ -27,6 +27,7 @@ services:
       - "./postgres_schema.sql:/docker-entrypoint-initdb.d/schema.sql"
     networks:
       - database
+
   caddy:
     image: caddy:2-alpine
     ports:
@@ -39,10 +40,17 @@ services:
     networks:
       - caddy_api
       - default
+  db_backup:
+    build:
+      context: .
+      dockerfile: db_backup.Dockerfile
+    volumes:
+      - ./db_backups:/db_backups
+    networks:
+      - database
 networks:
   database:
     internal: true
   caddy_api:
     internal: true
-
 

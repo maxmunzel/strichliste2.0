@@ -12,3 +12,4 @@ setup_*.html
 caddy_data/
 pgdata/
 db_backups/
+reports/

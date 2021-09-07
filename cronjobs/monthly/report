@@ -1,0 +1,4 @@
+#! /bin/sh
+# This script is used by the db_backup container to create monthly reports
+
+psql -d postgres://db:5432 -U postgres --csv -c "select * from strichliste.users_and_costs order by name;" > /reports/`date +%Y-%m-%dT%H:%M:%S`.csv

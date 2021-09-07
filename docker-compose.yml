@@ -40,12 +40,15 @@ services:
     networks:
       - caddy_api
       - default
-  db_backup:
+  cron:
     build:
       context: .
-      dockerfile: db_backup.Dockerfile
+      dockerfile: cron.Dockerfile
     volumes:
       - ./db_backups:/db_backups
+      - ./reports:/reports
+      - ./cronjobs/hourly:/etc/periodic/hourly
+      - ./cronjobs/monthly:/etc/periodic/monthly
     networks:
       - database
 networks:

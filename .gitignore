@@ -11,3 +11,4 @@ static/backend.html
 setup_*.html
 caddy_data/
 pgdata/
+db_backups/

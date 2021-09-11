@@ -94,24 +94,39 @@ type alias NewOrder =
 -- http
 
 
-getUsers msg =
-    Http.get
-        { url = hostname ++ "/users_and_costs?order=name.asc"
+getUsers jwtToken msg =
+    Http.request
+        { method = "GET"
+        , url = hostname ++ "/users_and_costs?order=name.asc"
         , expect = Http.expectJson msg (Json.Decode.list userDecoder)
+        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
+        , timeout = Nothing
+        , body = Http.emptyBody
+        , tracker = Nothing
         }
 
 
-getProducts msg =
-    Http.get
+getProducts jwtToken msg =
+    Http.request
         { url = hostname ++ "/products?order=price.asc&active=eq.true"
         , expect = Http.expectJson msg (Json.Decode.list productDecoder)
+        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
+        , method = "GET"
+        , timeout = Nothing
+        , body = Http.emptyBody
+        , tracker = Nothing
         }
 
 
-getOrders msg =
-    Http.get
+getOrders jwtToken msg =
+    Http.request
         { url = hostname ++ "/orders?select=*,user:users(*),product:products(*)&limit=200&order=creation_date.desc"
         , expect = Http.expectJson msg (Json.Decode.list orderDecoder)
+        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
+        , method = "GET"
+        , timeout = Nothing
+        , body = Http.emptyBody
+        , tracker = Nothing
         }
 
 

@@ -78,7 +78,7 @@ init persistance =
         ( AskForJwt persistance, Cmd.none )
 
     else
-        ( LoadingUsers persistance, getUsers GotUsers )
+        ( LoadingUsers persistance, getUsers persistance.jwtToken GotUsers )
 
 
 
@@ -109,7 +109,7 @@ update msg model =
                 Ok users ->
                     case model of
                         LoadingUsers persistance ->
-                            ( LoadingProducts persistance users, getProducts GotProducts )
+                            ( LoadingProducts persistance users, getProducts persistance.jwtToken GotProducts )
 
                         Loaded state ->
                             ( Loaded { state | offline = False, users = users }, Cmd.none )
@@ -180,7 +180,7 @@ update msg model =
                             ( model, Cmd.none )
 
         GetUsers persistance ->
-            ( LoadingUsers persistance, getUsers GotUsers )
+            ( LoadingUsers persistance, getUsers persistance.jwtToken GotUsers )
 
         ClickedUser state user ->
             case model of
@@ -215,7 +215,6 @@ update msg model =
             ( ProductView state { buyState | orders = List.map resetAmount buyState.orders }, Cmd.none )
 
         CommitNewOrder state buyState ->
-            -- TODO: Send NewOrder to Backend
             let
                 new_orders =
                     List.filter (\o -> o.amount > 0) buyState.orders
@@ -256,7 +255,12 @@ update msg model =
             ( Loaded { state | persistance = new_persistance, users = users_updates }, setPersistance new_persistance )
 
         Tick timestamp ->
-            ( model, Cmd.batch [ getUsers GotUsers, getProducts GotProducts ] )
+            case get_persitance model of
+                Just persistance ->
+                    ( model, Cmd.batch [ getUsers persistance.jwtToken GotUsers, getProducts persistance.jwtToken GotProducts ] )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         SyncTick timestamp ->
             let
@@ -345,7 +349,7 @@ update msg model =
                     ( model, Cmd.none )
 
         SetPersistance persistance ->
-            ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers GotUsers ] )
+            ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers persistance.jwtToken GotUsers ] )
 
         SentNewOrder result ->
             let
@@ -633,6 +637,31 @@ productView state buyState order =
         , br [] []
         , text order.product.description
         ]
+
+
+get_persitance : Model -> Maybe Persistance
+get_persitance model =
+    case model of
+        Failure persistance ->
+            Just persistance
+
+        AskForJwt persistance ->
+            Just persistance
+
+        LoadingUsers persistance ->
+            Just persistance
+
+        LoadingProducts persistance users ->
+            Just persistance
+
+        Blank state ->
+            Just state.persistance
+
+        Loaded state ->
+            Just state.persistance
+
+        ProductView state buyState ->
+            Just state.persistance
 
 
 port setPersistance : Persistance -> Cmd msg

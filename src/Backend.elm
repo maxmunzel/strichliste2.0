@@ -85,7 +85,7 @@ init _ =
       , new_product_alcohol_content = ""
       , new_product_volume = ""
       }
-    , Cmd.batch [ getUsers GotUsers, getProducts GotProducts, getOrders GotOrders ]
+    , Cmd.none
     )
 
 
@@ -98,13 +98,13 @@ update msg model =
     case msg of
         -- General
         ShowUsers ->
-            ( { model | view = EditUsers }, getUsers GotUsers )
+            ( { model | view = EditUsers }, getUsers model.jwtToken GotUsers )
 
         ShowProducts ->
-            ( { model | view = EditProducts }, getProducts GotProducts )
+            ( { model | view = EditProducts }, getProducts model.jwtToken GotProducts )
 
         ShowOrders ->
-            ( { model | view = EditOrders }, getOrders GotOrders )
+            ( { model | view = EditOrders }, getOrders model.jwtToken GotOrders )
 
         JwtUpdate text ->
             ( { model | jwtToken = text }, Cmd.none )
@@ -133,13 +133,13 @@ update msg model =
             ( { model | view = Failure }, Cmd.none )
 
         UpdatedUser (Ok _) ->
-            ( model, getUsers GotUsers )
+            ( model, getUsers model.jwtToken GotUsers )
 
         NewUserCreated (Err _) ->
             ( { model | view = Failure }, Cmd.none )
 
         NewUserCreated (Ok _) ->
-            ( model, getUsers GotUsers )
+            ( model, getUsers model.jwtToken GotUsers )
 
         NewUserAvatarChange text ->
             let
@@ -172,7 +172,7 @@ update msg model =
             ( model, updateProduct model.jwtToken product UpdatedProduct )
 
         UpdatedProduct (Ok _) ->
-            ( model, getProducts GotProducts )
+            ( model, getProducts model.jwtToken GotProducts )
 
         UpdatedProduct (Err _) ->
             ( { model | view = Failure }, Cmd.none )
@@ -223,7 +223,7 @@ update msg model =
                     ( model, Cmd.none )
 
         NewProductCreated (Ok _) ->
-            ( model, getProducts GotProducts )
+            ( model, getProducts model.jwtToken GotProducts )
 
         NewProductCreated (Err _) ->
             ( { model | view = Failure }, Cmd.none )
@@ -287,7 +287,7 @@ update msg model =
             ( model, orderSetUndone model.jwtToken order unDone UnDoneSet )
 
         UnDoneSet (Ok _) ->
-            ( model, getOrders GotOrders )
+            ( model, getOrders model.jwtToken GotOrders )
 
         UnDoneSet (Err _) ->
             ( { model | view = Failure }, Cmd.none )

@@ -93,27 +93,41 @@ from users u
          left join cost_last_month l on u.id = l.user_id
          left join alc_ml_last_30_days a on u.id = a.user_id;
 
-create role web_anon nologin;
-grant usage on schema strichliste to web_anon;
-
-grant select on users to web_anon;
-grant select on products to web_anon;
-grant select on orders to web_anon;
-grant select on users_and_costs to web_anon;
 
 create role rest login noinherit password '$PASSWORD';
+
+create role web_anon nologin;
 grant web_anon to rest;
 
 create role order_user nologin;
 grant order_user to rest;
+
+-- general read permissions
+grant select on users to order_user;
+grant select on products to order_user;
+grant select on orders to order_user;
+grant select on users_and_costs to order_user;
+
+-- allow order_user to place... orders
 grant usage on schema strichliste to order_user;
 grant insert, select on orders to order_user;
 grant usage, select on sequence orders_id_seq to order_user;
+
 
 create role xxxx_user nologin;
 grant usage on schema strichliste to xxxx_user;
 grant xxxx_user to rest;
 
+-- general read permissions
+grant select on users to xxxx_user;
+grant select on products to xxxx_user;
+grant select on orders to xxxx_user;
+grant select on users_and_costs to xxxx_user;
+
+-- Allow xxxx_user to update records.
+-- Notice, that he is not allowed to insert orders, so that 
+-- he can't be used instead of the order_user. This way it
+-- is less likely that his login in leaked to clients by user error.
 grant select, update, insert on users to xxxx_user;
 grant usage, select on sequence users_id_seq to xxxx_user;
 grant select, update, insert on products to xxxx_user;
@@ -161,4 +175,4 @@ Mate		/product_pics/Mate.jpg	1.1	500	0.0
 --Scratchy Kopfy	/profile_pics/18.jpg	t
 --Wolfy McWallpaper	/profile_pics/19.jpg	t
 --Reh	/profile_pics/0.jpg	t
-\.
+--\.

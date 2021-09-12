@@ -1,0 +1,59 @@
+services:
+  api:
+    volumes:
+      - ./:/conf
+    build:
+      dockerfile: postgrest.Dockerfile
+      context: .
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+    networks:
+      - database
+      - caddy_api
+    
+  db:
+    image: postgres:13-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      # db and api share a common _private_ and _internal_ network.
+      # as the api server handles authentication and has the credentials
+      # anyway this is acceptable and saves us from handling db passwords.
+      POSTGRES_HOST_AUTH_METHOD: "trust" 
+    volumes:
+      - "./pgdata:/var/lib/postgresql/data"
+      - "./postgres_schema.sql:/docker-entrypoint-initdb.d/schema.sql"
+    networks:
+      - database
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "./caddy_data:/data"
+      - "./Caddyfile:/etc/caddy/Caddyfile"
+      - "./static:/static"
+    networks:
+      - caddy_api
+      - default
+  cron:
+    build:
+      context: .
+      dockerfile: cron.Dockerfile
+    volumes:
+      - ./db_backups:/db_backups
+      - ./reports:/reports
+      - ./cronjobs/hourly:/etc/periodic/hourly
+      - ./cronjobs/monthly:/etc/periodic/monthly
+    networks:
+      - database
+networks:
+  database:
+    internal: true
+  caddy_api:
+    internal: true
+

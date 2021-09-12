@@ -43,7 +43,7 @@ if __name__ == "__main__":
             "Please Enter the Password used for setting up Tablets and backoffice access"
         ).encode("utf8")
     )
-    password_sha512 = sha.hexdigest()
+    password_sha3_256 = sha.hexdigest()
 
     tokens = {
         user: jwt.encode({"role": user}, jwt_secret, algorithm="HS256").decode()
@@ -54,7 +54,7 @@ if __name__ == "__main__":
             json.dumps(
                 {
                     "jwt_secret": jwt_secret,
-                    "password_sha512": password_sha512,
+                    "password_sha3_256": password_sha3_256,
                     "tokens": tokens,
                 }
             )

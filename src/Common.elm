@@ -1,4 +1,4 @@
-module Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, hostname, orderSetUndone, product2order, productDecoder, productDefaultLocation, resetAmount, updateProduct, updateUser, user2str, userDecoder)
+module Common exposing (..)
 
 import Http
 import Json.Decode exposing (Decoder, bool, field, float, int, list, string, value)
@@ -279,6 +279,37 @@ createUser jwtToken user msg =
         , url = hostname ++ "/users"
         , body = Http.jsonBody <| newUserEncoder <| user
         , expect = Http.expectWhatever msg
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+
+type UserName
+    = XxxxUser
+    | OrderUser
+
+
+username : UserName -> String
+username user =
+    case user of
+        XxxxUser ->
+            "xxxx_user"
+
+        OrderUser ->
+            "order_user"
+
+
+
+--get_jwt_token : UserName -> String -> (Result Http.Error String -> msg) -> Cmd msg
+
+
+get_jwt_token user password msg =
+    Http.request
+        { method = "GET"
+        , headers = [ Http.header "user" (username user), Http.header "password" password ]
+        , url = "/get_jwt"
+        , body = Http.emptyBody
+        , expect = Http.expectString msg
         , timeout = Nothing
         , tracker = Nothing
         }

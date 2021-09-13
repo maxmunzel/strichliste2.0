@@ -1,7 +1,7 @@
 port module Main exposing (BuyState, Model(..), Msg(..), Persistance, State, SyncState(..), areNewOrdersEmpty, init, main, productView, setPersistance, subscriptions, update, userView, view)
 
 import Browser
-import Common exposing (NewOrder, Product, User, getProducts, getUsers, hostname, product2order, resetAmount, user2str, userDecoder)
+import Common exposing (NewOrder, Product, User, UserName, getProducts, getUsers, get_jwt_token, hostname, product2order, resetAmount, user2str, userDecoder)
 import Debug
 import Design
 import Html exposing (..)
@@ -54,9 +54,15 @@ type alias BuyState =
     }
 
 
+type alias AskForJwtState =
+    { persistance : Persistance
+    , password : String
+    }
+
+
 type Model
     = Failure Persistance
-    | AskForJwt Persistance
+    | AskForJwt AskForJwtState
     | LoadingUsers Persistance
     | LoadingProducts Persistance (List User)
     | Loaded State
@@ -75,7 +81,7 @@ type alias Persistance =
 init : Persistance -> ( Model, Cmd Msg )
 init persistance =
     if persistance.jwtToken == "" then
-        ( AskForJwt persistance, Cmd.none )
+        ( AskForJwt { persistance = persistance, password = "" }, Cmd.none )
 
     else
         ( LoadingUsers persistance, getUsers persistance.jwtToken GotUsers )
@@ -99,11 +105,33 @@ type Msg
     | AskForJwtLocationUpdate String
     | SetPersistance Persistance
     | SentNewOrder (Result Http.Error ())
+    | GetJwt
+    | GotJwt (Result Http.Error String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        GetJwt ->
+            case model of
+                AskForJwt state ->
+                    ( model, get_jwt_token Common.OrderUser state.password GotJwt )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        GotJwt result ->
+            case result of
+                Ok jwtToken ->
+                    let
+                        persistance =
+                            get_persistance model
+                    in
+                    ( LoadingUsers { persistance | jwtToken = jwtToken }, getUsers persistance.jwtToken GotUsers )
+
+                Err _ ->
+                    ( AskForJwt { persistance = get_persistance model, password = "" }, Cmd.none )
+
         GotUsers result ->
             case result of
                 Ok users ->
@@ -255,12 +283,7 @@ update msg model =
             ( Loaded { state | persistance = new_persistance, users = users_updates }, setPersistance new_persistance )
 
         Tick timestamp ->
-            case get_persitance model of
-                Just persistance ->
-                    ( model, Cmd.batch [ getUsers persistance.jwtToken GotUsers, getProducts persistance.jwtToken GotProducts ] )
-
-                Nothing ->
-                    ( model, Cmd.none )
+            ( model, Cmd.batch [ getUsers (get_persistance model).jwtToken GotUsers, getProducts (get_persistance model).jwtToken GotProducts ] )
 
         SyncTick timestamp ->
             let
@@ -334,16 +357,24 @@ update msg model =
 
         AskForJwtTextUpdate text ->
             case model of
-                AskForJwt persistance ->
-                    ( AskForJwt { persistance | jwtToken = text }, Cmd.none )
+                AskForJwt state ->
+                    ( AskForJwt { state | password = text }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
 
         AskForJwtLocationUpdate text ->
             case model of
-                AskForJwt persistance ->
-                    ( AskForJwt { persistance | location = text }, Cmd.none )
+                AskForJwt state ->
+                    let
+                        persistance =
+                            state.persistance
+                    in
+                    let
+                        new_persistance =
+                            { persistance | location = text }
+                    in
+                    ( AskForJwt { state | persistance = new_persistance }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -354,27 +385,7 @@ update msg model =
         SentNewOrder result ->
             let
                 persistance =
-                    case model of
-                        Failure persistance_ ->
-                            persistance_
-
-                        AskForJwt persistance_ ->
-                            persistance_
-
-                        LoadingUsers persistance_ ->
-                            persistance_
-
-                        LoadingProducts persistance_ users ->
-                            persistance_
-
-                        Blank state ->
-                            state.persistance
-
-                        Loaded state ->
-                            state.persistance
-
-                        ProductView state buyState ->
-                            state.persistance
+                    get_persistance model
 
                 new_orders =
                     case result of
@@ -403,15 +414,15 @@ update msg model =
             case result of
                 Err (Http.BadStatus 401) ->
                     -- 401: Unauthorized
-                    ( AskForJwt persistance, Cmd.none )
+                    ( AskForJwt { persistance = new_persistance, password = "" }, Cmd.none )
 
                 _ ->
                     case model of
                         Failure _ ->
                             ( Failure new_persistance, setPersistance new_persistance )
 
-                        AskForJwt _ ->
-                            ( AskForJwt new_persistance, setPersistance new_persistance )
+                        AskForJwt state ->
+                            ( AskForJwt { state | persistance = new_persistance }, setPersistance new_persistance )
 
                         LoadingUsers _ ->
                             ( LoadingUsers new_persistance, setPersistance new_persistance )
@@ -450,11 +461,11 @@ view model =
     case model of
         AskForJwt persistance ->
             div []
-                [ h2 [] [ text "Please Enter JWT. If you set up using init.py you will find some in secrets.json" ]
+                [ h2 [] [ text "Please Enter Setup password: " ]
                 , input [ onInput AskForJwtTextUpdate ] []
                 , h2 [] [ text "Please enter location (e.g. \"Bar\", \"Kühlschrank\", …)" ]
                 , input [ onInput AskForJwtLocationUpdate ] []
-                , button [ onClick (SetPersistance persistance) ]
+                , button [ onClick GetJwt ]
                     [ text "Save" ]
                 ]
 
@@ -639,29 +650,29 @@ productView state buyState order =
         ]
 
 
-get_persitance : Model -> Maybe Persistance
-get_persitance model =
+get_persistance : Model -> Persistance
+get_persistance model =
     case model of
         Failure persistance ->
-            Just persistance
+            persistance
 
-        AskForJwt persistance ->
-            Just persistance
+        AskForJwt state ->
+            state.persistance
 
         LoadingUsers persistance ->
-            Just persistance
+            persistance
 
         LoadingProducts persistance users ->
-            Just persistance
+            persistance
 
         Blank state ->
-            Just state.persistance
+            state.persistance
 
         Loaded state ->
-            Just state.persistance
+            state.persistance
 
         ProductView state buyState ->
-            Just state.persistance
+            state.persistance
 
 
 port setPersistance : Persistance -> Cmd msg

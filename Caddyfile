@@ -4,6 +4,9 @@ handle_path /api/* {
     rewrite * {path}
     reverse_proxy api:3000
 }
+handle_path /get_jwt {
+    reverse_proxy auth_server:8080
+}
 
 root * /static
 file_server

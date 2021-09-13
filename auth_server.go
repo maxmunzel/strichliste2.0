@@ -35,7 +35,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/get_jwt", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		password := r.Header.Get("password")
 		user := r.Header.Get("user")
 		password_hash := make([]byte, 32)
@@ -43,7 +43,6 @@ func main() {
 		h := sha3.New256()
 		h.Write([]byte(password))
 		password_hash = h.Sum(nil)
-		fmt.Println("'" + password + "'")
 
 		if bytes.Equal(password_hash, expected_hash) {
 			if user == "xxxx_user" {

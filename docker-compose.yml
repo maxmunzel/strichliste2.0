@@ -40,6 +40,18 @@ services:
     networks:
       - caddy_api
       - default
+      - caddy_auth
+  auth_server:
+    build:
+      context: .
+      dockerfile: auth_server.Dockerfile
+    volumes:
+      - ./auth_server:/auth_server
+      - ./secrets.json:/secrets.json
+    ports:
+      - "8080:8080"
+    networks:
+      - caddy_auth
   cron:
     build:
       context: .
@@ -55,5 +67,7 @@ networks:
   database:
     internal: true
   caddy_api:
+    internal: true
+  caddy_auth:
     internal: true
 

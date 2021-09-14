@@ -3,12 +3,9 @@ elm-stuff
 # elm-repl generated files
 repl-temp-*
 .DS_Store
-static/main.js
 postgRest.conf
 secrets.json
-static/backend.html
 .idea/
-setup_*.html
 caddy_data/
 pgdata/
 db_backups/

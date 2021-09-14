@@ -299,10 +299,7 @@ username user =
             "order_user"
 
 
-
---get_jwt_token : UserName -> String -> (Result Http.Error String -> msg) -> Cmd msg
-
-
+get_jwt_token : UserName -> String -> (Result Http.Error String -> msg) -> Cmd msg
 get_jwt_token user password msg =
     Http.request
         { method = "GET"

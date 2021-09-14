@@ -1,7 +1,7 @@
 module Backend exposing (Model, Msg(..), View(..), main, update, view)
 
 import Browser
-import Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
+import Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, get_jwt_token, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -26,7 +26,9 @@ type Msg
     = ShowUsers
     | ShowProducts
     | ShowOrders
-    | JwtUpdate String
+    | PasswordChanged String
+    | PasswordEnter
+    | GotJwt (Result Http.Error String)
     | UpdateUser User
     | UpdatedUser (Result Http.Error ())
     | UpdateProduct Product
@@ -56,10 +58,12 @@ type View
     | EditProducts
     | EditOrders
     | Failure
+    | GetPassword
 
 
 type alias Model =
     { jwtToken : String
+    , password : String
     , view : View
     , users : List User
     , products : List Product
@@ -75,7 +79,8 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { jwtToken = ""
-      , view = EditOrders
+      , password = ""
+      , view = GetPassword
       , products = []
       , users = []
       , orders = []
@@ -106,8 +111,19 @@ update msg model =
         ShowOrders ->
             ( { model | view = EditOrders }, getOrders model.jwtToken GotOrders )
 
-        JwtUpdate text ->
-            ( { model | jwtToken = text }, Cmd.none )
+        PasswordChanged password ->
+            ( { model | password = password }, Cmd.none )
+
+        PasswordEnter ->
+            ( model, get_jwt_token Common.XxxxUser model.password GotJwt )
+
+        GotJwt result ->
+            case result of
+                Err _ ->
+                    ( { model | password = "" }, Cmd.none )
+
+                Ok jwt ->
+                    { model | password = "", jwtToken = jwt } |> update ShowOrders
 
         GotUsers result ->
             case result of
@@ -313,26 +329,44 @@ view model =
 
                 Failure ->
                     "Failure"
+
+                GetPassword ->
+                    "Login"
+
+        navbar =
+            if model.view /= GetPassword then
+                [ button [ onClick ShowOrders ] [ text "Edit Orders" ]
+                , button [ onClick ShowProducts ] [ text "Edit Products" ]
+                , button [ onClick ShowUsers ] [ text "Edit Users" ]
+                ]
+
+            else
+                []
     in
     div [ style "margin" "30px" ]
-        [ button [ onClick ShowOrders ] [ text "Edit Orders" ]
-        , button [ onClick ShowProducts ] [ text "Edit Products" ]
-        , button [ onClick ShowUsers ] [ text "Edit Users" ]
-        , input [ placeholder "jwtToken", value model.jwtToken, onInput JwtUpdate ] []
-        , h1 [] [ text title ]
-        , case model.view of
-            EditUsers ->
-                viewUsers model
+        (navbar
+            ++ [ h1 [] [ text title ]
+               , case model.view of
+                    EditUsers ->
+                        viewUsers model
 
-            EditProducts ->
-                viewProducts model
+                    EditProducts ->
+                        viewProducts model
 
-            EditOrders ->
-                viewOrders model
+                    EditOrders ->
+                        viewOrders model
 
-            Failure ->
-                p [] [ text "Something went wrong. Maybe you have forgotten to fill in the `jwtToken` field in the upper right?\n" ]
-        ]
+                    Failure ->
+                        p [] [ text "Something went wrong. Maybe you have forgotten to fill in the `jwtToken` field in the upper right?\n" ]
+
+                    GetPassword ->
+                        div []
+                            [ h3 [] [ text "Please enter Password: " ]
+                            , input [ type_ "password", value model.password, onInput PasswordChanged ] []
+                            , button [ onClick PasswordEnter ] [ text "Enter" ]
+                            ]
+               ]
+        )
 
 
 viewOrders model =

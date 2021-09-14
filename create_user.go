@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"golang.org/x/crypto/sha3"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
@@ -39,36 +39,24 @@ func main() {
 			Name   string `json:"name"`
 			Avatar string `json:"avatar"`
 		}
-		body, err := json.Marshal(newUser{user_name, filename})
-		if err != nil {
-			log.Println("Can't create Payload.")
-			log.Println(err)
-			http.Error(w, "Internal Error", 500)
-			return
-		}
-		log.Println(body)
+		body, _ := json.Marshal(newUser{user_name, filename})
 		body_reader := bytes.NewBuffer(body)
 		req, err := http.NewRequest("POST", "http://api:3000/users", body_reader)
 		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("Authorization", "Bearer "+jwt)
 		response, err := http.DefaultClient.Do(req)
-		if err != nil || response.StatusCode != 200 {
+		if err != nil || response.StatusCode != 201 {
 			log.Println(err)
 			log.Println(response)
 			http.Error(w, "Could not create User", 500)
-		}
-
-		dest_file, err := os.Create(filename)
-		defer dest_file.Close()
-		if err != nil {
-			log.Println("Cant create file")
-			log.Print(err)
 			return
 		}
-		_, err = io.Copy(dest_file, file)
+
+		err = ioutil.WriteFile(filename, file_contents.Bytes(), 0600)
 		if err != nil {
 			log.Println("Cant write file")
 			log.Print(err)
+			http.Error(w, "", 500)
 			return
 		}
 	})

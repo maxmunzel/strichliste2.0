@@ -1,7 +1,9 @@
 module Backend exposing (Model, Msg(..), View(..), main, update, view)
 
 import Browser
-import Common exposing (NewOrder, NewProduct, NewUser, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, get_jwt_token, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
+import Common exposing (NewOrder, NewProduct, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, get_jwt_token, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
+import File
+import File.Select
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -29,6 +31,8 @@ type Msg
     | PasswordChanged String
     | PasswordEnter
     | GotJwt (Result Http.Error String)
+    | SelectAvatar
+    | SelectedAvatar File.File
     | UpdateUser User
     | UpdatedUser (Result Http.Error ())
     | UpdateProduct Product
@@ -39,7 +43,6 @@ type Msg
     | CreateNewProduct
     | NewUserCreated (Result Http.Error ())
     | NewUserNameChange String
-    | NewUserAvatarChange String
     | NewProductCreated (Result Http.Error ())
     | NewProductNameChange String
     | NewProductImageChange String
@@ -68,7 +71,8 @@ type alias Model =
     , users : List User
     , products : List Product
     , orders : List Order
-    , new_user : NewUser
+    , new_user_name : String
+    , new_user_avatar : Maybe File.File
     , new_product : NewProduct
     , new_product_price : String
     , new_product_volume : String
@@ -84,7 +88,8 @@ init _ =
       , products = []
       , users = []
       , orders = []
-      , new_user = NewUser "" ""
+      , new_user_name = ""
+      , new_user_avatar = Nothing
       , new_product = NewProduct "" "" "" 0 0 0 productDefaultLocation
       , new_product_price = ""
       , new_product_alcohol_content = ""
@@ -157,31 +162,19 @@ update msg model =
         NewUserCreated (Ok _) ->
             ( model, getUsers model.jwtToken GotUsers )
 
-        NewUserAvatarChange text ->
-            let
-                new_user =
-                    model.new_user
-
-                new_user_updated =
-                    { new_user | avatar = text }
-            in
-            ( { model | new_user = new_user_updated }, Cmd.none )
-
         NewUserNameChange text ->
-            let
-                new_user =
-                    model.new_user
-
-                default_avatar =
-                    "/profile_pics/" ++ String.toLower text ++ ".jpg"
-
-                new_user_updated =
-                    { new_user | name = text, avatar = default_avatar }
-            in
-            ( { model | new_user = new_user_updated }, Cmd.none )
+            ( { model | new_user_name = text }, Cmd.none )
 
         CreateNewUser ->
-            ( { model | new_user = { name = "", avatar = "" } }, createUser model.jwtToken model.new_user NewUserCreated )
+            case ( model.new_user_avatar, model.new_user_name ) of
+                ( _, "" ) ->
+                    ( model, Cmd.none )
+
+                ( Nothing, _ ) ->
+                    ( model, Cmd.none )
+
+                ( Just avatar, name ) ->
+                    ( { model | new_user_avatar = Nothing, new_user_name = "" }, createUser model.jwtToken model.new_user_name avatar NewUserCreated )
 
         -- Product View
         UpdateProduct product ->
@@ -308,6 +301,12 @@ update msg model =
         UnDoneSet (Err _) ->
             ( { model | view = Failure }, Cmd.none )
 
+        SelectAvatar ->
+            ( model, File.Select.file [ "image/jpeg", "image/png" ] SelectedAvatar )
+
+        SelectedAvatar file ->
+            ( { model | new_user_avatar = Just file }, Cmd.none )
+
 
 
 -- VIEW
@@ -411,17 +410,30 @@ orderRow order =
         ]
 
 
+viewUsers : Model -> Html Msg
 viewUsers model =
+    let
+        avatar_button =
+            case model.new_user_avatar of
+                Just avatar ->
+                    button [ onClick SelectAvatar ] [ text (File.name avatar) ]
+
+                Nothing ->
+                    button [ onClick SelectAvatar ] [ text "select" ]
+    in
     div []
         [ table []
             ([ tr []
                 [ th [] [ text "Name" ], th [] [ text "Avatar" ], th [] [ text "Active" ], th [] [] ]
+             , tr [] []
+             , td [] []
              , tr []
-                [ td [] [ input [ placeholder "Name", value model.new_user.name, onInput NewUserNameChange ] [] ]
-                , td [] [ input [ placeholder "Avatar", value model.new_user.avatar, onInput NewUserAvatarChange ] [] ]
-                , td [] []
+                [ td [] [ input [ placeholder "Name", value model.new_user_name, onInput NewUserNameChange ] [] ]
+                , td [] [ avatar_button ]
                 , td [] [ button [ onClick CreateNewUser ] [ text "Create new" ] ]
                 ]
+
+             --             , td [] [ button [ onClick CreateNewUser ] [ text "Create new" ] ]
              ]
                 ++ List.map userRow model.users
             )

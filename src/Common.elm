@@ -1,5 +1,6 @@
 module Common exposing (..)
 
+import File
 import Http
 import Json.Decode exposing (Decoder, bool, field, float, int, list, string, value)
 import Json.Decode.Pipeline exposing (required)
@@ -31,13 +32,6 @@ type alias UserNoStat =
     , name : String
     , avatar : String
     , active : Bool
-    }
-
-
-type alias NewUser =
-    -- Model for a user we want to create. It therefor lacks technical fields like `id`
-    { name : String
-    , avatar : String
     }
 
 
@@ -186,14 +180,6 @@ userEncoder user =
         ]
 
 
-newUserEncoder : NewUser -> Json.Encode.Value
-newUserEncoder user =
-    Json.Encode.object
-        [ ( "name", Json.Encode.string user.name )
-        , ( "avatar", Json.Encode.string user.avatar )
-        ]
-
-
 productDecoder : Decoder Product
 productDecoder =
     Json.Decode.succeed Product
@@ -272,12 +258,18 @@ user2str user =
     user.name ++ "$" ++ user.avatar ++ "$" ++ String.fromInt user.id
 
 
-createUser jwtToken user msg =
+createUser : String -> String -> File.File -> (Result Http.Error () -> msg) -> Cmd msg
+createUser jwtToken name avatar msg =
     Http.request
         { method = "POST"
         , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
-        , url = hostname ++ "/users"
-        , body = Http.jsonBody <| newUserEncoder <| user
+        , url = "/create_user"
+        , body =
+            Http.multipartBody
+                [ Http.stringPart "name" name
+                , Http.stringPart "jwt" jwtToken
+                , Http.filePart "file" avatar
+                ]
         , expect = Http.expectWhatever msg
         , timeout = Nothing
         , tracker = Nothing

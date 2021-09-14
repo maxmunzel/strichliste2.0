@@ -33,7 +33,10 @@ func main() {
 		io.Copy(file_contents, file)
 
 		// prepend the files hash to make the filename (hence URL) non-enumeratable
-		filename := "/profile_pics/" + base32.StdEncoding.EncodeToString(sha3.New256().Sum(file_contents.Bytes()))[:20] + "_" + head.Filename
+		hash := sha3.New256()
+		_, _ = hash.Write(file_contents.Bytes())
+		hash_str := base32.StdEncoding.EncodeToString(hash.Sum(nil))[:20]
+		filename := "/profile_pics/" + hash_str + "_" + head.Filename
 
 		type newUser = struct {
 			Name   string `json:"name"`

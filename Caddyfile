@@ -8,6 +8,10 @@ handle_path /get_jwt {
     reverse_proxy auth_server:8080
 }
 
+handle_path /create_user {
+    reverse_proxy create_user:8088
+}
+
 root * /static
 file_server
 

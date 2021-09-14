@@ -1,3 +1,3 @@
-FROM postgres:13-alpine
+FROM alpine
 LABEL maintainer="maxmunzel"
 CMD [ "/auth_server" ]

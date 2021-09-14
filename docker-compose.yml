@@ -12,6 +12,18 @@ services:
     networks:
       - database
       - caddy_api
+
+  create_user:
+    build:
+      context: .
+      dockerfile: create_user.Dockerfile
+    ports:
+      - "8088:8088"
+    volumes:
+      - "./static/profile_pics:/profile_pics"
+      - "./create_user.go:/go/src/create_user/create_user.go"
+    networks:
+      - caddy_api
     
   db:
     image: postgres:13-alpine

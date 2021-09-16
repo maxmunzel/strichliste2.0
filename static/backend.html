@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ak.V === region.at.V)
+	if (region.al.X === region.av.X)
 	{
-		return 'on line ' + region.ak.V;
+		return 'on line ' + region.al.X;
 	}
-	return 'on lines ' + region.ak.V + ' through ' + region.at.V;
+	return 'on lines ' + region.al.X + ' through ' + region.av.X;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bn,
-		impl.bA,
-		impl.by,
+		impl.bq,
+		impl.bD,
+		impl.bB,
 		function() { return function() {} }
 	);
 });
@@ -2718,9 +2718,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		D: func(record.D),
-		al: record.al,
-		ah: record.ah
+		C: func(record.C),
+		am: record.am,
+		ai: record.ai
 	}
 });
 
@@ -2988,11 +2988,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.D;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.al;
+		var message = !tag ? value : tag < 3 ? value.a : value.C;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.am;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ah) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ai) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3942,9 +3942,9 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bn,
-		impl.bA,
-		impl.by,
+		impl.bq,
+		impl.bD,
+		impl.bB,
 		function(sendToApp, initialModel) {
 			var view = impl.i;
 			/**/
@@ -3978,11 +3978,11 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bn,
-		impl.bA,
-		impl.by,
+		impl.bq,
+		impl.bD,
+		impl.bB,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.aj && impl.aj(sendToApp)
+			var divertHrefToApp = impl.ak && impl.ak(sendToApp)
 			var view = impl.i;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -3991,12 +3991,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.s);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.r);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.bz) && (_VirtualDom_doc.title = title = doc.bz);
+				(title !== doc.bC) && (_VirtualDom_doc.title = title = doc.bC);
 			});
 		}
 	);
@@ -4052,12 +4052,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bp;
-	var onUrlRequest = impl.bq;
+	var onUrlChange = impl.bs;
+	var onUrlRequest = impl.bt;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		aj: function(sendToApp)
+		ak: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4073,9 +4073,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aN === next.aN
-							&& curr.aA === next.aA
-							&& curr.aJ.a === next.aJ.a
+							&& curr.aQ === next.aQ
+							&& curr.aC === next.aC
+							&& curr.aM.a === next.aM.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4083,13 +4083,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		bn: function(flags)
+		bq: function(flags)
 		{
-			return A3(impl.bn, flags, _Browser_getUrl(), key);
+			return A3(impl.bq, flags, _Browser_getUrl(), key);
 		},
 		i: impl.i,
-		bA: impl.bA,
-		by: impl.by
+		bD: impl.bD,
+		bB: impl.bB
 	});
 }
 
@@ -4155,17 +4155,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bk: 'hidden', bb: 'visibilitychange' }
+		? { bn: 'hidden', be: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bk: 'mozHidden', bb: 'mozvisibilitychange' }
+		? { bn: 'mozHidden', be: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bk: 'msHidden', bb: 'msvisibilitychange' }
+		? { bn: 'msHidden', be: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bk: 'webkitHidden', bb: 'webkitvisibilitychange' }
-		: { bk: 'hidden', bb: 'visibilitychange' };
+		? { bn: 'webkitHidden', be: 'webkitvisibilitychange' }
+		: { bn: 'hidden', be: 'visibilitychange' };
 }
 
 
@@ -4246,12 +4246,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aV: _Browser_getScene(),
-		a0: {
-			a3: _Browser_window.pageXOffset,
-			a4: _Browser_window.pageYOffset,
-			a2: _Browser_doc.documentElement.clientWidth,
-			ay: _Browser_doc.documentElement.clientHeight
+		aY: _Browser_getScene(),
+		a3: {
+			a6: _Browser_window.pageXOffset,
+			a7: _Browser_window.pageYOffset,
+			a5: _Browser_doc.documentElement.clientWidth,
+			aA: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4261,8 +4261,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		a2: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ay: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		a5: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aA: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4285,15 +4285,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aV: {
-				a2: node.scrollWidth,
-				ay: node.scrollHeight
+			aY: {
+				a5: node.scrollWidth,
+				aA: node.scrollHeight
 			},
-			a0: {
-				a3: node.scrollLeft,
-				a4: node.scrollTop,
-				a2: node.clientWidth,
-				ay: node.clientHeight
+			a3: {
+				a6: node.scrollLeft,
+				a7: node.scrollTop,
+				a5: node.clientWidth,
+				aA: node.clientHeight
 			}
 		};
 	});
@@ -4323,18 +4323,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aV: _Browser_getScene(),
-			a0: {
-				a3: x,
-				a4: y,
-				a2: _Browser_doc.documentElement.clientWidth,
-				ay: _Browser_doc.documentElement.clientHeight
+			aY: _Browser_getScene(),
+			a3: {
+				a6: x,
+				a7: y,
+				a5: _Browser_doc.documentElement.clientWidth,
+				aA: _Browser_doc.documentElement.clientHeight
 			},
-			bi: {
-				a3: x + rect.left,
-				a4: y + rect.top,
-				a2: rect.width,
-				ay: rect.height
+			bl: {
+				a6: x + rect.left,
+				a7: y + rect.top,
+				a5: rect.width,
+				aA: rect.height
 			}
 		};
 	});
@@ -4379,25 +4379,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.t.a(response)));
+			callback(toTask(request.s.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.t.b, xhr)); });
-		$elm$core$Maybe$isJust(request.y) && _Http_track(router, xhr, request.y.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.s.b, xhr)); });
+		$elm$core$Maybe$isJust(request.x) && _Http_track(router, xhr, request.x.a);
 
 		try {
-			xhr.open(request.v, request.z, true);
+			xhr.open(request.u, request.y, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.z));
+			return done($elm$http$Http$BadUrl_(request.y));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.s.a && xhr.setRequestHeader('Content-Type', request.s.a);
-		xhr.send(request.s.b);
+		request.r.a && xhr.setRequestHeader('Content-Type', request.r.a);
+		xhr.send(request.r.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4408,13 +4408,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.u; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.t; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.x.a || 0;
-	xhr.responseType = request.t.d;
-	xhr.withCredentials = request.a7;
+	xhr.timeout = request.w.a || 0;
+	xhr.responseType = request.s.d;
+	xhr.withCredentials = request.ba;
 }
 
 
@@ -4435,10 +4435,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		z: xhr.responseURL,
-		bw: xhr.status,
-		bx: xhr.statusText,
-		u: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		y: xhr.responseURL,
+		bz: xhr.status,
+		bA: xhr.statusText,
+		t: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4533,15 +4533,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			bv: event.loaded,
-			aX: event.total
+			by: event.loaded,
+			a_: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			bt: event.loaded,
-			aX: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			bw: event.loaded,
+			a_: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }
@@ -5356,7 +5356,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ax: fragment, aA: host, aH: path, aJ: port_, aN: protocol, aO: query};
+		return {az: fragment, aC: host, aK: path, aM: port_, aQ: protocol, aR: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5636,29 +5636,12 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Backend$GetPassword = 4;
-var $author$project$Common$NewProduct = F7(
-	function (name, description, image, price, alcohol_content, volume_in_ml, location) {
-		return {ao: alcohol_content, ad: description, ae: image, _: location, H: name, ai: price, a1: volume_in_ml};
-	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Common$productDefaultLocation = 'Bar, Kühlschrank EG';
 var $author$project$Backend$init = function (_v0) {
 	return _Utils_Tuple2(
-		{
-			j: '',
-			k: A7($author$project$Common$NewProduct, '', '', '', 0, 0, 0, $author$project$Common$productDefaultLocation),
-			O: '',
-			P: '',
-			Q: '',
-			R: $elm$core$Maybe$Nothing,
-			I: '',
-			aa: _List_Nil,
-			K: '',
-			ab: _List_Nil,
-			ac: _List_Nil,
-			i: 4
-		},
+		{j: '', N: '', O: '', Y: $elm$core$Maybe$Nothing, P: $author$project$Common$productDefaultLocation, Q: '', R: '', S: '', T: $elm$core$Maybe$Nothing, G: '', ac: _List_Nil, I: '', ad: _List_Nil, ae: _List_Nil, i: 4},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5674,32 +5657,35 @@ var $author$project$Backend$GotJwt = function (a) {
 	return {$: 5, a: a};
 };
 var $author$project$Backend$GotOrders = function (a) {
-	return {$: 26, a: a};
+	return {$: 27, a: a};
 };
 var $author$project$Backend$GotProducts = function (a) {
-	return {$: 13, a: a};
+	return {$: 15, a: a};
 };
 var $author$project$Backend$GotUsers = function (a) {
-	return {$: 12, a: a};
+	return {$: 14, a: a};
 };
 var $author$project$Backend$NewProductCreated = function (a) {
-	return {$: 18, a: a};
+	return {$: 20, a: a};
 };
 var $author$project$Backend$NewUserCreated = function (a) {
-	return {$: 16, a: a};
+	return {$: 18, a: a};
 };
 var $author$project$Backend$SelectedAvatar = function (a) {
 	return {$: 7, a: a};
 };
+var $author$project$Backend$SelectedProductImage = function (a) {
+	return {$: 9, a: a};
+};
 var $author$project$Backend$ShowOrders = {$: 2};
 var $author$project$Backend$UnDoneSet = function (a) {
-	return {$: 28, a: a};
+	return {$: 29, a: a};
 };
 var $author$project$Backend$UpdatedProduct = function (a) {
-	return {$: 11, a: a};
+	return {$: 13, a: a};
 };
 var $author$project$Backend$UpdatedUser = function (a) {
-	return {$: 9, a: a};
+	return {$: 11, a: a};
 };
 var $author$project$Common$XxxxUser = 0;
 var $elm$http$Http$BadStatus_ = F2(
@@ -6293,7 +6279,7 @@ var $elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.bw));
+					$elm$http$Http$BadStatus(metadata.bz));
 			default:
 				var body = response.b;
 				return A2(
@@ -6311,66 +6297,20 @@ var $elm$http$Http$expectWhatever = function (toMsg) {
 				return $elm$core$Result$Ok(0);
 			}));
 };
-var $elm$http$Http$Header = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$http$Http$header = $elm$http$Http$Header;
-var $author$project$Common$hostname = 'api';
-var $elm$http$Http$jsonBody = function (value) {
+var $elm$http$Http$filePart = _Http_pair;
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$http$Http$multipartBody = function (parts) {
 	return A2(
 		_Http_pair,
-		'application/json',
-		A2($elm$json$Json$Encode$encode, 0, value));
-};
-var $elm$json$Json$Encode$float = _Json_wrap;
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(0),
-			pairs));
-};
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Common$newProductEncoder = function (product) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'name',
-				$elm$json$Json$Encode$string(product.H)),
-				_Utils_Tuple2(
-				'description',
-				$elm$json$Json$Encode$string(product.ad)),
-				_Utils_Tuple2(
-				'image',
-				$elm$json$Json$Encode$string(product.ae)),
-				_Utils_Tuple2(
-				'price',
-				$elm$json$Json$Encode$float(product.ai)),
-				_Utils_Tuple2(
-				'volume_in_ml',
-				$elm$json$Json$Encode$float(product.a1)),
-				_Utils_Tuple2(
-				'alcohol_content',
-				$elm$json$Json$Encode$float(product.ao)),
-				_Utils_Tuple2(
-				'location',
-				$elm$json$Json$Encode$string(product._))
-			]));
+		'',
+		_Http_toFormData(parts));
 };
 var $elm$http$Http$Request = function (a) {
 	return {$: 1, a: a};
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {aQ: reqs, aZ: subs};
+		return {aT: reqs, a0: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6414,7 +6354,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.y;
+							var _v4 = req.x;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6444,7 +6384,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.aQ));
+			A3($elm$http$Http$updateReqs, router, cmds, state.aT));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6487,7 +6427,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.aZ)));
+					state.a0)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6501,14 +6441,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					a7: r.a7,
-					s: r.s,
-					t: A2(_Http_mapExpect, func, r.t),
+					ba: r.ba,
+					r: r.r,
+					s: A2(_Http_mapExpect, func, r.s),
+					t: r.t,
 					u: r.u,
-					v: r.v,
+					w: r.w,
 					x: r.x,
-					y: r.y,
-					z: r.z
+					y: r.y
 				});
 		}
 	});
@@ -6531,53 +6471,67 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{a7: false, s: r.s, t: r.t, u: r.u, v: r.v, x: r.x, y: r.y, z: r.z}));
+			{ba: false, r: r.r, s: r.s, t: r.t, u: r.u, w: r.w, x: r.x, y: r.y}));
 };
+var $elm$http$Http$stringPart = _Http_pair;
 var $author$project$Common$createProduct = F3(
 	function (jwtToken, product, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$jsonBody(
-					$author$project$Common$newProductEncoder(product)),
-				t: $elm$http$Http$expectWhatever(msg),
-				u: _List_fromArray(
-					[
-						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
-					]),
-				v: 'POST',
+				r: $elm$http$Http$multipartBody(
+					_List_fromArray(
+						[
+							A2($elm$http$Http$stringPart, 'name', product.M),
+							A2($elm$http$Http$stringPart, 'description', product.au),
+							A2($elm$http$Http$stringPart, 'jwt', jwtToken),
+							A2($elm$http$Http$filePart, 'image', product.aD),
+							A2(
+							$elm$http$Http$stringPart,
+							'price',
+							$elm$core$String$fromFloat(product.aj)),
+							A2(
+							$elm$http$Http$stringPart,
+							'volume_in_ml',
+							$elm$core$String$fromFloat(product.a4)),
+							A2(
+							$elm$http$Http$stringPart,
+							'alcohol_content',
+							$elm$core$String$fromFloat(product.ap)),
+							A2($elm$http$Http$stringPart, 'location', product.af)
+						])),
+				s: $elm$http$Http$expectWhatever(msg),
+				t: _List_Nil,
+				u: 'POST',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: $author$project$Common$hostname + '/products'
+				y: '/create_product'
 			});
 	});
-var $elm$http$Http$filePart = _Http_pair;
-var $elm$http$Http$multipartBody = function (parts) {
-	return A2(
-		_Http_pair,
-		'',
-		_Http_toFormData(parts));
-};
-var $elm$http$Http$stringPart = _Http_pair;
+var $elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$http$Http$header = $elm$http$Http$Header;
 var $author$project$Common$createUser = F4(
 	function (jwtToken, name, avatar, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$multipartBody(
+				r: $elm$http$Http$multipartBody(
 					_List_fromArray(
 						[
 							A2($elm$http$Http$stringPart, 'name', name),
 							A2($elm$http$Http$stringPart, 'jwt', jwtToken),
 							A2($elm$http$Http$filePart, 'file', avatar)
 						])),
-				t: $elm$http$Http$expectWhatever(msg),
-				u: _List_fromArray(
+				s: $elm$http$Http$expectWhatever(msg),
+				t: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				v: 'POST',
+				u: 'POST',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: '/create_user'
+				y: '/create_user'
 			});
 	});
 var $elm$time$Time$Posix = $elm$core$Basics$identity;
@@ -6603,7 +6557,7 @@ var $elm$parser$Parser$Advanced$Good = F3(
 	});
 var $elm$parser$Parser$Advanced$bumpOffset = F2(
 	function (newOffset, s) {
-		return {ar: s.ar + (newOffset - s.b), c: s.c, d: s.d, b: newOffset, aU: s.aU, a: s.a};
+		return {as: s.as + (newOffset - s.b), c: s.c, d: s.d, b: newOffset, aX: s.aX, a: s.a};
 	});
 var $elm$parser$Parser$Advanced$chompBase10 = _Parser_chompBase10;
 var $elm$parser$Parser$Advanced$isAsciiCode = _Parser_isAsciiCode;
@@ -6634,7 +6588,7 @@ var $elm$parser$Parser$Advanced$AddRight = F2(
 	});
 var $elm$parser$Parser$Advanced$DeadEnd = F4(
 	function (row, col, problem, contextStack) {
-		return {ar: col, bc: contextStack, aK: problem, aU: row};
+		return {as: col, bf: contextStack, aN: problem, aX: row};
 	});
 var $elm$parser$Parser$Advanced$Empty = {$: 0};
 var $elm$parser$Parser$Advanced$fromState = F2(
@@ -6642,7 +6596,7 @@ var $elm$parser$Parser$Advanced$fromState = F2(
 		return A2(
 			$elm$parser$Parser$Advanced$AddRight,
 			$elm$parser$Parser$Advanced$Empty,
-			A4($elm$parser$Parser$Advanced$DeadEnd, s.aU, s.ar, x, s.c));
+			A4($elm$parser$Parser$Advanced$DeadEnd, s.aX, s.as, x, s.c));
 	});
 var $elm$parser$Parser$Advanced$finalizeInt = F5(
 	function (invalid, handler, startOffset, _v0, s) {
@@ -6682,7 +6636,7 @@ var $elm$parser$Parser$Advanced$finalizeFloat = F6(
 			return A2(
 				$elm$parser$Parser$Advanced$Bad,
 				true,
-				A4($elm$parser$Parser$Advanced$fromInfo, s.aU, s.ar - (floatOffset + s.b), invalid, s.c));
+				A4($elm$parser$Parser$Advanced$fromInfo, s.aX, s.as - (floatOffset + s.b), invalid, s.c));
 		} else {
 			if (_Utils_eq(s.b, floatOffset)) {
 				return A2(
@@ -6728,37 +6682,37 @@ var $elm$parser$Parser$Advanced$number = function (c) {
 			var baseOffset = zeroOffset + 1;
 			return A3($elm$parser$Parser$Advanced$isAsciiCode, 120, zeroOffset, s.a) ? A5(
 				$elm$parser$Parser$Advanced$finalizeInt,
-				c.bo,
-				c.az,
+				c.br,
+				c.aB,
 				baseOffset,
 				A2($elm$parser$Parser$Advanced$consumeBase16, baseOffset, s.a),
 				s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 111, zeroOffset, s.a) ? A5(
 				$elm$parser$Parser$Advanced$finalizeInt,
-				c.bo,
-				c.aG,
+				c.br,
+				c.aJ,
 				baseOffset,
 				A3($elm$parser$Parser$Advanced$consumeBase, 8, baseOffset, s.a),
 				s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 98, zeroOffset, s.a) ? A5(
 				$elm$parser$Parser$Advanced$finalizeInt,
-				c.bo,
-				c.ap,
+				c.br,
+				c.aq,
 				baseOffset,
 				A3($elm$parser$Parser$Advanced$consumeBase, 2, baseOffset, s.a),
 				s) : A6(
 				$elm$parser$Parser$Advanced$finalizeFloat,
-				c.bo,
-				c.av,
-				c.aC,
-				c.aw,
+				c.br,
+				c.ax,
+				c.aF,
+				c.ay,
 				_Utils_Tuple2(zeroOffset, 0),
 				s)));
 		} else {
 			return A6(
 				$elm$parser$Parser$Advanced$finalizeFloat,
-				c.bo,
-				c.av,
-				c.aC,
-				c.aw,
+				c.br,
+				c.ax,
+				c.aF,
+				c.ay,
 				A3($elm$parser$Parser$Advanced$consumeBase, 10, s.b, s.a),
 				s);
 		}
@@ -6768,13 +6722,13 @@ var $elm$parser$Parser$Advanced$float = F2(
 	function (expecting, invalid) {
 		return $elm$parser$Parser$Advanced$number(
 			{
-				ap: $elm$core$Result$Err(invalid),
-				av: expecting,
-				aw: $elm$core$Result$Ok($elm$core$Basics$identity),
-				az: $elm$core$Result$Err(invalid),
-				aC: $elm$core$Result$Ok($elm$core$Basics$toFloat),
-				bo: invalid,
-				aG: $elm$core$Result$Err(invalid)
+				aq: $elm$core$Result$Err(invalid),
+				ax: expecting,
+				ay: $elm$core$Result$Ok($elm$core$Basics$identity),
+				aB: $elm$core$Result$Err(invalid),
+				aF: $elm$core$Result$Ok($elm$core$Basics$toFloat),
+				br: invalid,
+				aJ: $elm$core$Result$Err(invalid)
 			});
 	});
 var $elm$parser$Parser$float = A2($elm$parser$Parser$Advanced$float, $elm$parser$Parser$ExpectingFloat, $elm$parser$Parser$ExpectingFloat);
@@ -6801,10 +6755,11 @@ var $elm$http$Http$expectJson = F2(
 						A2($elm$json$Json$Decode$decodeString, decoder, string));
 				}));
 	});
+var $author$project$Common$hostname = 'api';
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Common$Order = F7(
 	function (id, creation_date, product, user, amount, unDone, location) {
-		return {a8: amount, bg: creation_date, bl: id, _: location, bs: product, am: unDone, bB: user};
+		return {bb: amount, bj: creation_date, bo: id, af: location, bv: product, an: unDone, bE: user};
 	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$field = _Json_decodeField;
@@ -6812,7 +6767,7 @@ var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$json$Json$Decode$map7 = _Json_map7;
 var $author$project$Common$Product = F9(
 	function (id, name, description, image, active, price, alcohol_content, volume_in_ml, location) {
-		return {B: active, ao: alcohol_content, ad: description, bl: id, ae: image, _: location, H: name, ai: price, a1: volume_in_ml};
+		return {A: active, ap: alcohol_content, au: description, bo: id, aD: image, af: location, M: name, aj: price, a4: volume_in_ml};
 	});
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
@@ -6863,7 +6818,7 @@ var $author$project$Common$productDecoder = A3(
 									$elm$json$Json$Decode$succeed($author$project$Common$Product))))))))));
 var $author$project$Common$UserNoStat = F4(
 	function (id, name, avatar, active) {
-		return {B: active, ba: avatar, bl: id, H: name};
+		return {A: active, bd: avatar, bo: id, M: name};
 	});
 var $elm$json$Json$Decode$map4 = _Json_map4;
 var $author$project$Common$userNoStatDecoder = A5(
@@ -6887,43 +6842,43 @@ var $author$project$Common$getOrders = F2(
 	function (jwtToken, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$emptyBody,
-				t: A2(
+				r: $elm$http$Http$emptyBody,
+				s: A2(
 					$elm$http$Http$expectJson,
 					msg,
 					$elm$json$Json$Decode$list($author$project$Common$orderDecoder)),
-				u: _List_fromArray(
+				t: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				v: 'GET',
+				u: 'GET',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: $author$project$Common$hostname + '/orders?select=*,user:users(*),product:products(*)&limit=200&order=creation_date.desc'
+				y: $author$project$Common$hostname + '/orders?select=*,user:users(*),product:products(*)&limit=200&order=creation_date.desc'
 			});
 	});
 var $author$project$Common$getProducts = F2(
 	function (jwtToken, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$emptyBody,
-				t: A2(
+				r: $elm$http$Http$emptyBody,
+				s: A2(
 					$elm$http$Http$expectJson,
 					msg,
 					$elm$json$Json$Decode$list($author$project$Common$productDecoder)),
-				u: _List_fromArray(
+				t: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				v: 'GET',
+				u: 'GET',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: $author$project$Common$hostname + '/products?order=price.asc&active=eq.true'
+				y: $author$project$Common$hostname + '/products?order=price.asc&active=eq.true'
 			});
 	});
 var $author$project$Common$User = F8(
 	function (id, name, avatar, active, cost_last_30_days, cost_this_month, cost_last_month, alc_ml_last_30_days) {
-		return {B: active, a6: alc_ml_last_30_days, ba: avatar, bd: cost_last_30_days, be: cost_last_month, bf: cost_this_month, bl: id, H: name};
+		return {A: active, a9: alc_ml_last_30_days, bd: avatar, bg: cost_last_30_days, bh: cost_last_month, bi: cost_this_month, bo: id, M: name};
 	});
 var $elm$json$Json$Decode$map8 = _Json_map8;
 var $author$project$Common$userDecoder = A9(
@@ -6941,19 +6896,19 @@ var $author$project$Common$getUsers = F2(
 	function (jwtToken, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$emptyBody,
-				t: A2(
+				r: $elm$http$Http$emptyBody,
+				s: A2(
 					$elm$http$Http$expectJson,
 					msg,
 					$elm$json$Json$Decode$list($author$project$Common$userDecoder)),
-				u: _List_fromArray(
+				t: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				v: 'GET',
+				u: 'GET',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: $author$project$Common$hostname + '/users_and_costs?order=name.asc'
+				y: $author$project$Common$hostname + '/users_and_costs?order=name.asc'
 			});
 	});
 var $elm$http$Http$expectString = function (toMsg) {
@@ -6973,9 +6928,9 @@ var $author$project$Common$get_jwt_token = F3(
 	function (user, password, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$emptyBody,
-				t: $elm$http$Http$expectString(msg),
-				u: _List_fromArray(
+				r: $elm$http$Http$emptyBody,
+				s: $elm$http$Http$expectString(msg),
+				t: _List_fromArray(
 					[
 						A2(
 						$elm$http$Http$header,
@@ -6983,13 +6938,32 @@ var $author$project$Common$get_jwt_token = F3(
 						$author$project$Common$username(user)),
 						A2($elm$http$Http$header, 'password', password)
 					]),
-				v: 'GET',
+				u: 'GET',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: '/get_jwt'
+				y: '/get_jwt'
 			});
 	});
 var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2($elm$json$Json$Encode$encode, 0, value));
+};
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(0),
+			pairs));
+};
 var $author$project$Common$orderSetUndone = F4(
 	function (jwtToken, order, unDone, msg) {
 		var payload = $elm$json$Json$Encode$object(
@@ -7001,16 +6975,16 @@ var $author$project$Common$orderSetUndone = F4(
 				]));
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$jsonBody(payload),
-				t: $elm$http$Http$expectWhatever(msg),
-				u: _List_fromArray(
+				r: $elm$http$Http$jsonBody(payload),
+				s: $elm$http$Http$expectWhatever(msg),
+				t: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				v: 'PATCH',
+				u: 'PATCH',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: $author$project$Common$hostname + ('/orders?id=eq.' + $elm$core$String$fromInt(order.bl))
+				y: $author$project$Common$hostname + ('/orders?id=eq.' + $elm$core$String$fromInt(order.bo))
 			});
 	});
 var $elm$core$String$replace = F3(
@@ -7022,10 +6996,10 @@ var $elm$core$String$replace = F3(
 	});
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
-		return {ar: col, aK: problem, aU: row};
+		return {as: col, aN: problem, aX: row};
 	});
 var $elm$parser$Parser$problemToDeadEnd = function (p) {
-	return A3($elm$parser$Parser$DeadEnd, p.aU, p.ar, p.aK);
+	return A3($elm$parser$Parser$DeadEnd, p.aX, p.as, p.aN);
 };
 var $elm$parser$Parser$Advanced$bagToList = F2(
 	function (bag, list) {
@@ -7057,7 +7031,7 @@ var $elm$parser$Parser$Advanced$run = F2(
 	function (_v0, src) {
 		var parse = _v0;
 		var _v1 = parse(
-			{ar: 1, c: _List_Nil, d: 1, b: 0, aU: 1, a: src});
+			{as: 1, c: _List_Nil, d: 1, b: 0, aX: 1, a: src});
 		if (!_v1.$) {
 			var value = _v1.b;
 			return $elm$core$Result$Ok(value);
@@ -7079,52 +7053,54 @@ var $elm$parser$Parser$run = F2(
 				A2($elm$core$List$map, $elm$parser$Parser$problemToDeadEnd, problems));
 		}
 	});
+var $elm$json$Json$Encode$float = _Json_wrap;
 var $elm$json$Json$Encode$int = _Json_wrap;
+var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Common$productEncoder = function (product) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
 				'id',
-				$elm$json$Json$Encode$int(product.bl)),
+				$elm$json$Json$Encode$int(product.bo)),
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(product.H)),
+				$elm$json$Json$Encode$string(product.M)),
 				_Utils_Tuple2(
 				'description',
-				$elm$json$Json$Encode$string(product.ad)),
+				$elm$json$Json$Encode$string(product.au)),
 				_Utils_Tuple2(
 				'image',
-				$elm$json$Json$Encode$string(product.ae)),
+				$elm$json$Json$Encode$string(product.aD)),
 				_Utils_Tuple2(
 				'active',
-				$elm$json$Json$Encode$bool(product.B)),
+				$elm$json$Json$Encode$bool(product.A)),
 				_Utils_Tuple2(
 				'price',
-				$elm$json$Json$Encode$float(product.ai)),
+				$elm$json$Json$Encode$float(product.aj)),
 				_Utils_Tuple2(
 				'volume_in_ml',
-				$elm$json$Json$Encode$float(product.a1)),
+				$elm$json$Json$Encode$float(product.a4)),
 				_Utils_Tuple2(
 				'alcohol_content',
-				$elm$json$Json$Encode$float(product.ao))
+				$elm$json$Json$Encode$float(product.ap))
 			]));
 };
 var $author$project$Common$updateProduct = F3(
 	function (jwtToken, product, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$jsonBody(
+				r: $elm$http$Http$jsonBody(
 					$author$project$Common$productEncoder(product)),
-				t: $elm$http$Http$expectWhatever(msg),
-				u: _List_fromArray(
+				s: $elm$http$Http$expectWhatever(msg),
+				t: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				v: 'PATCH',
+				u: 'PATCH',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: $author$project$Common$hostname + ('/products?id=eq.' + $elm$core$String$fromInt(product.bl))
+				y: $author$project$Common$hostname + ('/products?id=eq.' + $elm$core$String$fromInt(product.bo))
 			});
 	});
 var $author$project$Common$userEncoder = function (user) {
@@ -7133,33 +7109,33 @@ var $author$project$Common$userEncoder = function (user) {
 			[
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(user.H)),
+				$elm$json$Json$Encode$string(user.M)),
 				_Utils_Tuple2(
 				'id',
-				$elm$json$Json$Encode$int(user.bl)),
+				$elm$json$Json$Encode$int(user.bo)),
 				_Utils_Tuple2(
 				'avatar',
-				$elm$json$Json$Encode$string(user.ba)),
+				$elm$json$Json$Encode$string(user.bd)),
 				_Utils_Tuple2(
 				'active',
-				$elm$json$Json$Encode$bool(user.B))
+				$elm$json$Json$Encode$bool(user.A))
 			]));
 };
 var $author$project$Common$updateUser = F3(
 	function (jwtToken, user, msg) {
 		return $elm$http$Http$request(
 			{
-				s: $elm$http$Http$jsonBody(
+				r: $elm$http$Http$jsonBody(
 					$author$project$Common$userEncoder(user)),
-				t: $elm$http$Http$expectWhatever(msg),
-				u: _List_fromArray(
+				s: $elm$http$Http$expectWhatever(msg),
+				t: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				v: 'PATCH',
+				u: 'PATCH',
+				w: $elm$core$Maybe$Nothing,
 				x: $elm$core$Maybe$Nothing,
-				y: $elm$core$Maybe$Nothing,
-				z: $author$project$Common$hostname + ('/users?id=eq.' + $elm$core$String$fromInt(user.bl))
+				y: $author$project$Common$hostname + ('/users?id=eq.' + $elm$core$String$fromInt(user.bo))
 			});
 	});
 var $author$project$Backend$update = F2(
@@ -7188,19 +7164,19 @@ var $author$project$Backend$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{K: password}),
+						{I: password}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					model,
-					A3($author$project$Common$get_jwt_token, 0, model.K, $author$project$Backend$GotJwt));
+					A3($author$project$Common$get_jwt_token, 0, model.I, $author$project$Backend$GotJwt));
 			case 5:
 				var result = msg.a;
 				if (result.$ === 1) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{K: ''}),
+							{I: ''}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var jwt = result.a;
@@ -7209,9 +7185,9 @@ var $author$project$Backend$update = F2(
 						$author$project$Backend$ShowOrders,
 						_Utils_update(
 							model,
-							{j: jwt, K: ''}));
+							{j: jwt, I: ''}));
 				}
-			case 12:
+			case 14:
 				var result = msg.a;
 				if (result.$ === 1) {
 					return _Utils_Tuple2(
@@ -7224,10 +7200,10 @@ var $author$project$Backend$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{ac: users}),
+							{ae: users}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 13:
+			case 15:
 				var result = msg.a;
 				if (result.$ === 1) {
 					return _Utils_Tuple2(
@@ -7240,15 +7216,15 @@ var $author$project$Backend$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{ab: products}),
+							{ad: products}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 8:
+			case 10:
 				var user = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Common$updateUser, model.j, user, $author$project$Backend$UpdatedUser));
-			case 9:
+			case 11:
 				if (msg.a.$ === 1) {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -7260,7 +7236,7 @@ var $author$project$Backend$update = F2(
 						model,
 						A2($author$project$Common$getUsers, model.j, $author$project$Backend$GotUsers));
 				}
-			case 16:
+			case 18:
 				if (msg.a.$ === 1) {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -7272,15 +7248,15 @@ var $author$project$Backend$update = F2(
 						model,
 						A2($author$project$Common$getUsers, model.j, $author$project$Backend$GotUsers));
 				}
-			case 17:
+			case 19:
 				var text = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{I: text}),
+						{G: text}),
 					$elm$core$Platform$Cmd$none);
-			case 14:
-				var _v4 = _Utils_Tuple2(model.R, model.I);
+			case 16:
+				var _v4 = _Utils_Tuple2(model.T, model.G);
 				_v4$0:
 				while (true) {
 					if (_v4.a.$ === 1) {
@@ -7299,18 +7275,18 @@ var $author$project$Backend$update = F2(
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
-									{R: $elm$core$Maybe$Nothing, I: ''}),
-								A4($author$project$Common$createUser, model.j, model.I, avatar, $author$project$Backend$NewUserCreated));
+									{T: $elm$core$Maybe$Nothing, G: ''}),
+								A4($author$project$Common$createUser, model.j, model.G, avatar, $author$project$Backend$NewUserCreated));
 						}
 					}
 				}
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 10:
+			case 12:
 				var product = msg.a;
 				return _Utils_Tuple2(
 					model,
 					A3($author$project$Common$updateProduct, model.j, product, $author$project$Backend$UpdatedProduct));
-			case 11:
+			case 13:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -7322,7 +7298,7 @@ var $author$project$Backend$update = F2(
 							{i: 3}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 15:
+			case 17:
 				var stripZero = function (string) {
 					return (A2($elm$core$String$startsWith, '0', string) && ($elm$core$String$length(string) > 1)) ? stripZero(
 						A2($elm$core$String$dropLeft, 1, string)) : string;
@@ -7334,7 +7310,7 @@ var $author$project$Backend$update = F2(
 						$elm$core$String$replace,
 						',',
 						'.',
-						stripZero(model.Q)));
+						stripZero(model.S)));
 				var price = A2(
 					$elm$parser$Parser$run,
 					$elm$parser$Parser$float,
@@ -7342,9 +7318,7 @@ var $author$project$Backend$update = F2(
 						$elm$core$String$replace,
 						',',
 						'.',
-						stripZero(model.P)));
-				var new_product = model.k;
-				var dummyProduct = A7($author$project$Common$NewProduct, '', '', '', 0, 0, 0, $author$project$Common$productDefaultLocation);
+						stripZero(model.R)));
 				var alcohol_content = A2(
 					$elm$parser$Parser$run,
 					$elm$parser$Parser$float,
@@ -7352,27 +7326,31 @@ var $author$project$Backend$update = F2(
 						$elm$core$String$replace,
 						',',
 						'.',
-						stripZero(model.O)));
+						stripZero(model.N)));
 				var _v6 = _Utils_Tuple3(price, volume_in_ml, alcohol_content);
 				if (((!_v6.a.$) && (!_v6.b.$)) && (!_v6.c.$)) {
 					var price_f = _v6.a.a;
 					var volume_in_ml_f = _v6.b.a;
 					var alcohol_content_f = _v6.c.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{k: dummyProduct, O: '', P: '', Q: ''}),
-						A3(
-							$author$project$Common$createProduct,
-							model.j,
+					var _v7 = model.Y;
+					if (!_v7.$) {
+						var image = _v7.a;
+						return _Utils_Tuple2(
 							_Utils_update(
-								new_product,
-								{ao: alcohol_content_f, ai: price_f, a1: volume_in_ml_f}),
-							$author$project$Backend$NewProductCreated));
+								model,
+								{N: '', O: '', P: $author$project$Common$productDefaultLocation, Q: '', R: '', S: ''}),
+							A3(
+								$author$project$Common$createProduct,
+								model.j,
+								{ap: alcohol_content_f, au: model.O, aD: image, af: model.P, M: model.Q, aj: price_f, a4: volume_in_ml_f},
+								$author$project$Backend$NewProductCreated));
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
-			case 18:
+			case 20:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -7384,72 +7362,49 @@ var $author$project$Backend$update = F2(
 							{i: 3}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 19:
-				var text = msg.a;
-				var new_product = model.k;
-				var new_product_updated = _Utils_update(
-					new_product,
-					{H: text});
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{k: new_product_updated}),
-					$elm$core$Platform$Cmd$none);
-			case 20:
-				var text = msg.a;
-				var new_product = model.k;
-				var new_product_updated = _Utils_update(
-					new_product,
-					{ae: text});
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{k: new_product_updated}),
-					$elm$core$Platform$Cmd$none);
 			case 21:
-				var text = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{P: text}),
-					$elm$core$Platform$Cmd$none);
-			case 22:
-				var text = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{O: text}),
-					$elm$core$Platform$Cmd$none);
-			case 23:
 				var text = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{Q: text}),
 					$elm$core$Platform$Cmd$none);
-			case 24:
+			case 22:
 				var text = msg.a;
-				var new_product = model.k;
-				var new_product_updated = _Utils_update(
-					new_product,
-					{ad: text});
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{k: new_product_updated}),
+						{R: text}),
+					$elm$core$Platform$Cmd$none);
+			case 23:
+				var text = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{N: text}),
+					$elm$core$Platform$Cmd$none);
+			case 24:
+				var text = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{S: text}),
 					$elm$core$Platform$Cmd$none);
 			case 25:
 				var text = msg.a;
-				var new_product = model.k;
-				var updated_new_product = _Utils_update(
-					new_product,
-					{_: text});
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{k: updated_new_product}),
+						{O: text}),
 					$elm$core$Platform$Cmd$none);
 			case 26:
+				var text = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{P: text}),
+					$elm$core$Platform$Cmd$none);
+			case 27:
 				if (msg.a.$ === 1) {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -7461,16 +7416,16 @@ var $author$project$Backend$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{aa: orders}),
+							{ac: orders}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 27:
+			case 28:
 				var order = msg.a;
 				var unDone = msg.b;
 				return _Utils_Tuple2(
 					model,
 					A4($author$project$Common$orderSetUndone, model.j, order, unDone, $author$project$Backend$UnDoneSet));
-			case 28:
+			case 29:
 				if (!msg.a.$) {
 					return _Utils_Tuple2(
 						model,
@@ -7490,13 +7445,30 @@ var $author$project$Backend$update = F2(
 						_List_fromArray(
 							['image/jpeg', 'image/png']),
 						$author$project$Backend$SelectedAvatar));
+			case 7:
+				var file = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							T: $elm$core$Maybe$Just(file)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 8:
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$elm$file$File$Select$file,
+						_List_fromArray(
+							['image/jpeg', 'image/png']),
+						$author$project$Backend$SelectedProductImage));
 			default:
 				var file = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							R: $elm$core$Maybe$Just(file)
+							Y: $elm$core$Maybe$Just(file)
 						}),
 					$elm$core$Platform$Cmd$none);
 		}
@@ -7577,7 +7549,7 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Backend$SetUndone = F2(
 	function (a, b) {
-		return {$: 27, a: a, b: b};
+		return {$: 28, a: a, b: b};
 	});
 var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$td = _VirtualDom_node('td');
@@ -7594,36 +7566,21 @@ var $author$project$Backend$orderRow = function (order) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						A2($elm$core$String$left, 19, order.bg))
+						A2($elm$core$String$left, 19, order.bj))
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(order.bB.H)
+						$elm$html$Html$text(order.bE.M)
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(order.bs.H)
-					])),
-				A2(
-				$elm$html$Html$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$elm$core$String$fromInt(order.a8))
-					])),
-				A2(
-				$elm$html$Html$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(order._)
+						$elm$html$Html$text(order.bv.M)
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -7631,7 +7588,22 @@ var $author$project$Backend$orderRow = function (order) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						order.am ? 'Yes' : 'No')
+						$elm$core$String$fromInt(order.bb))
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(order.af)
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						order.an ? 'Yes' : 'No')
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -7643,12 +7615,12 @@ var $author$project$Backend$orderRow = function (order) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Events$onClick(
-								A2($author$project$Backend$SetUndone, order, !order.am))
+								A2($author$project$Backend$SetUndone, order, !order.an))
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								order.am ? 'Redo' : 'Undo')
+								order.an ? 'Redo' : 'Undo')
 							]))
 					]))
 			]));
@@ -7717,36 +7689,34 @@ var $author$project$Backend$viewOrders = function (model) {
 									A2($elm$html$Html$th, _List_Nil, _List_Nil)
 								]))
 						]),
-					A2($elm$core$List$map, $author$project$Backend$orderRow, model.aa)))
+					A2($elm$core$List$map, $author$project$Backend$orderRow, model.ac)))
 			]));
 };
-var $author$project$Backend$CreateNewProduct = {$: 15};
+var $author$project$Backend$CreateNewProduct = {$: 17};
 var $author$project$Backend$NewProductAlcoholChange = function (a) {
-	return {$: 22, a: a};
-};
-var $author$project$Backend$NewProductDescriptionChange = function (a) {
-	return {$: 24, a: a};
-};
-var $author$project$Backend$NewProductImageChange = function (a) {
-	return {$: 20, a: a};
-};
-var $author$project$Backend$NewProductLocationChange = function (a) {
-	return {$: 25, a: a};
-};
-var $author$project$Backend$NewProductNameChange = function (a) {
-	return {$: 19, a: a};
-};
-var $author$project$Backend$NewProductPriceChange = function (a) {
-	return {$: 21, a: a};
-};
-var $author$project$Backend$NewProductVolumeChange = function (a) {
 	return {$: 23, a: a};
 };
+var $author$project$Backend$NewProductDescriptionChange = function (a) {
+	return {$: 25, a: a};
+};
+var $author$project$Backend$NewProductLocationChange = function (a) {
+	return {$: 26, a: a};
+};
+var $author$project$Backend$NewProductNameChange = function (a) {
+	return {$: 21, a: a};
+};
+var $author$project$Backend$NewProductPriceChange = function (a) {
+	return {$: 22, a: a};
+};
+var $author$project$Backend$NewProductVolumeChange = function (a) {
+	return {$: 24, a: a};
+};
+var $author$project$Backend$SelectProductImage = {$: 8};
+var $elm$file$File$name = _File_name;
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $author$project$Backend$UpdateProduct = function (a) {
-	return {$: 10, a: a};
+	return {$: 12, a: a};
 };
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Backend$productRow = function (product) {
 	return A2(
 		$elm$html$Html$tr,
@@ -7758,29 +7728,21 @@ var $author$project$Backend$productRow = function (product) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(product.H)
+						$elm$html$Html$text(product.M)
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(product.ad)
+						$elm$html$Html$text(product.au)
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(product.ae)
-					])),
-				A2(
-				$elm$html$Html$td,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$elm$core$String$fromFloat(product.ai))
+						$elm$html$Html$text(product.aD)
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -7788,7 +7750,7 @@ var $author$project$Backend$productRow = function (product) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$elm$core$String$fromFloat(product.a1))
+						$elm$core$String$fromFloat(product.aj))
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -7796,14 +7758,22 @@ var $author$project$Backend$productRow = function (product) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$elm$core$String$fromFloat(product.ao))
+						$elm$core$String$fromFloat(product.a4))
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(product._)
+						$elm$html$Html$text(
+						$elm$core$String$fromFloat(product.ap))
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(product.af)
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -7818,39 +7788,48 @@ var $author$project$Backend$productRow = function (product) {
 								$author$project$Backend$UpdateProduct(
 									_Utils_update(
 										product,
-										{B: !product.B})))
+										{A: !product.A})))
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								product.B ? ' Deactivate' : 'Activate')
+								product.A ? ' Deactivate' : 'Activate')
 							]))
 					]))
 			]));
 };
 var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$Backend$viewProducts = function (model) {
+	var select_button_text = function () {
+		var _v0 = model.Y;
+		if (_v0.$ === 1) {
+			return 'Select';
+		} else {
+			var f = _v0.a;
+			return $elm$file$File$name(f);
+		}
+	}();
 	var products_ordered = A2(
 		$elm$core$List$sortBy,
 		function (p) {
-			return p.B ? 0 : 1;
+			return p.A ? 0 : 1;
 		},
 		A2(
 			$elm$core$List$sortBy,
 			function ($) {
-				return $.ai;
+				return $.aj;
 			},
 			A2(
 				$elm$core$List$sortBy,
 				function ($) {
-					return $.H;
+					return $.M;
 				},
 				A2(
 					$elm$core$List$sortBy,
 					function ($) {
-						return $.bl;
+						return $.bo;
 					},
-					model.ab))));
+					model.ad))));
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -7932,7 +7911,7 @@ var $author$project$Backend$viewProducts = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$placeholder('Name'),
-													$elm$html$Html$Attributes$value(model.k.H),
+													$elm$html$Html$Attributes$value(model.Q),
 													$elm$html$Html$Events$onInput($author$project$Backend$NewProductNameChange)
 												]),
 											_List_Nil)
@@ -7947,7 +7926,7 @@ var $author$project$Backend$viewProducts = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$placeholder('Description'),
-													$elm$html$Html$Attributes$value(model.k.ad),
+													$elm$html$Html$Attributes$value(model.O),
 													$elm$html$Html$Events$onInput($author$project$Backend$NewProductDescriptionChange)
 												]),
 											_List_Nil)
@@ -7958,14 +7937,15 @@ var $author$project$Backend$viewProducts = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$input,
+											$elm$html$Html$button,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$placeholder('Image'),
-													$elm$html$Html$Attributes$value(model.k.ae),
-													$elm$html$Html$Events$onInput($author$project$Backend$NewProductImageChange)
+													$elm$html$Html$Events$onClick($author$project$Backend$SelectProductImage)
 												]),
-											_List_Nil)
+											_List_fromArray(
+												[
+													$elm$html$Html$text(select_button_text)
+												]))
 										])),
 									A2(
 									$elm$html$Html$td,
@@ -7977,7 +7957,7 @@ var $author$project$Backend$viewProducts = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$placeholder('Price'),
-													$elm$html$Html$Attributes$value(model.P),
+													$elm$html$Html$Attributes$value(model.R),
 													$elm$html$Html$Events$onInput($author$project$Backend$NewProductPriceChange)
 												]),
 											_List_Nil)
@@ -7992,7 +7972,7 @@ var $author$project$Backend$viewProducts = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$placeholder('Volume in Milliliters'),
-													$elm$html$Html$Attributes$value(model.Q),
+													$elm$html$Html$Attributes$value(model.S),
 													$elm$html$Html$Events$onInput($author$project$Backend$NewProductVolumeChange)
 												]),
 											_List_Nil)
@@ -8007,7 +7987,7 @@ var $author$project$Backend$viewProducts = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$placeholder('Alcohol Content'),
-													$elm$html$Html$Attributes$value(model.O),
+													$elm$html$Html$Attributes$value(model.N),
 													$elm$html$Html$Events$onInput($author$project$Backend$NewProductAlcoholChange)
 												]),
 											_List_Nil)
@@ -8022,7 +8002,7 @@ var $author$project$Backend$viewProducts = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$placeholder('Location'),
-													$elm$html$Html$Attributes$value(model.k._),
+													$elm$html$Html$Attributes$value(model.P),
 													$elm$html$Html$Events$onInput($author$project$Backend$NewProductLocationChange)
 												]),
 											_List_Nil)
@@ -8048,14 +8028,13 @@ var $author$project$Backend$viewProducts = function (model) {
 					A2($elm$core$List$map, $author$project$Backend$productRow, products_ordered)))
 			]));
 };
-var $author$project$Backend$CreateNewUser = {$: 14};
+var $author$project$Backend$CreateNewUser = {$: 16};
 var $author$project$Backend$NewUserNameChange = function (a) {
-	return {$: 17, a: a};
+	return {$: 19, a: a};
 };
 var $author$project$Backend$SelectAvatar = {$: 6};
-var $elm$file$File$name = _File_name;
 var $author$project$Backend$UpdateUser = function (a) {
-	return {$: 8, a: a};
+	return {$: 10, a: a};
 };
 var $author$project$Backend$userRow = function (user) {
 	return A2(
@@ -8068,14 +8047,14 @@ var $author$project$Backend$userRow = function (user) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(user.H)
+						$elm$html$Html$text(user.M)
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(user.ba)
+						$elm$html$Html$text(user.bd)
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -8083,7 +8062,7 @@ var $author$project$Backend$userRow = function (user) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						user.B ? 'Yes' : 'No')
+						user.A ? 'Yes' : 'No')
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -8098,19 +8077,19 @@ var $author$project$Backend$userRow = function (user) {
 								$author$project$Backend$UpdateUser(
 									_Utils_update(
 										user,
-										{B: !user.B})))
+										{A: !user.A})))
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								user.B ? ' Deactivate' : 'Activate')
+								user.A ? ' Deactivate' : 'Activate')
 							]))
 					]))
 			]));
 };
 var $author$project$Backend$viewUsers = function (model) {
 	var avatar_button = function () {
-		var _v0 = model.R;
+		var _v0 = model.T;
 		if (!_v0.$) {
 			var avatar = _v0.a;
 			return A2(
@@ -8193,7 +8172,7 @@ var $author$project$Backend$viewUsers = function (model) {
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$placeholder('Name'),
-													$elm$html$Html$Attributes$value(model.I),
+													$elm$html$Html$Attributes$value(model.G),
 													$elm$html$Html$Events$onInput($author$project$Backend$NewUserNameChange)
 												]),
 											_List_Nil)
@@ -8221,7 +8200,7 @@ var $author$project$Backend$viewUsers = function (model) {
 										]))
 								]))
 						]),
-					A2($elm$core$List$map, $author$project$Backend$userRow, model.ac)))
+					A2($elm$core$List$map, $author$project$Backend$userRow, model.ae)))
 			]));
 };
 var $author$project$Backend$view = function (model) {
@@ -8325,7 +8304,7 @@ var $author$project$Backend$view = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$type_('password'),
-												$elm$html$Html$Attributes$value(model.K),
+												$elm$html$Html$Attributes$value(model.I),
 												$elm$html$Html$Events$onInput($author$project$Backend$PasswordChanged)
 											]),
 										_List_Nil),
@@ -8345,7 +8324,7 @@ var $author$project$Backend$view = function (model) {
 				])));
 };
 var $author$project$Backend$main = $elm$browser$Browser$element(
-	{bn: $author$project$Backend$init, by: $author$project$Backend$subscriptions, bA: $author$project$Backend$update, i: $author$project$Backend$view});
+	{bq: $author$project$Backend$init, bB: $author$project$Backend$subscriptions, bD: $author$project$Backend$update, i: $author$project$Backend$view});
 _Platform_export({'Backend':{'init':$author$project$Backend$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 

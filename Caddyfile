@@ -11,6 +11,9 @@ handle_path /get_jwt {
 handle_path /create_user {
     reverse_proxy create_user:8088
 }
+handle_path /create_product {
+    reverse_proxy create_product:8087
+}
 
 root * /static
 file_server

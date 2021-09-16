@@ -1,7 +1,7 @@
 module Backend exposing (Model, Msg(..), View(..), main, update, view)
 
 import Browser
-import Common exposing (NewOrder, NewProduct, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, get_jwt_token, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
+import Common exposing (NewOrder, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, get_jwt_token, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
 import File
 import File.Select
 import Html exposing (..)
@@ -33,6 +33,8 @@ type Msg
     | GotJwt (Result Http.Error String)
     | SelectAvatar
     | SelectedAvatar File.File
+    | SelectProductImage
+    | SelectedProductImage File.File
     | UpdateUser User
     | UpdatedUser (Result Http.Error ())
     | UpdateProduct Product
@@ -45,7 +47,6 @@ type Msg
     | NewUserNameChange String
     | NewProductCreated (Result Http.Error ())
     | NewProductNameChange String
-    | NewProductImageChange String
     | NewProductPriceChange String
     | NewProductAlcoholChange String
     | NewProductVolumeChange String
@@ -73,10 +74,13 @@ type alias Model =
     , orders : List Order
     , new_user_name : String
     , new_user_avatar : Maybe File.File
-    , new_product : NewProduct
+    , new_product_name : String
+    , new_product_description : String
     , new_product_price : String
     , new_product_volume : String
+    , new_product_location : String
     , new_product_alcohol_content : String
+    , new_product_image : Maybe File.File
     }
 
 
@@ -90,10 +94,13 @@ init _ =
       , orders = []
       , new_user_name = ""
       , new_user_avatar = Nothing
-      , new_product = NewProduct "" "" "" 0 0 0 productDefaultLocation
+      , new_product_name = ""
+      , new_product_description = ""
       , new_product_price = ""
       , new_product_alcohol_content = ""
       , new_product_volume = ""
+      , new_product_image = Nothing
+      , new_product_location = productDefaultLocation
       }
     , Cmd.none
     )
@@ -204,29 +211,33 @@ update msg model =
 
                 volume_in_ml =
                     Parser.run Parser.float <| String.replace "," "." <| stripZero <| model.new_product_volume
-
-                new_product =
-                    model.new_product
-
-                dummyProduct =
-                    NewProduct "" "" "" 0 0 0 productDefaultLocation
             in
             case ( price, volume_in_ml, alcohol_content ) of
                 ( Ok price_f, Ok volume_in_ml_f, Ok alcohol_content_f ) ->
-                    ( { model
-                        | new_product = dummyProduct
-                        , new_product_price = ""
-                        , new_product_volume = ""
-                        , new_product_alcohol_content = ""
-                      }
-                    , createProduct model.jwtToken
-                        { new_product
-                            | price = price_f
-                            , volume_in_ml = volume_in_ml_f
-                            , alcohol_content = alcohol_content_f
-                        }
-                        NewProductCreated
-                    )
+                    case model.new_product_image of
+                        Just image ->
+                            ( { model
+                                | new_product_name = ""
+                                , new_product_description = ""
+                                , new_product_price = ""
+                                , new_product_volume = ""
+                                , new_product_alcohol_content = ""
+                                , new_product_location = productDefaultLocation
+                              }
+                            , createProduct model.jwtToken
+                                { name = model.new_product_name
+                                , description = model.new_product_description
+                                , image = image
+                                , price = price_f
+                                , volume_in_ml = volume_in_ml_f
+                                , alcohol_content = alcohol_content_f
+                                , location = model.new_product_location
+                                }
+                                NewProductCreated
+                            )
+
+                        Nothing ->
+                            ( model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -238,24 +249,7 @@ update msg model =
             ( { model | view = Failure }, Cmd.none )
 
         NewProductNameChange text ->
-            let
-                new_product =
-                    model.new_product
-
-                new_product_updated =
-                    { new_product | name = text }
-            in
-            ( { model | new_product = new_product_updated }, Cmd.none )
-
-        NewProductImageChange text ->
-            let
-                new_product =
-                    model.new_product
-
-                new_product_updated =
-                    { new_product | image = text }
-            in
-            ( { model | new_product = new_product_updated }, Cmd.none )
+            ( { model | new_product_name = text }, Cmd.none )
 
         NewProductPriceChange text ->
             ( { model | new_product_price = text }, Cmd.none )
@@ -267,24 +261,10 @@ update msg model =
             ( { model | new_product_volume = text }, Cmd.none )
 
         NewProductDescriptionChange text ->
-            let
-                new_product =
-                    model.new_product
-
-                new_product_updated =
-                    { new_product | description = text }
-            in
-            ( { model | new_product = new_product_updated }, Cmd.none )
+            ( { model | new_product_description = text }, Cmd.none )
 
         NewProductLocationChange text ->
-            let
-                new_product =
-                    model.new_product
-
-                updated_new_product =
-                    { new_product | location = text }
-            in
-            ( { model | new_product = updated_new_product }, Cmd.none )
+            ( { model | new_product_location = text }, Cmd.none )
 
         GotOrders (Err _) ->
             ( { model | view = Failure }, Cmd.none )
@@ -306,6 +286,12 @@ update msg model =
 
         SelectedAvatar file ->
             ( { model | new_user_avatar = Just file }, Cmd.none )
+
+        SelectProductImage ->
+            ( model, File.Select.file [ "image/jpeg", "image/png" ] SelectedProductImage )
+
+        SelectedProductImage file ->
+            ( { model | new_product_image = Just file }, Cmd.none )
 
 
 
@@ -484,19 +470,27 @@ viewProducts model =
                         else
                             1
                     )
+
+        select_button_text =
+            case model.new_product_image of
+                Nothing ->
+                    "Select"
+
+                Just f ->
+                    File.name f
     in
     div []
         [ table []
             ([ tr []
                 [ th [] [ text "Name" ], th [] [ text "Description" ], th [] [ text "Image" ], th [] [ text "Price" ], th [] [ text "Volume in Milliliters" ], th [] [ text "Alcohol Content" ], th [] [ text "Location" ] ]
              , tr []
-                [ td [] [ input [ placeholder "Name", value model.new_product.name, onInput NewProductNameChange ] [] ]
-                , td [] [ input [ placeholder "Description", value model.new_product.description, onInput NewProductDescriptionChange ] [] ]
-                , td [] [ input [ placeholder "Image", value model.new_product.image, onInput NewProductImageChange ] [] ]
+                [ td [] [ input [ placeholder "Name", value model.new_product_name, onInput NewProductNameChange ] [] ]
+                , td [] [ input [ placeholder "Description", value model.new_product_description, onInput NewProductDescriptionChange ] [] ]
+                , td [] [ button [ onClick SelectProductImage ] [ text select_button_text ] ]
                 , td [] [ input [ placeholder "Price", value model.new_product_price, onInput NewProductPriceChange ] [] ]
                 , td [] [ input [ placeholder "Volume in Milliliters", value model.new_product_volume, onInput NewProductVolumeChange ] [] ]
                 , td [] [ input [ placeholder "Alcohol Content", value model.new_product_alcohol_content, onInput NewProductAlcoholChange ] [] ]
-                , td [] [ input [ placeholder "Location", value model.new_product.location, onInput NewProductLocationChange ] [] ]
+                , td [] [ input [ placeholder "Location", value model.new_product_location, onInput NewProductLocationChange ] [] ]
                 , td [] [ button [ onClick CreateNewProduct ] [ text "Create new" ] ]
                 ]
              ]

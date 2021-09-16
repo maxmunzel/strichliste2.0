@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -26,9 +27,26 @@ func main() {
 			return
 		}
 		jwt := r.Form.Get("jwt")
-		user_name := r.Form.Get("name")
+		name := r.Form.Get("name")
+		description := r.Form.Get("description")
+		price, err := strconv.ParseFloat(r.Form.Get("price"), 64)
+		if err != nil {
+			http.Error(w, "Cant parse price", 400)
+			return
+		}
+		volume_in_ml, err := strconv.ParseFloat(r.Form.Get("volume_in_ml"), 64)
+		if err != nil {
+			http.Error(w, "Cant parse volume_in_ml", 400)
+			return
+		}
+		alcohol_content, err := strconv.ParseFloat(r.Form.Get("alcohol_content"), 64)
+		if err != nil {
+			http.Error(w, "Cant parse alcohol_content", 400)
+			return
+		}
+		location := r.Form.Get("location")
 
-		file, _, err := r.FormFile("file")
+		file, _, err := r.FormFile("image")
 		if err != nil {
 			log.Println("Cant read file")
 			log.Print(err)
@@ -38,7 +56,9 @@ func main() {
 		io.Copy(buf, file)
 		file_contents := buf.Bytes()
 
-		cropped, err := cropscalePng(bytes.NewBuffer(file_contents), 200, 200)
+		file_contents_copy := make([]byte, len(file_contents))
+		copy(file_contents_copy, file_contents)
+		cropped, err := cropscalePng(bytes.NewReader(file_contents_copy), 140, 400)
 		if err != nil {
 			log.Printf("Error scaling image: %s\n", err)
 			http.Error(w, "Invalid Image", 400)
@@ -49,22 +69,28 @@ func main() {
 		hash_slice := hash[:]
 		hash_str := base32.StdEncoding.EncodeToString(hash_slice)[:25]
 
-		filename := "/profile_pics/" + hash_str + ".png"
+		filename := "/product_pics/" + hash_str + ".png"
 
-		type newUser = struct {
-			Name   string `json:"name"`
-			Avatar string `json:"avatar"`
+		type newProduct = struct {
+			Name            string  `json:"name"`
+			Description     string  `json:"description"`
+			Image           string  `json:"image"`
+			Price           float64 `json:"price"`
+			Volume          float64 `json:"volume_in_ml"`
+			Alcohol_content float64 `json:"alcohol_content"`
+			Location        string  `json:"location"`
 		}
-		body, _ := json.Marshal(newUser{user_name, filename})
+		body, _ := json.Marshal(newProduct{
+			name, description, filename, price, volume_in_ml, alcohol_content, location})
 		body_reader := bytes.NewBuffer(body)
-		req, err := http.NewRequest("POST", "http://api:3000/users", body_reader)
+		req, err := http.NewRequest("POST", "http://api:3000/products", body_reader)
 		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("Authorization", "Bearer "+jwt)
 		response, err := http.DefaultClient.Do(req)
 		if err != nil || response.StatusCode != 201 {
 			log.Println(err)
 			log.Println(response)
-			http.Error(w, "Could not create User", 500)
+			http.Error(w, "Could not create Product", 500)
 			return
 		}
 
@@ -77,7 +103,7 @@ func main() {
 		}
 	})
 
-	log.Fatal(http.ListenAndServe(":8088", nil))
+	log.Fatal(http.ListenAndServe(":8087", nil))
 }
 
 func cropscalePng(r io.Reader, target_x, target_y int) ([]byte, error) {

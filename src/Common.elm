@@ -221,12 +221,26 @@ newProductEncoder product =
         ]
 
 
+
+-- createProduct:String -> -> (Result Http.Error () -> msg) -> Cmd msg
+
+
 createProduct jwtToken product msg =
     Http.request
         { method = "POST"
-        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
-        , url = hostname ++ "/products"
-        , body = Http.jsonBody <| newProductEncoder <| product
+        , headers = []
+        , url = "/create_product"
+        , body =
+            Http.multipartBody
+                [ Http.stringPart "name" product.name
+                , Http.stringPart "description" product.description
+                , Http.stringPart "jwt" jwtToken
+                , Http.filePart "image" product.image
+                , Http.stringPart "price" (String.fromFloat product.price)
+                , Http.stringPart "volume_in_ml" (String.fromFloat product.volume_in_ml)
+                , Http.stringPart "alcohol_content" (String.fromFloat product.alcohol_content)
+                , Http.stringPart "location" product.location
+                ]
         , expect = Http.expectWhatever msg
         , timeout = Nothing
         , tracker = Nothing

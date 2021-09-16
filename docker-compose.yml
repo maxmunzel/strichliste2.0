@@ -14,6 +14,18 @@ services:
       - database
       - caddy_api
 
+  create_product:
+    restart: always
+    build:
+      context: .
+      dockerfile: create_product.Dockerfile
+    ports:
+      - "8087:8087"
+    volumes:
+      - "./static/product_pics:/product_pics"
+      - "./create_product.go:/go/src/create_user/create_user.go"
+    networks:
+      - caddy_api
   create_user:
     restart: always
     build:

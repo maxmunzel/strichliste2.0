@@ -3991,7 +3991,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.r);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.s);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
@@ -4379,25 +4379,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.s.a(response)));
+			callback(toTask(request.t.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.s.b, xhr)); });
-		$elm$core$Maybe$isJust(request.x) && _Http_track(router, xhr, request.x.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.t.b, xhr)); });
+		$elm$core$Maybe$isJust(request.y) && _Http_track(router, xhr, request.y.a);
 
 		try {
-			xhr.open(request.u, request.y, true);
+			xhr.open(request.v, request.z, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.y));
+			return done($elm$http$Http$BadUrl_(request.z));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.r.a && xhr.setRequestHeader('Content-Type', request.r.a);
-		xhr.send(request.r.b);
+		request.s.a && xhr.setRequestHeader('Content-Type', request.s.a);
+		xhr.send(request.s.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4408,12 +4408,12 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.t; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.u; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.w.a || 0;
-	xhr.responseType = request.s.d;
+	xhr.timeout = request.x.a || 0;
+	xhr.responseType = request.t.d;
 	xhr.withCredentials = request.ba;
 }
 
@@ -4435,10 +4435,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		y: xhr.responseURL,
+		z: xhr.responseURL,
 		bz: xhr.status,
 		bA: xhr.statusText,
-		t: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		u: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -6354,7 +6354,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.x;
+							var _v4 = req.y;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6442,13 +6442,13 @@ var $elm$http$Http$cmdMap = F2(
 			return $elm$http$Http$Request(
 				{
 					ba: r.ba,
-					r: r.r,
-					s: A2(_Http_mapExpect, func, r.s),
-					t: r.t,
+					s: r.s,
+					t: A2(_Http_mapExpect, func, r.t),
 					u: r.u,
-					w: r.w,
+					v: r.v,
 					x: r.x,
-					y: r.y
+					y: r.y,
+					z: r.z
 				});
 		}
 	});
@@ -6471,14 +6471,14 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{ba: false, r: r.r, s: r.s, t: r.t, u: r.u, w: r.w, x: r.x, y: r.y}));
+			{ba: false, s: r.s, t: r.t, u: r.u, v: r.v, x: r.x, y: r.y, z: r.z}));
 };
 var $elm$http$Http$stringPart = _Http_pair;
 var $author$project$Common$createProduct = F3(
 	function (jwtToken, product, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$multipartBody(
+				s: $elm$http$Http$multipartBody(
 					_List_fromArray(
 						[
 							A2($elm$http$Http$stringPart, 'name', product.M),
@@ -6499,12 +6499,12 @@ var $author$project$Common$createProduct = F3(
 							$elm$core$String$fromFloat(product.ap)),
 							A2($elm$http$Http$stringPart, 'location', product.af)
 						])),
-				s: $elm$http$Http$expectWhatever(msg),
-				t: _List_Nil,
-				u: 'POST',
-				w: $elm$core$Maybe$Nothing,
+				t: $elm$http$Http$expectWhatever(msg),
+				u: _List_Nil,
+				v: 'POST',
 				x: $elm$core$Maybe$Nothing,
-				y: '/create_product'
+				y: $elm$core$Maybe$Nothing,
+				z: '/create_product'
 			});
 	});
 var $elm$http$Http$Header = F2(
@@ -6516,22 +6516,22 @@ var $author$project$Common$createUser = F4(
 	function (jwtToken, name, avatar, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$multipartBody(
+				s: $elm$http$Http$multipartBody(
 					_List_fromArray(
 						[
 							A2($elm$http$Http$stringPart, 'name', name),
 							A2($elm$http$Http$stringPart, 'jwt', jwtToken),
 							A2($elm$http$Http$filePart, 'file', avatar)
 						])),
-				s: $elm$http$Http$expectWhatever(msg),
-				t: _List_fromArray(
+				t: $elm$http$Http$expectWhatever(msg),
+				u: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				u: 'POST',
-				w: $elm$core$Maybe$Nothing,
+				v: 'POST',
 				x: $elm$core$Maybe$Nothing,
-				y: '/create_user'
+				y: $elm$core$Maybe$Nothing,
+				z: '/create_user'
 			});
 	});
 var $elm$time$Time$Posix = $elm$core$Basics$identity;
@@ -6767,7 +6767,7 @@ var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$json$Json$Decode$map7 = _Json_map7;
 var $author$project$Common$Product = F9(
 	function (id, name, description, image, active, price, alcohol_content, volume_in_ml, location) {
-		return {A: active, ap: alcohol_content, au: description, bo: id, aD: image, af: location, M: name, aj: price, a4: volume_in_ml};
+		return {r: active, ap: alcohol_content, au: description, bo: id, aD: image, af: location, M: name, aj: price, a4: volume_in_ml};
 	});
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
@@ -6818,7 +6818,7 @@ var $author$project$Common$productDecoder = A3(
 									$elm$json$Json$Decode$succeed($author$project$Common$Product))))))))));
 var $author$project$Common$UserNoStat = F4(
 	function (id, name, avatar, active) {
-		return {A: active, bd: avatar, bo: id, M: name};
+		return {r: active, bd: avatar, bo: id, M: name};
 	});
 var $elm$json$Json$Decode$map4 = _Json_map4;
 var $author$project$Common$userNoStatDecoder = A5(
@@ -6842,43 +6842,43 @@ var $author$project$Common$getOrders = F2(
 	function (jwtToken, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$emptyBody,
-				s: A2(
+				s: $elm$http$Http$emptyBody,
+				t: A2(
 					$elm$http$Http$expectJson,
 					msg,
 					$elm$json$Json$Decode$list($author$project$Common$orderDecoder)),
-				t: _List_fromArray(
+				u: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				u: 'GET',
-				w: $elm$core$Maybe$Nothing,
+				v: 'GET',
 				x: $elm$core$Maybe$Nothing,
-				y: $author$project$Common$hostname + '/orders?select=*,user:users(*),product:products(*)&limit=200&order=creation_date.desc'
+				y: $elm$core$Maybe$Nothing,
+				z: $author$project$Common$hostname + '/orders?select=*,user:users(*),product:products(*)&limit=200&order=creation_date.desc'
 			});
 	});
 var $author$project$Common$getProducts = F2(
 	function (jwtToken, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$emptyBody,
-				s: A2(
+				s: $elm$http$Http$emptyBody,
+				t: A2(
 					$elm$http$Http$expectJson,
 					msg,
 					$elm$json$Json$Decode$list($author$project$Common$productDecoder)),
-				t: _List_fromArray(
+				u: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				u: 'GET',
-				w: $elm$core$Maybe$Nothing,
+				v: 'GET',
 				x: $elm$core$Maybe$Nothing,
-				y: $author$project$Common$hostname + '/products?order=price.asc&active=eq.true'
+				y: $elm$core$Maybe$Nothing,
+				z: $author$project$Common$hostname + '/products?order=price.asc&active=eq.true'
 			});
 	});
 var $author$project$Common$User = F8(
 	function (id, name, avatar, active, cost_last_30_days, cost_this_month, cost_last_month, alc_ml_last_30_days) {
-		return {A: active, a9: alc_ml_last_30_days, bd: avatar, bg: cost_last_30_days, bh: cost_last_month, bi: cost_this_month, bo: id, M: name};
+		return {r: active, a9: alc_ml_last_30_days, bd: avatar, bg: cost_last_30_days, bh: cost_last_month, bi: cost_this_month, bo: id, M: name};
 	});
 var $elm$json$Json$Decode$map8 = _Json_map8;
 var $author$project$Common$userDecoder = A9(
@@ -6896,19 +6896,19 @@ var $author$project$Common$getUsers = F2(
 	function (jwtToken, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$emptyBody,
-				s: A2(
+				s: $elm$http$Http$emptyBody,
+				t: A2(
 					$elm$http$Http$expectJson,
 					msg,
 					$elm$json$Json$Decode$list($author$project$Common$userDecoder)),
-				t: _List_fromArray(
+				u: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				u: 'GET',
-				w: $elm$core$Maybe$Nothing,
+				v: 'GET',
 				x: $elm$core$Maybe$Nothing,
-				y: $author$project$Common$hostname + '/users_and_costs?order=name.asc'
+				y: $elm$core$Maybe$Nothing,
+				z: $author$project$Common$hostname + '/users_and_costs?order=name.asc'
 			});
 	});
 var $elm$http$Http$expectString = function (toMsg) {
@@ -6928,9 +6928,9 @@ var $author$project$Common$get_jwt_token = F3(
 	function (user, password, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$emptyBody,
-				s: $elm$http$Http$expectString(msg),
-				t: _List_fromArray(
+				s: $elm$http$Http$emptyBody,
+				t: $elm$http$Http$expectString(msg),
+				u: _List_fromArray(
 					[
 						A2(
 						$elm$http$Http$header,
@@ -6938,10 +6938,10 @@ var $author$project$Common$get_jwt_token = F3(
 						$author$project$Common$username(user)),
 						A2($elm$http$Http$header, 'password', password)
 					]),
-				u: 'GET',
-				w: $elm$core$Maybe$Nothing,
+				v: 'GET',
 				x: $elm$core$Maybe$Nothing,
-				y: '/get_jwt'
+				y: $elm$core$Maybe$Nothing,
+				z: '/get_jwt'
 			});
 	});
 var $elm$json$Json$Encode$bool = _Json_wrap;
@@ -6975,16 +6975,16 @@ var $author$project$Common$orderSetUndone = F4(
 				]));
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$jsonBody(payload),
-				s: $elm$http$Http$expectWhatever(msg),
-				t: _List_fromArray(
+				s: $elm$http$Http$jsonBody(payload),
+				t: $elm$http$Http$expectWhatever(msg),
+				u: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				u: 'PATCH',
-				w: $elm$core$Maybe$Nothing,
+				v: 'PATCH',
 				x: $elm$core$Maybe$Nothing,
-				y: $author$project$Common$hostname + ('/orders?id=eq.' + $elm$core$String$fromInt(order.bo))
+				y: $elm$core$Maybe$Nothing,
+				z: $author$project$Common$hostname + ('/orders?id=eq.' + $elm$core$String$fromInt(order.bo))
 			});
 	});
 var $elm$core$String$replace = F3(
@@ -7074,7 +7074,7 @@ var $author$project$Common$productEncoder = function (product) {
 				$elm$json$Json$Encode$string(product.aD)),
 				_Utils_Tuple2(
 				'active',
-				$elm$json$Json$Encode$bool(product.A)),
+				$elm$json$Json$Encode$bool(product.r)),
 				_Utils_Tuple2(
 				'price',
 				$elm$json$Json$Encode$float(product.aj)),
@@ -7090,17 +7090,17 @@ var $author$project$Common$updateProduct = F3(
 	function (jwtToken, product, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$jsonBody(
+				s: $elm$http$Http$jsonBody(
 					$author$project$Common$productEncoder(product)),
-				s: $elm$http$Http$expectWhatever(msg),
-				t: _List_fromArray(
+				t: $elm$http$Http$expectWhatever(msg),
+				u: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				u: 'PATCH',
-				w: $elm$core$Maybe$Nothing,
+				v: 'PATCH',
 				x: $elm$core$Maybe$Nothing,
-				y: $author$project$Common$hostname + ('/products?id=eq.' + $elm$core$String$fromInt(product.bo))
+				y: $elm$core$Maybe$Nothing,
+				z: $author$project$Common$hostname + ('/products?id=eq.' + $elm$core$String$fromInt(product.bo))
 			});
 	});
 var $author$project$Common$userEncoder = function (user) {
@@ -7118,24 +7118,24 @@ var $author$project$Common$userEncoder = function (user) {
 				$elm$json$Json$Encode$string(user.bd)),
 				_Utils_Tuple2(
 				'active',
-				$elm$json$Json$Encode$bool(user.A))
+				$elm$json$Json$Encode$bool(user.r))
 			]));
 };
 var $author$project$Common$updateUser = F3(
 	function (jwtToken, user, msg) {
 		return $elm$http$Http$request(
 			{
-				r: $elm$http$Http$jsonBody(
+				s: $elm$http$Http$jsonBody(
 					$author$project$Common$userEncoder(user)),
-				s: $elm$http$Http$expectWhatever(msg),
-				t: _List_fromArray(
+				t: $elm$http$Http$expectWhatever(msg),
+				u: _List_fromArray(
 					[
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
-				u: 'PATCH',
-				w: $elm$core$Maybe$Nothing,
+				v: 'PATCH',
 				x: $elm$core$Maybe$Nothing,
-				y: $author$project$Common$hostname + ('/users?id=eq.' + $elm$core$String$fromInt(user.bo))
+				y: $elm$core$Maybe$Nothing,
+				z: $author$project$Common$hostname + ('/users?id=eq.' + $elm$core$String$fromInt(user.bo))
 			});
 	});
 var $author$project$Backend$update = F2(
@@ -7788,12 +7788,12 @@ var $author$project$Backend$productRow = function (product) {
 								$author$project$Backend$UpdateProduct(
 									_Utils_update(
 										product,
-										{A: !product.A})))
+										{r: !product.r})))
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								product.A ? ' Deactivate' : 'Activate')
+								product.r ? ' Deactivate' : 'Activate')
 							]))
 					]))
 			]));
@@ -7812,7 +7812,7 @@ var $author$project$Backend$viewProducts = function (model) {
 	var products_ordered = A2(
 		$elm$core$List$sortBy,
 		function (p) {
-			return p.A ? 0 : 1;
+			return p.r ? 0 : 1;
 		},
 		A2(
 			$elm$core$List$sortBy,
@@ -8033,6 +8033,17 @@ var $author$project$Backend$NewUserNameChange = function (a) {
 	return {$: 19, a: a};
 };
 var $author$project$Backend$SelectAvatar = {$: 6};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $author$project$Backend$UpdateUser = function (a) {
 	return {$: 10, a: a};
 };
@@ -8062,7 +8073,7 @@ var $author$project$Backend$userRow = function (user) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						user.A ? 'Yes' : 'No')
+						user.r ? 'Yes' : 'No')
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -8077,12 +8088,12 @@ var $author$project$Backend$userRow = function (user) {
 								$author$project$Backend$UpdateUser(
 									_Utils_update(
 										user,
-										{A: !user.A})))
+										{r: !user.r})))
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								user.A ? ' Deactivate' : 'Activate')
+								user.r ? ' Deactivate' : 'Activate')
 							]))
 					]))
 			]));
@@ -8200,7 +8211,15 @@ var $author$project$Backend$viewUsers = function (model) {
 										]))
 								]))
 						]),
-					A2($elm$core$List$map, $author$project$Backend$userRow, model.ae)))
+					A2(
+						$elm$core$List$map,
+						$author$project$Backend$userRow,
+						A2(
+							$elm$core$List$filter,
+							function (u) {
+								return u.r;
+							},
+							model.ae))))
 			]));
 };
 var $author$project$Backend$view = function (model) {

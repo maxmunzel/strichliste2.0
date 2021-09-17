@@ -421,7 +421,7 @@ viewUsers model =
 
              --             , td [] [ button [ onClick CreateNewUser ] [ text "Create new" ] ]
              ]
-                ++ List.map userRow model.users
+                ++ List.map userRow (List.filter (\u -> u.active) model.users)
             )
         ]
 

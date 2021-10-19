@@ -75,6 +75,8 @@ type alias Persistance =
     { jwtToken : String
     , orders : List NewOrder
     , location : String
+    , device_id : String -- randomly generated string that should be unique for each client i.e. sufficiently long
+    , order_counter : Int -- count of all orders that have been sent using the current device_id
     }
 
 
@@ -294,6 +296,7 @@ update msg model =
                         , ( "product_id", Json.Encode.int order.product.id )
                         , ( "amount", Json.Encode.int order.amount )
                         , ( "location", Json.Encode.string persistance.location )
+                        , ( "idempotence_token", Json.Encode.string (persistance.device_id ++ "_" ++ String.fromInt persistance.order_counter) )
                         ]
 
                 updateSync : State -> ( State, Cmd Msg )
@@ -311,9 +314,12 @@ update msg model =
                                 order :: _ ->
                                     ( { state | sync = Sending }
                                     , Http.request
-                                        { url = hostname ++ "/orders"
+                                        { url = hostname ++ "/orders?on_conflict=idempotence_token"
                                         , method = "POST"
-                                        , headers = [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken) ]
+                                        , headers =
+                                            [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken)
+                                            , Http.header "Prefer" "resolution=ignore-duplicates"
+                                            ]
                                         , body = Http.jsonBody <| packNewOrder state.persistance <| order
                                         , expect = Http.expectWhatever SentNewOrder
                                         , timeout = Just 1000.0
@@ -400,8 +406,16 @@ update msg model =
                         Err _ ->
                             persistance.orders
 
+                new_order_count =
+                    case result of
+                        Ok _ ->
+                            persistance.order_counter + 1
+
+                        Err _ ->
+                            persistance.order_counter
+
                 new_persistance =
-                    { persistance | orders = new_orders }
+                    { persistance | orders = new_orders, order_counter = new_order_count }
 
                 offline =
                     case result of
@@ -414,7 +428,7 @@ update msg model =
             case result of
                 Err (Http.BadStatus 401) ->
                     -- 401: Unauthorized
-                    ( AskForJwt { persistance = new_persistance, password = "" }, Cmd.none )
+                    ( AskForJwt { persistance = new_persistance, password = "" }, setPersistance new_persistance )
 
                 _ ->
                     case model of

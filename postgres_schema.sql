@@ -30,7 +30,8 @@ create table orders
     user_id       int references users (id),
     amount        int     not null,
     undone        boolean not null default false,
-    location      TEXT    not null
+    location      TEXT    not null,
+    idempotence_token TEXT UNIQUE
 );
 
 create or replace view history as

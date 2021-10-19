@@ -10,6 +10,9 @@
   <body>
     <div id="elm"></div>
     <script>
+      function generate_device_id() {
+        return Math.random().toString(32).toUpperCase().substring(2);
+      }
       let default_persistance = {
         jwtToken: "",
         orders: [],
@@ -22,6 +25,13 @@
         );
       }
       persistance = JSON.parse(localStorage.getItem("persistance"));
+
+      if (persistance["device_id"] === undefined) {
+        // add idempotence fields for old clients
+        persistance["device_id"] = generate_device_id();
+        persistance["order_counter"] = 0;
+        localStorage.setItem("persistance", JSON.stringify(persistance));
+      }
 
       var app = Elm.Main.init({
         node: document.getElementById("elm"),

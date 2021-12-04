@@ -75,8 +75,15 @@ services:
       context: .
       dockerfile: auth_server.Dockerfile
     volumes:
-      - ./auth_server:/auth_server
-      - ./secrets.json:/secrets.json
+      - type: bind
+        source: "./auth_server.go"
+        target: "/go/src/auth_server/auth_server.go"
+        read_only: true
+
+      - type: bind
+        source: "./secrets.json"
+        target: "/go/src/auth_server/secrets.json"
+        read_only: true
     ports:
       - "8080:8080"
     networks:

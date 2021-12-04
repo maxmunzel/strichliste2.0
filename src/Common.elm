@@ -310,7 +310,7 @@ get_jwt_token user password msg =
     Http.request
         { method = "GET"
         , headers = [ Http.header "user" (username user), Http.header "password" password ]
-        , url = "/get_jwt"
+        , url = "auth/get_jwt"
         , body = Http.emptyBody
         , expect = Http.expectString msg
         , timeout = Nothing

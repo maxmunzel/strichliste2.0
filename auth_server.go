@@ -35,7 +35,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/get_jwt", func(w http.ResponseWriter, r *http.Request) {
 		password := r.Header.Get("password")
 		user := r.Header.Get("user")
 		password_hash := make([]byte, 32)

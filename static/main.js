@@ -6693,7 +6693,7 @@ var $author$project$Common$get_jwt_token = F3(
 				w: 'GET',
 				z: $elm$core$Maybe$Nothing,
 				A: $elm$core$Maybe$Nothing,
-				B: '/get_jwt'
+				B: 'auth/get_jwt'
 			});
 	});
 var $author$project$Main$get_persistance = function (model) {

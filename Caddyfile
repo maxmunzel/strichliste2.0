@@ -4,7 +4,8 @@ handle_path /api/* {
     rewrite * {path}
     reverse_proxy api:3000
 }
-handle_path /get_jwt {
+handle_path /auth/* {
+    rewrite * {path}
     reverse_proxy auth_server:8080
 }
 

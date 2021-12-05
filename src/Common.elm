@@ -8,7 +8,7 @@ import Json.Encode
 
 
 hostname =
-    "api"
+    "postgrest"
 
 
 

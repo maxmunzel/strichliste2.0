@@ -6029,7 +6029,7 @@ var $elm$http$Http$Header = F2(
 		return {$: 0, a: a, b: b};
 	});
 var $elm$http$Http$header = $elm$http$Http$Header;
-var $author$project$Common$hostname = 'api';
+var $author$project$Common$hostname = 'postgrest';
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $elm$http$Http$Request = function (a) {
 	return {$: 1, a: a};

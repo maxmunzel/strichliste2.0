@@ -1,6 +1,6 @@
 :80
 
-handle_path /api/* {
+handle_path /postgrest/* {
     rewrite * {path}
     reverse_proxy api:3000
 }

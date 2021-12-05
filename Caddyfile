@@ -2,18 +2,16 @@
 
 handle_path /postgrest/* {
     rewrite * {path}
-    reverse_proxy api:3000
+    reverse_proxy postgrest:3000
 }
 handle_path /auth/* {
     rewrite * {path}
     reverse_proxy auth_server:8080
 }
 
-handle_path /create_user {
-    reverse_proxy create_user:8088
-}
-handle_path /create_product {
-    reverse_proxy create_product:8087
+handle_path /api/* {
+    rewrite * {path}
+    reverse_proxy api:8087
 }
 
 root * /static

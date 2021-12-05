@@ -229,7 +229,7 @@ createProduct jwtToken product msg =
     Http.request
         { method = "POST"
         , headers = []
-        , url = "/create_product"
+        , url = "api/create_product"
         , body =
             Http.multipartBody
                 [ Http.stringPart "name" product.name
@@ -277,7 +277,7 @@ createUser jwtToken name avatar msg =
     Http.request
         { method = "POST"
         , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
-        , url = "/create_user"
+        , url = "/api/create_user"
         , body =
             Http.multipartBody
                 [ Http.stringPart "name" name

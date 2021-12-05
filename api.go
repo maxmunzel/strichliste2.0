@@ -18,7 +18,66 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/create_user", func(w http.ResponseWriter, r *http.Request) {
+		// firstly, make sure we have all parameters we want
+		err := r.ParseMultipartForm(10 * 1024 * 1024)
+		if err != nil {
+			log.Println("Cant parse Form.")
+			log.Println(err)
+			return
+		}
+		jwt := r.Form.Get("jwt")
+		user_name := r.Form.Get("name")
+
+		file, _, err := r.FormFile("file")
+		if err != nil {
+			log.Println("Cant read file")
+			log.Print(err)
+			return
+		}
+		buf := bytes.NewBuffer(nil)
+		io.Copy(buf, file)
+		file_contents := buf.Bytes()
+
+		cropped, err := cropscalePng(bytes.NewBuffer(file_contents), 200, 200)
+		if err != nil {
+			log.Printf("Error scaling image: %s\n", err)
+			http.Error(w, "Invalid Image", 400)
+			return
+		}
+
+		hash := sha3.Sum256(file_contents)
+		hash_slice := hash[:]
+		hash_str := base32.StdEncoding.EncodeToString(hash_slice)[:25]
+
+		filename := "/profile_pics/" + hash_str + ".png"
+
+		type newUser = struct {
+			Name   string `json:"name"`
+			Avatar string `json:"avatar"`
+		}
+		body, _ := json.Marshal(newUser{user_name, filename})
+		body_reader := bytes.NewBuffer(body)
+		req, err := http.NewRequest("POST", "http://postgrest:3000/users", body_reader)
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+jwt)
+		response, err := http.DefaultClient.Do(req)
+		if err != nil || response.StatusCode != 201 {
+			log.Println(err)
+			log.Println(response)
+			http.Error(w, "Could not create User", 500)
+			return
+		}
+
+		err = ioutil.WriteFile(filename, cropped, 0600)
+		if err != nil {
+			log.Println("Cant write file")
+			log.Print(err)
+			http.Error(w, "", 500)
+			return
+		}
+	})
+	http.HandleFunc("/create_product", func(w http.ResponseWriter, r *http.Request) {
 		// firstly, make sure we have all parameters we want
 		err := r.ParseMultipartForm(10 * 1024 * 1024)
 		if err != nil {
@@ -83,7 +142,7 @@ func main() {
 		body, _ := json.Marshal(newProduct{
 			name, description, filename, price, volume_in_ml, alcohol_content, location})
 		body_reader := bytes.NewBuffer(body)
-		req, err := http.NewRequest("POST", "http://api:3000/products", body_reader)
+		req, err := http.NewRequest("POST", "http://postgrest:3000/products", body_reader)
 		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("Authorization", "Bearer "+jwt)
 		response, err := http.DefaultClient.Do(req)

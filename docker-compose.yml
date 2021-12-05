@@ -1,5 +1,5 @@
 services:
-  api:
+  postgrest:
     restart: always
     volumes:
       - ./:/conf
@@ -12,32 +12,22 @@ services:
       - 3000:3000
     networks:
       - database
-      - caddy_api
+      - caddy_postgrest
 
-  create_product:
+  api:
     restart: always
     build:
       context: .
-      dockerfile: create_product.Dockerfile
+      dockerfile: api.Dockerfile
     ports:
       - "8087:8087"
     volumes:
       - "./static/product_pics:/product_pics"
-      - "./create_product.go:/go/src/create_user/create_user.go"
-    networks:
-      - caddy_api
-  create_user:
-    restart: always
-    build:
-      context: .
-      dockerfile: create_user.Dockerfile
-    ports:
-      - "8088:8088"
-    volumes:
       - "./static/profile_pics:/profile_pics"
-      - "./create_user.go:/go/src/create_user/create_user.go"
+      - "./api.go:/go/src/api/api.go"
     networks:
-      - caddy_api
+      - caddy_postgrest
+      - api_auth
     
   db:
     restart: always
@@ -45,8 +35,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      # db and api share a common _private_ and _internal_ network.
-      # as the api server handles authentication and has the credentials
+      # db and postgrest share a common _private_ and _internal_ network.
+      # as the postgrest server handles authentication and has the credentials
       # anyway this is acceptable and saves us from handling db passwords.
       POSTGRES_HOST_AUTH_METHOD: "trust" 
     volumes:
@@ -66,7 +56,7 @@ services:
       - "./Caddyfile:/etc/caddy/Caddyfile"
       - "./static:/static"
     networks:
-      - caddy_api
+      - caddy_postgrest
       - default
       - caddy_auth
   auth_server:
@@ -88,6 +78,7 @@ services:
       - "8080:8080"
     networks:
       - caddy_auth
+      - api_auth
   cron:
     restart: always
     build:
@@ -103,8 +94,12 @@ services:
 networks:
   database:
     internal: true
-  caddy_api:
+  caddy_postgrest:
     internal: true
   caddy_auth:
+    internal: true
+  api_auth:
+    internal: true
+  api_auth:
     internal: true
 

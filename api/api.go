@@ -17,7 +17,40 @@ import (
 	"strconv"
 )
 
+type FileList = struct {
+	Files []string `json:"files"`
+}
+
 func main() {
+	http.HandleFunc("/list_reports", func(w http.ResponseWriter, r *http.Request) {
+		ok, err := is_authenticated_as(r, "xxxx_user")
+
+		if !ok || err != nil {
+			http.Error(w, "Please provide valid jwt via the \"Authorization\" header.", 401)
+			return
+		}
+		// firstly, make sure we have all parameters we want
+
+		files, err := ioutil.ReadDir("../reports")
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "Could not read Reports", 500)
+			return
+		}
+
+		payload := FileList{}
+		payload.Files = make([]string, 0, 10)
+		for _, file := range files {
+			payload.Files = append(payload.Files, file.Name())
+		}
+		payload_json, err := json.Marshal(payload.Files)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(payload_json)
+	})
 	http.HandleFunc("/create_user", func(w http.ResponseWriter, r *http.Request) {
 		// firstly, make sure we have all parameters we want
 		err := r.ParseMultipartForm(10 * 1024 * 1024)
@@ -162,6 +195,7 @@ func main() {
 		}
 	})
 
+	log.Println("Starting API Server")
 	log.Fatal(http.ListenAndServe(":8087", nil))
 }
 
@@ -201,4 +235,35 @@ func cropscalePng(r io.Reader, target_x, target_y int) ([]byte, error) {
 
 	return buf.Bytes(), err
 
+}
+func is_authenticated_as(r *http.Request, user string) (bool, error) {
+	// check if a given request has the proper authentication as the required user by consulting the auth service
+	// if user != r.Header.Get("user") {
+	// 	return false, nil
+	// }
+
+	c := http.Client{}
+	req, err := http.NewRequest("GET", "http://auth:8080/check_jwt", nil)
+	if err != nil {
+		return false, err
+	}
+
+	req.Header.Add("user", user)
+	req.Header.Add("Authorization", r.Header.Get("Authorization"))
+
+	resp, err := c.Do(req)
+	if err != nil {
+		log.Println("Error consulting auth service: %s", err)
+		return false, nil
+	}
+
+	if resp.StatusCode != 200 {
+		msg, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			msg = []byte(err.Error())
+		}
+		return false, errors.New(string(msg))
+	}
+
+	return true, nil
 }

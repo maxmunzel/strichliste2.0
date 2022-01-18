@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type secrets = struct {
@@ -20,7 +21,7 @@ type secrets = struct {
 }
 
 func main() {
-	secrets_bytes, err := ioutil.ReadFile("secrets.json")
+	secrets_bytes, err := ioutil.ReadFile("../secrets.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,18 +37,24 @@ func main() {
 	}
 
 	http.HandleFunc("/check_jwt", func(w http.ResponseWriter, r *http.Request) {
-		docstring := `This endpoint expects an user ('user') and an jwt token ('jwt') as Headers.
+		docstring := `This endpoint expects an user ('user') and an jwt token ('Authorization') as Headers.
 It returns 200 iff the given jwt is valid for the given user.
 You can obtain a jwt using the /auth/get_jwt endpoint.`
-		jwt := r.Header.Get("jwt")
+		jwt := r.Header.Get("Authorization")
 		user := r.Header.Get("user")
 
 		accept := func() {
 			http.Error(w, "Valid jwt for "+user+".", 200)
+			fmt.Printf("INFO: Successful Authorization as %s from %s.\n", user, r.RemoteAddr)
 		}
 
 		reject := func() {
 			http.Error(w, "Invalid jwt for user or incorrect request.\n"+docstring, 401)
+			fmt.Printf("WARN: Invalid Authorization attempt as %s from %s.\n", user, r.RemoteAddr)
+		}
+
+		if strings.HasPrefix(jwt, "Bearer ") {
+			jwt = strings.Replace(jwt, "Bearer ", "", 1)
 		}
 
 		if user == "xxxx_user" && jwt == secrets.Tokens.Xxxx_user {

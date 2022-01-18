@@ -18,13 +18,14 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: api.Dockerfile
+      dockerfile: api/Dockerfile
     ports:
       - "8087:8087"
     volumes:
       - "./static/product_pics:/product_pics"
       - "./static/profile_pics:/profile_pics"
-      - "./api.go:/go/src/api/api.go"
+      - "./reports:/go/src/reports"
+      - "./api/api.go:/go/src/api/api.go"
     networks:
       - caddy_postgrest
       - api_auth
@@ -59,20 +60,20 @@ services:
       - caddy_postgrest
       - default
       - caddy_auth
-  auth_server:
+  auth:
     restart: always
     build:
-      context: .
-      dockerfile: auth_server.Dockerfile
+      context: . 
+      dockerfile: auth/Dockerfile
     volumes:
       - type: bind
-        source: "./auth_server.go"
-        target: "/go/src/auth_server/auth_server.go"
+        source: "./auth"
+        target: "/go/src/auth_server"
         read_only: true
 
       - type: bind
         source: "./secrets.json"
-        target: "/go/src/auth_server/secrets.json"
+        target: "/go/src/secrets.json"
         read_only: true
     ports:
       - "8080:8080"
@@ -97,8 +98,6 @@ networks:
   caddy_postgrest:
     internal: true
   caddy_auth:
-    internal: true
-  api_auth:
     internal: true
   api_auth:
     internal: true

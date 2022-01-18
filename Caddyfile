@@ -6,7 +6,7 @@ handle_path /postgrest/* {
 }
 handle_path /auth/* {
     rewrite * {path}
-    reverse_proxy auth_server:8080
+    reverse_proxy auth:8080
 }
 
 handle_path /api/* {

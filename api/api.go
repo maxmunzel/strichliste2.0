@@ -14,6 +14,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -22,6 +24,37 @@ type FileList = struct {
 }
 
 func main() {
+	http.HandleFunc("/get_report", func(w http.ResponseWriter, r *http.Request) {
+		ok, err := is_authenticated_as(r, "xxxx_user")
+
+		if !ok || err != nil {
+			http.Error(w, "Please provide valid jwt via the \"Authorization\" header.", 401)
+			return
+		}
+
+		report := r.Header.Get("report")
+		if report == "" {
+			http.Error(w, "Please specify required report via the \"report\" header.", 400)
+			return
+		}
+
+		_, report = filepath.Split(report) // split of dir to avoid something like "../../etc/passwd"
+
+		report_path := "../reports/" + report
+		file, err := os.Open(report_path)
+		defer file.Close()
+		if err != nil {
+			log.Printf("WARN: Could not open report \"%s\": %s\n", report_path, err)
+			http.Error(w, "Could not find report "+report+".", 404)
+			return
+		}
+		w.Header().Add("Content-Type", "application/octet-stream")
+		_, err = io.Copy(w, file)
+		if err != nil {
+			http.Error(w, "Internal Error", 500)
+		}
+	})
+
 	http.HandleFunc("/list_reports", func(w http.ResponseWriter, r *http.Request) {
 		ok, err := is_authenticated_as(r, "xxxx_user")
 
@@ -253,7 +286,7 @@ func is_authenticated_as(r *http.Request, user string) (bool, error) {
 
 	resp, err := c.Do(req)
 	if err != nil {
-		log.Println("Error consulting auth service: %s", err)
+		log.Printf("Error consulting auth service: %s\n", err)
 		return false, nil
 	}
 

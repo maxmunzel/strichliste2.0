@@ -5,6 +5,7 @@ import (
 	"encoding/base32"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/image/draw"
 	"image"
@@ -15,40 +16,36 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
+	"strings"
 )
 
-type FileList = struct {
-	Files []string `json:"files"`
+func filenameToHash(secret, filename string) string {
+	hash := sha3.Sum256([]byte(secret + filename))
+	base32_hash := base32.HexEncoding.EncodeToString(hash[:])
+	return base32_hash
 }
 
 func main() {
+	hash_to_file := make(map[string]string)
+
 	http.HandleFunc("/get_report", func(w http.ResponseWriter, r *http.Request) {
-		ok, err := is_authenticated_as(r, "xxxx_user")
-
-		if !ok || err != nil {
-			http.Error(w, "Please provide valid jwt via the \"Authorization\" header.", 401)
-			return
-		}
-
-		report := r.Header.Get("report")
+		report := hash_to_file[r.URL.Query().Get("file")]
 		if report == "" {
-			http.Error(w, "Please specify required report via the \"report\" header.", 400)
+			http.Error(w, "Please specify a valid file ID via the \"file\" GET parameter. You can get valid file ids from the /list_reports endpoint. You may also need to call /list_reports again.\n\nIf all of this seems confusing and non-helpful to you, try reloading the page and clicking the download link again.", 400)
 			return
 		}
-
-		_, report = filepath.Split(report) // split of dir to avoid something like "../../etc/passwd"
 
 		report_path := "../reports/" + report
 		file, err := os.Open(report_path)
 		defer file.Close()
 		if err != nil {
 			log.Printf("WARN: Could not open report \"%s\": %s\n", report_path, err)
-			http.Error(w, "Could not find report "+report+".", 404)
+			http.Error(w, "", 500)
 			return
 		}
 		w.Header().Add("Content-Type", "application/octet-stream")
+		w.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", report))
 		_, err = io.Copy(w, file)
 		if err != nil {
 			http.Error(w, "Internal Error", 500)
@@ -57,6 +54,8 @@ func main() {
 
 	http.HandleFunc("/list_reports", func(w http.ResponseWriter, r *http.Request) {
 		ok, err := is_authenticated_as(r, "xxxx_user")
+		jwt := strings.Replace(r.Header.Get("Authorization"), "Bearer ", "", 1)
+		result := make(map[string]string)
 
 		if !ok || err != nil {
 			http.Error(w, "Please provide valid jwt via the \"Authorization\" header.", 401)
@@ -71,14 +70,17 @@ func main() {
 			return
 		}
 
-		payload := FileList{}
-		payload.Files = make([]string, 0, 10)
 		for _, file := range files {
-			payload.Files = append(payload.Files, file.Name())
+			filename := file.Name()
+			hash := filenameToHash(jwt, filename)
+
+			result[filename] = hash
+			hash_to_file[hash] = filename
 		}
-		payload_json, err := json.Marshal(payload.Files)
+		payload_json, err := json.Marshal(result)
 		if err != nil {
 			log.Fatalln(err)
+			http.Error(w, "Internal Error", 500)
 		}
 
 		w.Header().Add("Content-Type", "application/json")

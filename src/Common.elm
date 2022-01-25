@@ -7,6 +7,7 @@ import Json.Decode.Pipeline exposing (required)
 import Json.Encode
 
 
+hostname : String
 hostname =
     "postgrest"
 
@@ -329,6 +330,18 @@ orderSetUndone jwtToken order unDone msg =
         , url = hostname ++ "/orders?id=eq." ++ String.fromInt order.id
         , body = Http.jsonBody payload
         , expect = Http.expectWhatever msg
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+
+getReports jwtToken msg =
+    Http.request
+        { method = "GET"
+        , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
+        , url = "/api/list_reports"
+        , body = Http.emptyBody
+        , expect = Http.expectJson msg (Json.Decode.dict string)
         , timeout = Nothing
         , tracker = Nothing
         }

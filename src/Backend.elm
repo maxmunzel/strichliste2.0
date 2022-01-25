@@ -1,7 +1,8 @@
 module Backend exposing (Model, Msg(..), View(..), main, update, view)
 
 import Browser
-import Common exposing (NewOrder, Order, Product, User, createProduct, createUser, getOrders, getProducts, getUsers, get_jwt_token, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
+import Common exposing (NewOrder, Order, Product, User, createProduct, createUser, getOrders, getProducts, getReports, getUsers, get_jwt_token, orderSetUndone, productDefaultLocation, updateProduct, updateUser)
+import Dict
 import File
 import File.Select
 import Html exposing (..)
@@ -9,10 +10,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Parser
-
-
-hostname =
-    "http://localhost:3000"
 
 
 main =
@@ -28,6 +25,7 @@ type Msg
     = ShowUsers
     | ShowProducts
     | ShowOrders
+    | ShowReports
     | PasswordChanged String
     | PasswordEnter
     | GotJwt (Result Http.Error String)
@@ -55,6 +53,7 @@ type Msg
     | GotOrders (Result Http.Error (List Order))
     | SetUndone Order Bool
     | UnDoneSet (Result Http.Error ())
+    | GotReports (Result Http.Error (Dict.Dict String String))
 
 
 type View
@@ -63,6 +62,7 @@ type View
     | EditOrders
     | Failure
     | GetPassword
+    | Reports
 
 
 type alias Model =
@@ -81,6 +81,7 @@ type alias Model =
     , new_product_location : String
     , new_product_alcohol_content : String
     , new_product_image : Maybe File.File
+    , reports : Dict.Dict String String
     }
 
 
@@ -101,6 +102,7 @@ init _ =
       , new_product_volume = ""
       , new_product_image = Nothing
       , new_product_location = productDefaultLocation
+      , reports = Dict.empty
       }
     , Cmd.none
     )
@@ -122,6 +124,9 @@ update msg model =
 
         ShowOrders ->
             ( { model | view = EditOrders }, getOrders model.jwtToken GotOrders )
+
+        ShowReports ->
+            ( { model | view = Reports }, getReports model.jwtToken GotReports )
 
         PasswordChanged password ->
             ( { model | password = password }, Cmd.none )
@@ -272,6 +277,12 @@ update msg model =
         GotOrders (Ok orders) ->
             ( { model | orders = orders }, Cmd.none )
 
+        GotReports (Err _) ->
+            ( { model | view = Failure }, Cmd.none )
+
+        GotReports (Ok reports) ->
+            ( { model | reports = reports }, Cmd.none )
+
         SetUndone order unDone ->
             ( model, orderSetUndone model.jwtToken order unDone UnDoneSet )
 
@@ -318,11 +329,15 @@ view model =
                 GetPassword ->
                     "Login"
 
+                Reports ->
+                    "Reports"
+
         navbar =
             if model.view /= GetPassword then
                 [ button [ onClick ShowOrders ] [ text "Edit Orders" ]
                 , button [ onClick ShowProducts ] [ text "Edit Products" ]
                 , button [ onClick ShowUsers ] [ text "Edit Users" ]
+                , button [ onClick ShowReports ] [ text "Reports" ]
                 ]
 
             else
@@ -341,6 +356,9 @@ view model =
                     EditOrders ->
                         viewOrders model
 
+                    Reports ->
+                        viewReports model
+
                     Failure ->
                         p [] [ text "Something went wrong. Maybe you have forgotten to fill in the `jwtToken` field in the upper right?\n" ]
 
@@ -351,6 +369,20 @@ view model =
                             , button [ onClick PasswordEnter ] [ text "Enter" ]
                             ]
                ]
+        )
+
+
+viewReports : Model -> Html Msg
+viewReports model =
+    div []
+        (List.map
+            (\( name, hash ) ->
+                div []
+                    [ a [ href ("api/get_report?file=" ++ hash) ] [ text name ]
+                    , br [] []
+                    ]
+            )
+            (Dict.toList model.reports |> List.sortBy Tuple.first |> List.reverse)
         )
 
 

@@ -1,5 +1,18 @@
 :80
 
+@images {
+    path *.jpg
+    path *.jpeg
+    path *.png
+    path /profile_pics
+    path /product_pics
+}
+
+@code {
+    path *.html
+    path *.js
+}
+
 handle_path /postgrest/* {
     rewrite * {path}
     reverse_proxy postgrest:3000
@@ -13,6 +26,17 @@ handle_path /api/* {
     rewrite * {path}
     reverse_proxy api:8087
 }
+
+
+header @images {
+    "Cache-Control" "max-age=31536000, immutable"
+}
+
+header @code {
+    "Cache-Control" "no-store"
+}
+
+
 
 root * /static
 file_server

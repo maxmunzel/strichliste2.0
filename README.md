@@ -2,6 +2,9 @@
 
   A reliable, no-maintenance solution to replace tally lists.
 
+![Screenshot of the main view showing a picture of each user.](https://user-images.githubusercontent.com/5411096/151516646-33655e9c-3ae4-4a82-a4b6-6821629d6d0a.png)
+![Screenshot of the order view, where users select what they want to buy.](https://user-images.githubusercontent.com/5411096/151516691-0c9beed1-1823-4350-925d-f787e8d379a2.png)
+
 ## History and Design Goals
 
 During my time as the treasurer of my student dormitory, I hated counting the tally lists ontop of the drinks fridge.
@@ -16,11 +19,12 @@ The requirements were:
 1. Completely zero-maintenance.
 1. Easy backups.
 1. Have pictures of both users and beverages
-1. Make statistics accessible to the users
-1. Have a dead-simple UI (users may be drunk from time to time)
-1. Be reasonably secure and temper-proof
-1. Easy deployment
-1. Simple, easy to change code
+1. Have some products only appear on certain tablets. Use one system for drinks, the washing maschine, coffee, ...
+3. Make statistics accessible to the users
+4. Have a dead-simple UI (users may be drunk from time to time)
+5. Be reasonably secure and temper-proof
+6. Easy deployment
+7. Simple, easy to change code
 
 The result is this system. Its fits our use-case nicely and just works (tm).
 

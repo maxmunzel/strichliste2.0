@@ -8,7 +8,7 @@
 ## History and Design Goals
 
 During my time as the treasurer of my student dormitory, I hated counting the tally lists ontop of the drinks fridge.
-Not hesitant to waste hours implementing and optimizing a computer system to avoid a small manual task ([relevant xkcd](https://xkcd.com/1319/)), I created version of
+Not hesitant to waste hours implementing and optimizing a computer system to avoid a small manual task ([relevant xkcd](https://xkcd.com/1319/)), I created the first version of
 [strichliste](https://github.com/maxmunzel/strichliste). After it served us for a few years, a vision for a better system came to mind. 
 
 The requirements were:

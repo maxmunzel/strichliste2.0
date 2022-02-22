@@ -32,7 +32,7 @@ services:
     
   db:
     restart: always
-    image: postgres:13-alpine
+    image: postgres:13 # the alpine image has known instabilities regarding file permissions
     ports:
       - "5432:5432"
     environment:

@@ -128,8 +128,11 @@ update msg model =
                     let
                         persistance =
                             get_persistance model
+
+                        new_persistance =
+                            { persistance | jwtToken = jwtToken }
                     in
-                    ( LoadingUsers { persistance | jwtToken = jwtToken }, getUsers persistance.jwtToken GotUsers )
+                    ( LoadingUsers new_persistance, Cmd.batch [ getUsers jwtToken GotUsers, setPersistance new_persistance ] )
 
                 Err _ ->
                     ( AskForJwt { persistance = get_persistance model, password = "" }, Cmd.none )
@@ -285,7 +288,15 @@ update msg model =
             ( Loaded { state | persistance = new_persistance, users = users_updates }, setPersistance new_persistance )
 
         Tick timestamp ->
-            ( model, Cmd.batch [ getUsers (get_persistance model).jwtToken GotUsers, getProducts (get_persistance model).jwtToken GotProducts ] )
+            case model of
+                ProductView _ _ ->
+                    ( model, Cmd.batch [ getUsers (get_persistance model).jwtToken GotUsers, getProducts (get_persistance model).jwtToken GotProducts ] )
+
+                Loaded _ ->
+                    ( model, Cmd.batch [ getUsers (get_persistance model).jwtToken GotUsers, getProducts (get_persistance model).jwtToken GotProducts ] )
+
+                _ ->
+                    ( model, Cmd.none )
 
         SyncTick timestamp ->
             let

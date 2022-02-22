@@ -6959,12 +6959,17 @@ var $author$project$Main$update = F2(
 				if (!result.$) {
 					var jwtToken = result.a;
 					var persistance = $author$project$Main$get_persistance(model);
+					var new_persistance = _Utils_update(
+						persistance,
+						{l: jwtToken});
 					return _Utils_Tuple2(
-						$author$project$Main$LoadingUsers(
-							_Utils_update(
-								persistance,
-								{l: jwtToken})),
-						A2($author$project$Common$getUsers, persistance.l, $author$project$Main$GotUsers));
+						$author$project$Main$LoadingUsers(new_persistance),
+						$elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									A2($author$project$Common$getUsers, jwtToken, $author$project$Main$GotUsers),
+									$author$project$Main$setPersistance(new_persistance)
+								])));
 				} else {
 					return _Utils_Tuple2(
 						$author$project$Main$AskForJwt(
@@ -7196,20 +7201,40 @@ var $author$project$Main$update = F2(
 					$author$project$Main$setPersistance(new_persistance));
 			case 7:
 				var timestamp = msg.a;
-				return _Utils_Tuple2(
-					model,
-					$elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								A2(
-								$author$project$Common$getUsers,
-								$author$project$Main$get_persistance(model).l,
-								$author$project$Main$GotUsers),
-								A2(
-								$author$project$Common$getProducts,
-								$author$project$Main$get_persistance(model).l,
-								$author$project$Main$GotProducts)
-							])));
+				switch (model.$) {
+					case 6:
+						return _Utils_Tuple2(
+							model,
+							$elm$core$Platform$Cmd$batch(
+								_List_fromArray(
+									[
+										A2(
+										$author$project$Common$getUsers,
+										$author$project$Main$get_persistance(model).l,
+										$author$project$Main$GotUsers),
+										A2(
+										$author$project$Common$getProducts,
+										$author$project$Main$get_persistance(model).l,
+										$author$project$Main$GotProducts)
+									])));
+					case 4:
+						return _Utils_Tuple2(
+							model,
+							$elm$core$Platform$Cmd$batch(
+								_List_fromArray(
+									[
+										A2(
+										$author$project$Common$getUsers,
+										$author$project$Main$get_persistance(model).l,
+										$author$project$Main$GotUsers),
+										A2(
+										$author$project$Common$getProducts,
+										$author$project$Main$get_persistance(model).l,
+										$author$project$Main$GotProducts)
+									])));
+					default:
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
 			case 8:
 				var timestamp = msg.a;
 				var packNewOrder = F2(
@@ -7236,15 +7261,15 @@ var $author$project$Main$update = F2(
 								]));
 					});
 				var updateSync = function (state) {
-					var _v11 = state.M;
-					if (_v11 === 1) {
+					var _v12 = state.M;
+					if (_v12 === 1) {
 						return _Utils_Tuple2(state, $elm$core$Platform$Cmd$none);
 					} else {
-						var _v12 = state.e.f;
-						if (!_v12.b) {
+						var _v13 = state.e.f;
+						if (!_v13.b) {
 							return _Utils_Tuple2(state, $elm$core$Platform$Cmd$none);
 						} else {
-							var order = _v12.a;
+							var order = _v13.a;
 							return _Utils_Tuple2(
 								_Utils_update(
 									state,
@@ -7350,11 +7375,11 @@ var $author$project$Main$update = F2(
 				}();
 				var new_orders = function () {
 					if (!result.$) {
-						var _v19 = persistance.f;
-						if (!_v19.b) {
+						var _v20 = persistance.f;
+						if (!_v20.b) {
 							return _List_Nil;
 						} else {
-							var tail = _v19.b;
+							var tail = _v20.b;
 							return tail;
 						}
 					} else {

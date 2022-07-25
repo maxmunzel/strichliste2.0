@@ -1,0 +1,3 @@
+# Ignore Generated Files in Github Language Stats
+static/main.js linguist-vendored
+static/backend.html linguist-vendored

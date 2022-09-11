@@ -12,6 +12,11 @@ hostname =
     "postgrest"
 
 
+timeout : Maybe number
+timeout =
+    Just 2000
+
+
 
 -- model
 
@@ -95,7 +100,7 @@ getUsers jwtToken msg =
         , url = hostname ++ "/users_and_costs?order=name.asc"
         , expect = Http.expectJson msg (Json.Decode.list userDecoder)
         , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
-        , timeout = Nothing
+        , timeout = timeout
         , body = Http.emptyBody
         , tracker = Nothing
         }
@@ -107,7 +112,7 @@ getProducts jwtToken msg =
         , expect = Http.expectJson msg (Json.Decode.list productDecoder)
         , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
         , method = "GET"
-        , timeout = Nothing
+        , timeout = timeout
         , body = Http.emptyBody
         , tracker = Nothing
         }
@@ -119,7 +124,7 @@ getOrders jwtToken msg =
         , expect = Http.expectJson msg (Json.Decode.list orderDecoder)
         , headers = [ Http.header "Authorization" ("Bearer " ++ jwtToken) ]
         , method = "GET"
-        , timeout = Nothing
+        , timeout = timeout
         , body = Http.emptyBody
         , tracker = Nothing
         }
@@ -132,7 +137,7 @@ updateUser jwtToken user msg =
         , url = hostname ++ "/users?id=eq." ++ String.fromInt user.id
         , body = Http.jsonBody <| userEncoder <| user
         , expect = Http.expectWhatever msg
-        , timeout = Nothing
+        , timeout = timeout
         , tracker = Nothing
         }
 
@@ -144,7 +149,7 @@ updateProduct jwtToken product msg =
         , url = hostname ++ "/products?id=eq." ++ String.fromInt product.id
         , body = Http.jsonBody <| productEncoder <| product
         , expect = Http.expectWhatever msg
-        , timeout = Nothing
+        , timeout = timeout
         , tracker = Nothing
         }
 
@@ -243,7 +248,7 @@ createProduct jwtToken product msg =
                 , Http.stringPart "location" product.location
                 ]
         , expect = Http.expectWhatever msg
-        , timeout = Nothing
+        , timeout = timeout
         , tracker = Nothing
         }
 
@@ -286,7 +291,7 @@ createUser jwtToken name avatar msg =
                 , Http.filePart "file" avatar
                 ]
         , expect = Http.expectWhatever msg
-        , timeout = Nothing
+        , timeout = timeout
         , tracker = Nothing
         }
 
@@ -314,7 +319,7 @@ get_jwt_token user password msg =
         , url = "auth/get_jwt"
         , body = Http.emptyBody
         , expect = Http.expectString msg
-        , timeout = Nothing
+        , timeout = timeout
         , tracker = Nothing
         }
 
@@ -330,7 +335,7 @@ orderSetUndone jwtToken order unDone msg =
         , url = hostname ++ "/orders?id=eq." ++ String.fromInt order.id
         , body = Http.jsonBody payload
         , expect = Http.expectWhatever msg
-        , timeout = Nothing
+        , timeout = timeout
         , tracker = Nothing
         }
 
@@ -342,6 +347,6 @@ getReports jwtToken msg =
         , url = "/api/list_reports"
         , body = Http.emptyBody
         , expect = Http.expectJson msg (Json.Decode.dict string)
-        , timeout = Nothing
+        , timeout = timeout
         , tracker = Nothing
         }

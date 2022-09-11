@@ -6199,6 +6199,7 @@ var $elm$http$Http$request = function (r) {
 		$elm$http$Http$Request(
 			{a9: false, q: r.q, r: r.r, s: r.s, u: r.u, x: r.x, y: r.y, z: r.z}));
 };
+var $author$project$Common$timeout = $elm$core$Maybe$Just(2000);
 var $author$project$Common$User = F8(
 	function (id, name, avatar, active, cost_last_30_days, cost_this_month, cost_last_month, alc_ml_last_30_days) {
 		return {T: active, a8: alc_ml_last_30_days, af: avatar, bd: cost_last_30_days, be: cost_last_month, bf: cost_this_month, t: id, B: name};
@@ -6231,7 +6232,7 @@ var $author$project$Common$getUsers = F2(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				u: 'GET',
-				x: $elm$core$Maybe$Nothing,
+				x: $author$project$Common$timeout,
 				y: $elm$core$Maybe$Nothing,
 				z: $author$project$Common$hostname + '/users_and_costs?order=name.asc'
 			});
@@ -6658,7 +6659,7 @@ var $author$project$Common$getProducts = F2(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				u: 'GET',
-				x: $elm$core$Maybe$Nothing,
+				x: $author$project$Common$timeout,
 				y: $elm$core$Maybe$Nothing,
 				z: $author$project$Common$hostname + '/products?order=price.asc&active=eq.true'
 			});
@@ -6691,7 +6692,7 @@ var $author$project$Common$get_jwt_token = F3(
 						A2($elm$http$Http$header, 'password', password)
 					]),
 				u: 'GET',
-				x: $elm$core$Maybe$Nothing,
+				x: $author$project$Common$timeout,
 				y: $elm$core$Maybe$Nothing,
 				z: 'auth/get_jwt'
 			});

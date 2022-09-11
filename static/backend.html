@@ -6478,6 +6478,7 @@ var $elm$http$Http$request = function (r) {
 			{bb: false, p: r.p, q: r.q, r: r.r, s: r.s, v: r.v, w: r.w, x: r.x}));
 };
 var $elm$http$Http$stringPart = _Http_pair;
+var $author$project$Common$timeout = $elm$core$Maybe$Just(2000);
 var $author$project$Common$createProduct = F3(
 	function (jwtToken, product, msg) {
 		return $elm$http$Http$request(
@@ -6506,7 +6507,7 @@ var $author$project$Common$createProduct = F3(
 				q: $elm$http$Http$expectWhatever(msg),
 				r: _List_Nil,
 				s: 'POST',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: 'api/create_product'
 			});
@@ -6533,7 +6534,7 @@ var $author$project$Common$createUser = F4(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'POST',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: '/api/create_user'
 			});
@@ -6856,7 +6857,7 @@ var $author$project$Common$getOrders = F2(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'GET',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: $author$project$Common$hostname + '/orders?select=*,user:users(*),product:products(*)&limit=200&order=creation_date.desc'
 			});
@@ -6875,7 +6876,7 @@ var $author$project$Common$getProducts = F2(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'GET',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: $author$project$Common$hostname + '/products?order=price.asc&active=eq.true'
 			});
@@ -6913,7 +6914,7 @@ var $author$project$Common$getReports = F2(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'GET',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: '/api/list_reports'
 			});
@@ -6948,7 +6949,7 @@ var $author$project$Common$getUsers = F2(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'GET',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: $author$project$Common$hostname + '/users_and_costs?order=name.asc'
 			});
@@ -6981,7 +6982,7 @@ var $author$project$Common$get_jwt_token = F3(
 						A2($elm$http$Http$header, 'password', password)
 					]),
 				s: 'GET',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: 'auth/get_jwt'
 			});
@@ -7024,7 +7025,7 @@ var $author$project$Common$orderSetUndone = F4(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'PATCH',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: $author$project$Common$hostname + ('/orders?id=eq.' + $elm$core$String$fromInt(order.bp))
 			});
@@ -7140,7 +7141,7 @@ var $author$project$Common$updateProduct = F3(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'PATCH',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: $author$project$Common$hostname + ('/products?id=eq.' + $elm$core$String$fromInt(product.bp))
 			});
@@ -7175,7 +7176,7 @@ var $author$project$Common$updateUser = F3(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'PATCH',
-				v: $elm$core$Maybe$Nothing,
+				v: $author$project$Common$timeout,
 				w: $elm$core$Maybe$Nothing,
 				x: $author$project$Common$hostname + ('/users?id=eq.' + $elm$core$String$fromInt(user.bp))
 			});

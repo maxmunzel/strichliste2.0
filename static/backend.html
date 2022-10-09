@@ -6534,7 +6534,7 @@ var $author$project$Common$createUser = F4(
 						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + jwtToken)
 					]),
 				s: 'POST',
-				v: $author$project$Common$timeout,
+				v: $elm$core$Maybe$Just(30000),
 				w: $elm$core$Maybe$Nothing,
 				x: '/api/create_user'
 			});

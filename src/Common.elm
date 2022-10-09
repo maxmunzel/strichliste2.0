@@ -291,7 +291,7 @@ createUser jwtToken name avatar msg =
                 , Http.filePart "file" avatar
                 ]
         , expect = Http.expectWhatever msg
-        , timeout = timeout
+        , timeout = Just 30000 -- uploading the (not jet downscaled) user image may take some time
         , tracker = Nothing
         }
 

@@ -46,7 +46,7 @@ if __name__ == "__main__":
     password_sha3_256 = sha.hexdigest()
 
     tokens = {
-        user: jwt.encode({"role": user}, jwt_secret, algorithm="HS256").decode()
+        user: jwt.encode({"role": user}, jwt_secret, algorithm="HS256")
         for user in ["order_user", "xxxx_user"]
     }
     with open("secrets.json", "w", os.O_CREAT) as f:

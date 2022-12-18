@@ -7893,7 +7893,7 @@ var $author$project$Main$productView = F3(
 					$elm$html$Html$span,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'color', 'blue')
+							$elm$html$Html$Attributes$class('productPrice')
 						]),
 					_List_fromArray(
 						[
@@ -7901,7 +7901,16 @@ var $author$project$Main$productView = F3(
 							A2($myrho$elm_round$Round$round, 2, order.aO._) + '€')
 						])),
 					A2($elm$html$Html$br, _List_Nil, _List_Nil),
-					$elm$html$Html$text(order.aO.W)
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('productDescription')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(order.aO.W)
+						]))
 				]));
 	});
 var $author$project$Design$red = A2($author$project$Design$ButtonColor, '#CF1E36', '#FFFFFF');

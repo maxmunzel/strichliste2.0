@@ -677,9 +677,9 @@ productView state buyState order =
             ]
         , b [] [ text order.product.name ]
         , br [] []
-        , span [ style "color" "blue" ] [ text (Round.round 2 order.product.price ++ "€") ]
+        , span [ class "productPrice" ] [ text (Round.round 2 order.product.price ++ "€") ]
         , br [] []
-        , text order.product.description
+        , span [ class "productDescription" ] [ text order.product.description ]
         ]
 
 

@@ -68,3 +68,11 @@ html {
 .stats p {
   margin-top: 0.5em;
 }
+
+.productDescription {
+  color: #777;
+}
+
+.productPrice {
+  font-weight: 500;
+}

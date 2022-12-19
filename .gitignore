@@ -12,3 +12,4 @@ db_backups/
 reports/
 static/product_pics
 static/profile_pics
+postgREST.conf

@@ -1,0 +1,78 @@
+html {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-gap: 10px;
+  grid-auto-flow: dense;
+  list-style: none;
+  margin: 1em auto;
+  padding: 0;
+}
+
+.gridItem {
+  margin: 10px;
+  text-align: center;
+  touch-action: manipulation;
+}
+
+.imgContainer {
+  position: relative;
+  height: 200px;
+  margin-bottom: 15px;
+  transition: margin-bottom 100ms, height 100ms;
+}
+
+.imgContainer p {
+  display: block;
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  right: 0;
+
+  font-size: 32px;
+  font-weight: bold;
+
+  color: #000;
+  text-align: center;
+  margin: 0;
+  user-select: none;
+}
+
+.imgContainer img {
+  position: absolute;
+  top: 0;
+  left: -9999px;
+  right: -9999px;
+  margin: auto;
+
+  height: 200px;
+  transition: height 100ms;
+}
+
+.selected .imgContainer {
+  margin-bottom: 0;
+  height: 215px;
+}
+
+.selected .imgContainer img {
+  height: 170px;
+}
+
+.stats h2 {
+  margin-bottom: 0;
+}
+
+.stats p {
+  margin-top: 0.5em;
+}
+
+.productDescription {
+  color: #555;
+}
+
+.productPrice {
+  font-weight: 500;
+}

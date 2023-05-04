@@ -7527,6 +7527,14 @@ var $author$project$Design$button = F3(
 				]));
 	});
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $author$project$Design$ButtonColor = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -7534,14 +7542,7 @@ var $author$project$Design$ButtonColor = F2(
 var $author$project$Design$green = A2($author$project$Design$ButtonColor, '#1B6525', '#FFFFFF');
 var $author$project$Design$gridStyle = _List_fromArray(
 	[
-		A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-		A2($elm$html$Html$Attributes$style, 'grid-template-columns', 'repeat(auto-fill, minmax(120px, 1fr))'),
-		A2($elm$html$Html$Attributes$style, 'grid-gap', '10px'),
-		A2($elm$html$Html$Attributes$style, 'grid-auto-flow', 'dense'),
-		A2($elm$html$Html$Attributes$style, 'list-style', 'none'),
-		A2($elm$html$Html$Attributes$style, 'margin', '1em auto'),
-		A2($elm$html$Html$Attributes$style, 'padding', '0'),
-		A2($elm$html$Html$Attributes$style, 'max-width', '800px')
+		$elm$html$Html$Attributes$class('grid')
 	]);
 var $author$project$Design$grid = $elm$html$Html$div($author$project$Design$gridStyle);
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
@@ -7835,13 +7836,7 @@ var $myrho$elm_round$Round$round = $myrho$elm_round$Round$roundFun(
 				}
 			}
 		}));
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -7850,40 +7845,72 @@ var $elm$html$Html$Attributes$src = function (url) {
 };
 var $author$project$Main$productView = F3(
 	function (state, buyState, order) {
-		var productText = (!order.ai) ? order.aO.B : (order.aO.B + (' x' + $elm$core$String$fromInt(order.ai)));
+		var countText = (!order.ai) ? '' : ('x' + $elm$core$String$fromInt(order.ai));
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
 					$elm$html$Html$Events$onClick(
 					A3($author$project$Main$ClickedProduct, state, buyState, order)),
-					A2($elm$html$Html$Attributes$style, 'margin', '10px'),
-					A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
-					A2($elm$html$Html$Attributes$style, 'touch-action', 'manipulation')
+					$elm$html$Html$Attributes$class('gridItem'),
+					$elm$html$Html$Attributes$class(
+					(!order.ai) ? 'notSelected' : 'selected')
 				]),
 			_List_fromArray(
 				[
 					A2(
-					$elm$html$Html$img,
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$src(order.aO.X),
-							A2($elm$html$Html$Attributes$style, 'height', '200px')
+							$elm$html$Html$Attributes$class('imgContainer')
 						]),
-					_List_Nil),
-					A2($elm$html$Html$br, _List_Nil, _List_Nil),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$img,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$src(order.aO.X)
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$p,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(countText)
+								]))
+						])),
 					A2(
 					$elm$html$Html$b,
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(productText)
+							$elm$html$Html$text(order.aO.B)
 						])),
 					A2($elm$html$Html$br, _List_Nil, _List_Nil),
-					$elm$html$Html$text(
-					A2($myrho$elm_round$Round$round, 2, order.aO._) + '€'),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('productPrice')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							A2($myrho$elm_round$Round$round, 2, order.aO._) + '€')
+						])),
 					A2($elm$html$Html$br, _List_Nil, _List_Nil),
-					$elm$html$Html$text(order.aO.W)
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('productDescription')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(order.aO.W)
+						]))
 				]));
 	});
 var $author$project$Design$red = A2($author$project$Design$ButtonColor, '#CF1E36', '#FFFFFF');
@@ -8181,64 +8208,73 @@ var $author$project$Main$view = function (model) {
 							A2($author$project$Main$productView, state, buyState),
 							buyState.f)),
 						A2(
-						$elm$html$Html$h2,
-						_List_Nil,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Kosten in den letzten 30 Tagen')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_Nil,
+								$elm$html$Html$Attributes$class('stats')
+							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(
-								A2($myrho$elm_round$Round$round, 2, buyState.a2.bd) + '€')
-							])),
-						A2(
-						$elm$html$Html$h2,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Kosten in diesem Monat')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								A2($myrho$elm_round$Round$round, 2, buyState.a2.bf) + '€')
-							])),
-						A2(
-						$elm$html$Html$h2,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Kosten im vergangenen Monat')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								A2($myrho$elm_round$Round$round, 2, buyState.a2.be) + '€')
-							])),
-						A2(
-						$elm$html$Html$h2,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Liter Bieräquivalent in den letzten 30 Tagen')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								A2($myrho$elm_round$Round$round, 2, (buyState.a2.a8 / 0.05) / 1000))
+								A2(
+								$elm$html$Html$h2,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Kosten in den letzten 30 Tagen')
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										A2($myrho$elm_round$Round$round, 2, buyState.a2.bd) + '€')
+									])),
+								A2(
+								$elm$html$Html$h2,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Kosten in diesem Monat')
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										A2($myrho$elm_round$Round$round, 2, buyState.a2.bf) + '€')
+									])),
+								A2(
+								$elm$html$Html$h2,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Kosten im vergangenen Monat')
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										A2($myrho$elm_round$Round$round, 2, buyState.a2.be) + '€')
+									])),
+								A2(
+								$elm$html$Html$h2,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Liter Bieräquivalent in den letzten 30 Tagen')
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										A2($myrho$elm_round$Round$round, 2, (buyState.a2.a8 / 0.05) / 1000))
+									]))
 							]))
 					]));
 	}

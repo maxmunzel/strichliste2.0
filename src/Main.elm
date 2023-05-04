@@ -545,14 +545,16 @@ view model =
                     ]
                 , Design.grid
                     (List.map (productView state buyState) buyState.orders)
-                , h2 [] [ text "Kosten in den letzten 30 Tagen" ]
-                , p [] [ text <| Round.round 2 buyState.user.cost_last_30_days ++ "€" ]
-                , h2 [] [ text "Kosten in diesem Monat" ]
-                , p [] [ text <| Round.round 2 buyState.user.cost_this_month ++ "€" ]
-                , h2 [] [ text "Kosten im vergangenen Monat" ]
-                , p [] [ text <| Round.round 2 buyState.user.cost_last_month ++ "€" ]
-                , h2 [] [ text "Liter Bieräquivalent in den letzten 30 Tagen" ]
-                , p [] [ text <| Round.round 2 ((buyState.user.alc_ml_last_30_days / 0.05) / 1000) ]
+                , div [ class "stats" ]
+                    [ h2 [] [ text "Kosten in den letzten 30 Tagen" ]
+                    , p [] [ text <| Round.round 2 buyState.user.cost_last_30_days ++ "€" ]
+                    , h2 [] [ text "Kosten in diesem Monat" ]
+                    , p [] [ text <| Round.round 2 buyState.user.cost_this_month ++ "€" ]
+                    , h2 [] [ text "Kosten im vergangenen Monat" ]
+                    , p [] [ text <| Round.round 2 buyState.user.cost_last_month ++ "€" ]
+                    , h2 [] [ text "Liter Bieräquivalent in den letzten 30 Tagen" ]
+                    , p [] [ text <| Round.round 2 ((buyState.user.alc_ml_last_30_days / 0.05) / 1000) ]
+                    ]
                 ]
 
 
@@ -622,30 +624,36 @@ userView state user =
 productView : State -> BuyState -> NewOrder -> Html Msg
 productView state buyState order =
     let
-        productText =
+        countText =
             if order.amount == 0 then
-                order.product.name
+                ""
 
             else
-                order.product.name ++ " x" ++ String.fromInt order.amount
+                "x" ++ String.fromInt order.amount
     in
     div
         [ onClick (ClickedProduct state buyState order)
-        , style "margin" "10px"
-        , style "text-align" "center"
-        , style "touch-action" "manipulation"
+        , class "gridItem"
+        , class
+            (if order.amount == 0 then
+                "notSelected"
+
+             else
+                "selected"
+            )
         ]
-        [ img
-            [ src order.product.image
-            , style "height" "200px"
+        [ div [ class "imgContainer" ]
+            [ img
+                [ src order.product.image
+                ]
+                []
+            , p [] [ text countText ]
             ]
-            []
+        , b [] [ text order.product.name ]
         , br [] []
-        , b [] [ text productText ]
+        , span [ class "productPrice" ] [ text (Round.round 2 order.product.price ++ "€") ]
         , br [] []
-        , text (Round.round 2 order.product.price ++ "€")
-        , br [] []
-        , text order.product.description
+        , span [ class "productDescription" ] [ text order.product.description ]
         ]
 
 

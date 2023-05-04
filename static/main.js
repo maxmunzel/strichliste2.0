@@ -519,11 +519,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.an.Y === region.au.Y)
+	if (region.am.X === region.at.X)
 	{
-		return 'on line ' + region.an.Y;
+		return 'on line ' + region.am.X;
 	}
-	return 'on lines ' + region.an.Y + ' through ' + region.au.Y;
+	return 'on lines ' + region.am.X + ' through ' + region.at.X;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bm,
-		impl.bz,
-		impl.bw,
+		impl.bl,
+		impl.by,
+		impl.bv,
 		function() { return function() {} }
 	);
 });
@@ -2705,8 +2705,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		E: func(record.E),
-		ao: record.ao,
-		al: record.al
+		an: record.an,
+		ak: record.ak
 	}
 });
 
@@ -2975,10 +2975,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.E;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ao;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.an;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.al) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ak) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3928,11 +3928,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bm,
-		impl.bz,
-		impl.bw,
+		impl.bl,
+		impl.by,
+		impl.bv,
 		function(sendToApp, initialModel) {
-			var view = impl.bA;
+			var view = impl.bz;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3964,12 +3964,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bm,
-		impl.bz,
-		impl.bw,
+		impl.bl,
+		impl.by,
+		impl.bv,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.am && impl.am(sendToApp)
-			var view = impl.bA;
+			var divertHrefToApp = impl.al && impl.al(sendToApp)
+			var view = impl.bz;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3982,7 +3982,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.bx) && (_VirtualDom_doc.title = title = doc.bx);
+				(title !== doc.bw) && (_VirtualDom_doc.title = title = doc.bw);
 			});
 		}
 	);
@@ -4038,12 +4038,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bo;
-	var onUrlRequest = impl.bp;
+	var onUrlChange = impl.bn;
+	var onUrlRequest = impl.bo;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		am: function(sendToApp)
+		al: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4059,9 +4059,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aP === next.aP
-							&& curr.aB === next.aB
-							&& curr.aK.a === next.aK.a
+							&& curr.aO === next.aO
+							&& curr.aA === next.aA
+							&& curr.aJ.a === next.aJ.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4069,13 +4069,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		bm: function(flags)
+		bl: function(flags)
 		{
-			return A3(impl.bm, flags, _Browser_getUrl(), key);
+			return A3(impl.bl, flags, _Browser_getUrl(), key);
 		},
-		bA: impl.bA,
 		bz: impl.bz,
-		bw: impl.bw
+		by: impl.by,
+		bv: impl.bv
 	});
 }
 
@@ -4141,17 +4141,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bk: 'hidden', bb: 'visibilitychange' }
+		? { bj: 'hidden', ba: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bk: 'mozHidden', bb: 'mozvisibilitychange' }
+		? { bj: 'mozHidden', ba: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bk: 'msHidden', bb: 'msvisibilitychange' }
+		? { bj: 'msHidden', ba: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bk: 'webkitHidden', bb: 'webkitvisibilitychange' }
-		: { bk: 'hidden', bb: 'visibilitychange' };
+		? { bj: 'webkitHidden', ba: 'webkitvisibilitychange' }
+		: { bj: 'hidden', ba: 'visibilitychange' };
 }
 
 
@@ -4232,12 +4232,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aX: _Browser_getScene(),
-		a3: {
-			a5: _Browser_window.pageXOffset,
-			a6: _Browser_window.pageYOffset,
-			a4: _Browser_doc.documentElement.clientWidth,
-			az: _Browser_doc.documentElement.clientHeight
+		aW: _Browser_getScene(),
+		a2: {
+			a4: _Browser_window.pageXOffset,
+			a5: _Browser_window.pageYOffset,
+			a3: _Browser_doc.documentElement.clientWidth,
+			ay: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4247,8 +4247,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		a4: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		az: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		a3: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ay: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4271,15 +4271,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aX: {
-				a4: node.scrollWidth,
-				az: node.scrollHeight
+			aW: {
+				a3: node.scrollWidth,
+				ay: node.scrollHeight
 			},
-			a3: {
-				a5: node.scrollLeft,
-				a6: node.scrollTop,
-				a4: node.clientWidth,
-				az: node.clientHeight
+			a2: {
+				a4: node.scrollLeft,
+				a5: node.scrollTop,
+				a3: node.clientWidth,
+				ay: node.clientHeight
 			}
 		};
 	});
@@ -4309,18 +4309,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aX: _Browser_getScene(),
-			a3: {
-				a5: x,
-				a6: y,
-				a4: _Browser_doc.documentElement.clientWidth,
-				az: _Browser_doc.documentElement.clientHeight
+			aW: _Browser_getScene(),
+			a2: {
+				a4: x,
+				a5: y,
+				a3: _Browser_doc.documentElement.clientWidth,
+				ay: _Browser_doc.documentElement.clientHeight
 			},
-			bi: {
-				a5: x + rect.left,
-				a6: y + rect.top,
-				a4: rect.width,
-				az: rect.height
+			bh: {
+				a4: x + rect.left,
+				a5: y + rect.top,
+				a3: rect.width,
+				ay: rect.height
 			}
 		};
 	});
@@ -4400,7 +4400,7 @@ function _Http_configureRequest(xhr, request)
 	}
 	xhr.timeout = request.x.a || 0;
 	xhr.responseType = request.r.d;
-	xhr.withCredentials = request.a9;
+	xhr.withCredentials = request.a8;
 }
 
 
@@ -4422,8 +4422,8 @@ function _Http_toMetadata(xhr)
 {
 	return {
 		z: xhr.responseURL,
-		bu: xhr.status,
-		bv: xhr.statusText,
+		bt: xhr.status,
+		bu: xhr.statusText,
 		s: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
@@ -4519,15 +4519,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			bt: event.loaded,
-			aZ: event.total
+			bs: event.loaded,
+			aY: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			br: event.loaded,
-			aZ: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			bq: event.loaded,
+			aY: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }
@@ -5119,7 +5119,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ay: fragment, aB: host, aI: path, aK: port_, aP: protocol, aQ: query};
+		return {ax: fragment, aA: host, aH: path, aJ: port_, aO: protocol, aP: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -6002,7 +6002,7 @@ var $elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.bu));
+					$elm$http$Http$BadStatus(metadata.bt));
 			default:
 				var body = response.b;
 				return A2(
@@ -6036,7 +6036,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {aS: reqs, a$: subs};
+		return {aR: reqs, a_: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6110,7 +6110,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.aS));
+			A3($elm$http$Http$updateReqs, router, cmds, state.aR));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6153,7 +6153,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.a$)));
+					state.a_)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6167,7 +6167,7 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					a9: r.a9,
+					a8: r.a8,
 					q: r.q,
 					r: A2(_Http_mapExpect, func, r.r),
 					s: r.s,
@@ -6197,12 +6197,12 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{a9: false, q: r.q, r: r.r, s: r.s, u: r.u, x: r.x, y: r.y, z: r.z}));
+			{a8: false, q: r.q, r: r.r, s: r.s, u: r.u, x: r.x, y: r.y, z: r.z}));
 };
 var $author$project$Common$timeout = $elm$core$Maybe$Just(2000);
 var $author$project$Common$User = F8(
 	function (id, name, avatar, active, cost_last_30_days, cost_this_month, cost_last_month, alc_ml_last_30_days) {
-		return {T: active, a8: alc_ml_last_30_days, af: avatar, bd: cost_last_30_days, be: cost_last_month, bf: cost_this_month, t: id, B: name};
+		return {S: active, a7: alc_ml_last_30_days, ae: avatar, bc: cost_last_30_days, bd: cost_last_month, be: cost_this_month, t: id, B: name};
 	});
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$json$Json$Decode$map8 = _Json_map8;
@@ -6242,7 +6242,7 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (persistance) {
 	return (persistance.l === '') ? _Utils_Tuple2(
 		$author$project$Main$AskForJwt(
-			{Q: '', e: persistance}),
+			{P: '', e: persistance}),
 		$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 		$author$project$Main$LoadingUsers(persistance),
 		A2($author$project$Common$getUsers, persistance.l, $author$project$Main$GotUsers));
@@ -6260,7 +6260,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {aN: processes, a0: taggers};
+		return {aM: processes, a$: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -6407,7 +6407,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.aN;
+		var processes = _v0.aM;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -6476,7 +6476,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.a0);
+		var _v0 = A2($elm$core$Dict$get, interval, state.a$);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -6526,7 +6526,7 @@ var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				A2($elm$time$Time$every, 10000, $author$project$Main$Tick),
+				A2($elm$time$Time$every, 1100, $author$project$Main$Tick),
 				A2($elm$time$Time$every, 1000, $author$project$Main$SyncTick)
 			]));
 };
@@ -6539,7 +6539,6 @@ var $author$project$Main$GotJwt = function (a) {
 var $author$project$Main$GotProducts = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$Idle = 0;
 var $author$project$Main$Loaded = function (a) {
 	return {$: 4, a: a};
 };
@@ -6552,10 +6551,10 @@ var $author$project$Main$ProductView = F2(
 	function (a, b) {
 		return {$: 6, a: a, b: b};
 	});
-var $author$project$Main$Sending = 1;
-var $author$project$Main$SentNewOrder = function (a) {
-	return {$: 12, a: a};
-};
+var $author$project$Main$SentNewOrder = F2(
+	function (a, b) {
+		return {$: 12, a: a, b: b};
+	});
 var $elm$core$List$sum = function (numbers) {
 	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
@@ -6564,7 +6563,7 @@ var $author$project$Main$areNewOrdersEmpty = function (orders) {
 		A2(
 			$elm$core$List$map,
 			function (o) {
-				return o.ai;
+				return o.ah;
 			},
 			orders));
 };
@@ -6598,7 +6597,7 @@ var $elm$core$List$filter = F2(
 	});
 var $author$project$Common$Product = F9(
 	function (id, name, description, image, active, price, alcohol_content, volume_in_ml, location) {
-		return {T: active, U: alcohol_content, W: description, t: id, X: image, Z: location, B: name, _: price, ae: volume_in_ml};
+		return {S: active, T: alcohol_content, V: description, t: id, W: image, Y: location, B: name, Z: price, ad: volume_in_ml};
 	});
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
@@ -6731,6 +6730,7 @@ var $elm$http$Http$jsonBody = function (value) {
 		'application/json',
 		A2($elm$json$Json$Encode$encode, 0, value));
 };
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -6746,7 +6746,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 };
 var $author$project$Common$NewOrder = F3(
 	function (user, product, amount) {
-		return {ai: amount, aO: product, a2: user};
+		return {ah: amount, aN: product, a1: user};
 	});
 var $author$project$Common$product2order = F2(
 	function (user, product) {
@@ -6755,7 +6755,7 @@ var $author$project$Common$product2order = F2(
 var $author$project$Common$resetAmount = function (order) {
 	return _Utils_update(
 		order,
-		{ai: 0});
+		{ah: 0});
 };
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $author$project$Main$scrollToTop = _Platform_outgoingPort(
@@ -6787,16 +6787,16 @@ var $author$project$Main$setPersistance = _Platform_outgoingPort(
 				[
 					_Utils_Tuple2(
 					'device_id',
-					$elm$json$Json$Encode$string($.ag)),
+					$elm$json$Json$Encode$string($.af)),
 					_Utils_Tuple2(
 					'jwtToken',
 					$elm$json$Json$Encode$string($.l)),
 					_Utils_Tuple2(
 					'location',
-					$elm$json$Json$Encode$string($.Z)),
+					$elm$json$Json$Encode$string($.Y)),
 					_Utils_Tuple2(
 					'order_counter',
-					$elm$json$Json$Encode$int($.J)),
+					$elm$json$Json$Encode$int($.G)),
 					_Utils_Tuple2(
 					'orders',
 					$elm$json$Json$Encode$list(
@@ -6806,7 +6806,7 @@ var $author$project$Main$setPersistance = _Platform_outgoingPort(
 									[
 										_Utils_Tuple2(
 										'amount',
-										$elm$json$Json$Encode$int($.ai)),
+										$elm$json$Json$Encode$int($.ah)),
 										_Utils_Tuple2(
 										'product',
 										function ($) {
@@ -6815,33 +6815,33 @@ var $author$project$Main$setPersistance = _Platform_outgoingPort(
 													[
 														_Utils_Tuple2(
 														'active',
-														$elm$json$Json$Encode$bool($.T)),
+														$elm$json$Json$Encode$bool($.S)),
 														_Utils_Tuple2(
 														'alcohol_content',
-														$elm$json$Json$Encode$float($.U)),
+														$elm$json$Json$Encode$float($.T)),
 														_Utils_Tuple2(
 														'description',
-														$elm$json$Json$Encode$string($.W)),
+														$elm$json$Json$Encode$string($.V)),
 														_Utils_Tuple2(
 														'id',
 														$elm$json$Json$Encode$int($.t)),
 														_Utils_Tuple2(
 														'image',
-														$elm$json$Json$Encode$string($.X)),
+														$elm$json$Json$Encode$string($.W)),
 														_Utils_Tuple2(
 														'location',
-														$elm$json$Json$Encode$string($.Z)),
+														$elm$json$Json$Encode$string($.Y)),
 														_Utils_Tuple2(
 														'name',
 														$elm$json$Json$Encode$string($.B)),
 														_Utils_Tuple2(
 														'price',
-														$elm$json$Json$Encode$float($._)),
+														$elm$json$Json$Encode$float($.Z)),
 														_Utils_Tuple2(
 														'volume_in_ml',
-														$elm$json$Json$Encode$float($.ae))
+														$elm$json$Json$Encode$float($.ad))
 													]));
-										}($.aO)),
+										}($.aN)),
 										_Utils_Tuple2(
 										'user',
 										function ($) {
@@ -6850,22 +6850,22 @@ var $author$project$Main$setPersistance = _Platform_outgoingPort(
 													[
 														_Utils_Tuple2(
 														'active',
-														$elm$json$Json$Encode$bool($.T)),
+														$elm$json$Json$Encode$bool($.S)),
 														_Utils_Tuple2(
 														'alc_ml_last_30_days',
-														$elm$json$Json$Encode$float($.a8)),
+														$elm$json$Json$Encode$float($.a7)),
 														_Utils_Tuple2(
 														'avatar',
-														$elm$json$Json$Encode$string($.af)),
+														$elm$json$Json$Encode$string($.ae)),
 														_Utils_Tuple2(
 														'cost_last_30_days',
-														$elm$json$Json$Encode$float($.bd)),
+														$elm$json$Json$Encode$float($.bc)),
 														_Utils_Tuple2(
 														'cost_last_month',
-														$elm$json$Json$Encode$float($.be)),
+														$elm$json$Json$Encode$float($.bd)),
 														_Utils_Tuple2(
 														'cost_this_month',
-														$elm$json$Json$Encode$float($.bf)),
+														$elm$json$Json$Encode$float($.be)),
 														_Utils_Tuple2(
 														'id',
 														$elm$json$Json$Encode$int($.t)),
@@ -6873,7 +6873,7 @@ var $author$project$Main$setPersistance = _Platform_outgoingPort(
 														'name',
 														$elm$json$Json$Encode$string($.B))
 													]));
-										}($.a2))
+										}($.a1))
 									]));
 						})($.f))
 				]));
@@ -6941,7 +6941,7 @@ var $author$project$Main$showProduct = F2(
 				A2(
 					$elm$core$List$map,
 					$author$project$Main$strip,
-					A2($elm$core$String$split, ',', product.Z))));
+					A2($elm$core$String$split, ',', product.Y))));
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6951,7 +6951,7 @@ var $author$project$Main$update = F2(
 					var state = model.a;
 					return _Utils_Tuple2(
 						model,
-						A3($author$project$Common$get_jwt_token, 1, state.Q, $author$project$Main$GotJwt));
+						A3($author$project$Common$get_jwt_token, 1, state.P, $author$project$Main$GotJwt));
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
@@ -6975,7 +6975,7 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						$author$project$Main$AskForJwt(
 							{
-								Q: '',
+								P: '',
 								e: $author$project$Main$get_persistance(model)
 							}),
 						$elm$core$Platform$Cmd$none);
@@ -6996,7 +6996,7 @@ var $author$project$Main$update = F2(
 								$author$project$Main$Loaded(
 									_Utils_update(
 										state,
-										{F: false, N: users})),
+										{F: false, M: users})),
 								$elm$core$Platform$Cmd$none);
 						case 6:
 							var state = model.a;
@@ -7006,7 +7006,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$ProductView,
 									_Utils_update(
 										state,
-										{F: false, N: users}),
+										{F: false, M: users}),
 									buyState),
 								$elm$core$Platform$Cmd$none);
 						default:
@@ -7059,7 +7059,7 @@ var $author$project$Main$update = F2(
 							var users = model.b;
 							return _Utils_Tuple2(
 								$author$project$Main$Loaded(
-									{F: false, e: persistance, ah: products, M: 0, N: users}),
+									{F: false, e: persistance, ag: products, M: users}),
 								$elm$core$Platform$Cmd$none);
 						case 4:
 							var state = model.a;
@@ -7067,7 +7067,7 @@ var $author$project$Main$update = F2(
 								$author$project$Main$Loaded(
 									_Utils_update(
 										state,
-										{F: false, ah: products})),
+										{F: false, ag: products})),
 								$elm$core$Platform$Cmd$none);
 						case 6:
 							var state = model.a;
@@ -7075,10 +7075,10 @@ var $author$project$Main$update = F2(
 							if ($author$project$Main$areNewOrdersEmpty(buyState.f)) {
 								var orders = A2(
 									$elm$core$List$map,
-									$author$project$Common$product2order(buyState.a2),
+									$author$project$Common$product2order(buyState.a1),
 									A2(
 										$elm$core$List$filter,
-										$author$project$Main$showProduct(state.e.Z),
+										$author$project$Main$showProduct(state.e.Y),
 										products));
 								return _Utils_Tuple2(
 									A2(
@@ -7109,13 +7109,13 @@ var $author$project$Main$update = F2(
 						$author$project$Common$product2order(user),
 						A2(
 							$elm$core$List$filter,
-							$author$project$Main$showProduct(state.e.Z),
-							state.ah));
+							$author$project$Main$showProduct(state.e.Y),
+							state.ag));
 					return _Utils_Tuple2(
 						A2(
 							$author$project$Main$ProductView,
 							state,
-							{f: orders, a2: user}),
+							{f: orders, a1: user}),
 						$author$project$Main$scrollToTop(0));
 				} else {
 					return _Utils_Tuple2(
@@ -7129,9 +7129,9 @@ var $author$project$Main$update = F2(
 				var newNewOrders = A2(
 					$elm$core$List$map,
 					function (o) {
-						return _Utils_eq(o.aO.t, order.aO.t) ? _Utils_update(
+						return _Utils_eq(o.aN.t, order.aN.t) ? _Utils_update(
 							o,
-							{ai: o.ai + 1}) : o;
+							{ah: o.ah + 1}) : o;
 					},
 					buyState.f);
 				return _Utils_Tuple2(
@@ -7158,12 +7158,12 @@ var $author$project$Main$update = F2(
 			case 6:
 				var state = msg.a;
 				var buyState = msg.b;
-				var user = buyState.a2;
+				var user = buyState.a1;
 				var persistance = state.e;
 				var new_orders = A2(
 					$elm$core$List$filter,
 					function (o) {
-						return o.ai > 0;
+						return o.ah > 0;
 					},
 					buyState.f);
 				var new_persistance = _Utils_update(
@@ -7175,30 +7175,30 @@ var $author$project$Main$update = F2(
 					A2(
 						$elm$core$List$map,
 						function (o) {
-							return o.aO._ * o.ai;
+							return o.aN.Z * o.ah;
 						},
 						new_orders));
 				var alcohol = $elm$core$List$sum(
 					A2(
 						$elm$core$List$map,
 						function (o) {
-							return (o.aO.ae * o.aO.U) * o.ai;
+							return (o.aN.ad * o.aN.T) * o.ah;
 						},
 						new_orders));
 				var user_updated = _Utils_update(
 					user,
-					{a8: user.a8 + alcohol, bd: user.bd + cost, bf: user.bf + cost});
+					{a7: user.a7 + alcohol, bc: user.bc + cost, be: user.be + cost});
 				var users_updates = A2(
 					$elm$core$List$map,
 					function (u) {
 						return _Utils_eq(u.t, user.t) ? user_updated : u;
 					},
-					state.N);
+					state.M);
 				return _Utils_Tuple2(
 					$author$project$Main$Loaded(
 						_Utils_update(
 							state,
-							{e: new_persistance, N: users_updates})),
+							{e: new_persistance, M: users_updates})),
 					$author$project$Main$setPersistance(new_persistance));
 			case 7:
 				var timestamp = msg.a;
@@ -7245,52 +7245,46 @@ var $author$project$Main$update = F2(
 								[
 									_Utils_Tuple2(
 									'user_id',
-									$elm$json$Json$Encode$int(order.a2.t)),
+									$elm$json$Json$Encode$int(order.a1.t)),
 									_Utils_Tuple2(
 									'product_id',
-									$elm$json$Json$Encode$int(order.aO.t)),
+									$elm$json$Json$Encode$int(order.aN.t)),
 									_Utils_Tuple2(
 									'amount',
-									$elm$json$Json$Encode$int(order.ai)),
+									$elm$json$Json$Encode$int(order.ah)),
 									_Utils_Tuple2(
 									'location',
-									$elm$json$Json$Encode$string(persistance.Z)),
+									$elm$json$Json$Encode$string(persistance.Y)),
 									_Utils_Tuple2(
 									'idempotence_token',
 									$elm$json$Json$Encode$string(
-										persistance.ag + ('_' + $elm$core$String$fromInt(persistance.J))))
+										persistance.af + ('_' + $elm$core$String$fromInt(persistance.G))))
 								]));
 					});
 				var updateSync = function (state) {
-					var _v12 = state.M;
-					if (_v12 === 1) {
+					var _v12 = state.e.f;
+					if (!_v12.b) {
 						return _Utils_Tuple2(state, $elm$core$Platform$Cmd$none);
 					} else {
-						var _v13 = state.e.f;
-						if (!_v13.b) {
-							return _Utils_Tuple2(state, $elm$core$Platform$Cmd$none);
-						} else {
-							var order = _v13.a;
-							return _Utils_Tuple2(
-								_Utils_update(
-									state,
-									{M: 1}),
-								$elm$http$Http$request(
-									{
-										q: $elm$http$Http$jsonBody(
-											A2(packNewOrder, state.e, order)),
-										r: $elm$http$Http$expectWhatever($author$project$Main$SentNewOrder),
-										s: _List_fromArray(
-											[
-												A2($elm$http$Http$header, 'Authorization', 'Bearer ' + state.e.l),
-												A2($elm$http$Http$header, 'Prefer', 'resolution=ignore-duplicates')
-											]),
-										u: 'POST',
-										x: $elm$core$Maybe$Just(1000.0),
-										y: $elm$core$Maybe$Nothing,
-										z: $author$project$Common$hostname + '/orders?on_conflict=idempotence_token'
-									}));
-						}
+						var order = _v12.a;
+						return _Utils_Tuple2(
+							state,
+							$elm$http$Http$request(
+								{
+									q: $elm$http$Http$jsonBody(
+										A2(packNewOrder, state.e, order)),
+									r: $elm$http$Http$expectWhatever(
+										$author$project$Main$SentNewOrder(state.e.G)),
+									s: _List_fromArray(
+										[
+											A2($elm$http$Http$header, 'Authorization', 'Bearer ' + state.e.l),
+											A2($elm$http$Http$header, 'Prefer', 'resolution=ignore-duplicates')
+										]),
+									u: 'POST',
+									x: $elm$core$Maybe$Just(900.0),
+									y: $elm$core$Maybe$Nothing,
+									z: $author$project$Common$hostname + '/orders?on_conflict=idempotence_token'
+								}));
 					}
 				};
 				switch (model.$) {
@@ -7332,7 +7326,7 @@ var $author$project$Main$update = F2(
 						$author$project$Main$AskForJwt(
 							_Utils_update(
 								state,
-								{Q: text})),
+								{P: text})),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -7344,7 +7338,7 @@ var $author$project$Main$update = F2(
 					var persistance = state.e;
 					var new_persistance = _Utils_update(
 						persistance,
-						{Z: text});
+						{Y: text});
 					return _Utils_Tuple2(
 						$author$project$Main$AskForJwt(
 							_Utils_update(
@@ -7365,93 +7359,90 @@ var $author$project$Main$update = F2(
 								A2($author$project$Common$getUsers, persistance.l, $author$project$Main$GotUsers)
 							])));
 			default:
-				var result = msg.a;
-				var persistance = $author$project$Main$get_persistance(model);
-				var offline = function () {
-					if (!result.$) {
-						return false;
-					} else {
-						return true;
-					}
-				}();
-				var new_orders = function () {
-					if (!result.$) {
-						var _v20 = persistance.f;
-						if (!_v20.b) {
-							return _List_Nil;
-						} else {
-							var tail = _v20.b;
-							return tail;
-						}
-					} else {
-						return persistance.f;
-					}
-				}();
-				var new_order_count = function () {
-					if (!result.$) {
-						return persistance.J + 1;
-					} else {
-						return persistance.J;
-					}
-				}();
-				var new_persistance = _Utils_update(
-					persistance,
-					{J: new_order_count, f: new_orders});
-				if (((result.$ === 1) && (result.a.$ === 3)) && (result.a.a === 401)) {
+				if (((msg.b.$ === 1) && (msg.b.a.$ === 3)) && (msg.b.a.a === 401)) {
 					return _Utils_Tuple2(
 						$author$project$Main$AskForJwt(
-							{Q: '', e: new_persistance}),
-						$author$project$Main$setPersistance(new_persistance));
+							{
+								P: '',
+								e: $author$project$Main$get_persistance(model)
+							}),
+						$elm$core$Platform$Cmd$none);
 				} else {
-					switch (model.$) {
-						case 0:
-							return _Utils_Tuple2(
-								$author$project$Main$Failure(new_persistance),
-								$author$project$Main$setPersistance(new_persistance));
-						case 1:
-							var state = model.a;
-							return _Utils_Tuple2(
-								$author$project$Main$AskForJwt(
-									_Utils_update(
-										state,
-										{e: new_persistance})),
-								$author$project$Main$setPersistance(new_persistance));
-						case 2:
-							return _Utils_Tuple2(
-								$author$project$Main$LoadingUsers(new_persistance),
-								$author$project$Main$setPersistance(new_persistance));
-						case 3:
-							var users = model.b;
-							return _Utils_Tuple2(
-								A2($author$project$Main$LoadingProducts, new_persistance, users),
-								$author$project$Main$setPersistance(new_persistance));
-						case 5:
-							var state = model.a;
-							return _Utils_Tuple2(
-								$author$project$Main$Loaded(
-									_Utils_update(
-										state,
-										{e: new_persistance, M: 0})),
-								$author$project$Main$setPersistance(new_persistance));
-						case 4:
-							var state = model.a;
-							return _Utils_Tuple2(
-								$author$project$Main$Loaded(
-									_Utils_update(
-										state,
-										{e: new_persistance, M: 0})),
-								$author$project$Main$setPersistance(new_persistance));
-						default:
-							var state = model.a;
-							var buyState = model.b;
-							return _Utils_Tuple2(
-								A2(
-									$author$project$Main$ProductView,
-									_Utils_update(
-										state,
-										{e: new_persistance, M: 0}),
-									buyState),
-								$author$project$Main$setPersistance(new_persistance));
+					var count = msg.a;
+					var result = msg.b;
+					if (!_Utils_eq(
+						count,
+						$author$project$Main$get_persistance(model).G)) {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						if (result.$ === 1) {
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						} else {
+							var persistance = $author$project$Main$get_persistance(model);
+							var new_orders = function () {
+								var _v17 = persistance.f;
+								if (!_v17.b) {
+									return _List_Nil;
+								} else {
+									var tail = _v17.b;
+									return tail;
+								}
+							}();
+							var new_order_count = persistance.G + 1;
+							var new_persistance = _Utils_update(
+								persistance,
+								{G: new_order_count, f: new_orders});
+							switch (model.$) {
+								case 0:
+									return _Utils_Tuple2(
+										$author$project$Main$Failure(new_persistance),
+										$author$project$Main$setPersistance(new_persistance));
+								case 1:
+									var state = model.a;
+									return _Utils_Tuple2(
+										$author$project$Main$AskForJwt(
+											_Utils_update(
+												state,
+												{e: new_persistance})),
+										$author$project$Main$setPersistance(new_persistance));
+								case 2:
+									return _Utils_Tuple2(
+										$author$project$Main$LoadingUsers(new_persistance),
+										$author$project$Main$setPersistance(new_persistance));
+								case 3:
+									var users = model.b;
+									return _Utils_Tuple2(
+										A2($author$project$Main$LoadingProducts, new_persistance, users),
+										$author$project$Main$setPersistance(new_persistance));
+								case 5:
+									var state = model.a;
+									return _Utils_Tuple2(
+										$author$project$Main$Loaded(
+											_Utils_update(
+												state,
+												{e: new_persistance})),
+										$author$project$Main$setPersistance(new_persistance));
+								case 4:
+									var state = model.a;
+									return _Utils_Tuple2(
+										$author$project$Main$Loaded(
+											_Utils_update(
+												state,
+												{e: new_persistance})),
+										$author$project$Main$setPersistance(new_persistance));
+								default:
+									var state = model.a;
+									var buyState = model.b;
+									return _Utils_Tuple2(
+										A2(
+											$author$project$Main$ProductView,
+											_Utils_update(
+												state,
+												{e: new_persistance}),
+											buyState),
+										$author$project$Main$setPersistance(new_persistance));
+							}
+						}
 					}
 				}
 		}
@@ -7595,7 +7586,6 @@ var $elm$core$Basics$not = _Basics_not;
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
@@ -7845,7 +7835,7 @@ var $elm$html$Html$Attributes$src = function (url) {
 };
 var $author$project$Main$productView = F3(
 	function (state, buyState, order) {
-		var countText = (!order.ai) ? '' : ('x' + $elm$core$String$fromInt(order.ai));
+		var countText = (!order.ah) ? '' : ('x' + $elm$core$String$fromInt(order.ah));
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -7854,7 +7844,7 @@ var $author$project$Main$productView = F3(
 					A3($author$project$Main$ClickedProduct, state, buyState, order)),
 					$elm$html$Html$Attributes$class('gridItem'),
 					$elm$html$Html$Attributes$class(
-					(!order.ai) ? 'notSelected' : 'selected')
+					(!order.ah) ? 'notSelected' : 'selected')
 				]),
 			_List_fromArray(
 				[
@@ -7870,7 +7860,7 @@ var $author$project$Main$productView = F3(
 							$elm$html$Html$img,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$src(order.aO.X)
+									$elm$html$Html$Attributes$src(order.aN.W)
 								]),
 							_List_Nil),
 							A2(
@@ -7886,7 +7876,7 @@ var $author$project$Main$productView = F3(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(order.aO.B)
+							$elm$html$Html$text(order.aN.B)
 						])),
 					A2($elm$html$Html$br, _List_Nil, _List_Nil),
 					A2(
@@ -7898,7 +7888,7 @@ var $author$project$Main$productView = F3(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							A2($myrho$elm_round$Round$round, 2, order.aO._) + '€')
+							A2($myrho$elm_round$Round$round, 2, order.aN.Z) + '€')
 						])),
 					A2($elm$html$Html$br, _List_Nil, _List_Nil),
 					A2(
@@ -7909,14 +7899,14 @@ var $author$project$Main$productView = F3(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(order.aO.W)
+							$elm$html$Html$text(order.aN.V)
 						]))
 				]));
 	});
 var $author$project$Design$red = A2($author$project$Design$ButtonColor, '#CF1E36', '#FFFFFF');
 var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$Common$user2str = function (user) {
-	return user.B + ('$' + (user.af + ('$' + $elm$core$String$fromInt(user.t))));
+	return user.B + ('$' + (user.ae + ('$' + $elm$core$String$fromInt(user.t))));
 };
 var $author$project$Main$ClickedUser = F2(
 	function (a, b) {
@@ -7944,7 +7934,7 @@ var $author$project$Main$userView = F2(
 							A2($elm$html$Html$Attributes$style, 'width', '80px'),
 							A2($elm$html$Html$Attributes$style, 'height', '80px'),
 							A2($elm$html$Html$Attributes$style, 'align', 'center'),
-							$elm$html$Html$Attributes$src(user.af)
+							$elm$html$Html$Attributes$src(user.ae)
 						]),
 					_List_Nil),
 					A2(
@@ -8049,7 +8039,7 @@ var $author$project$Main$view = function (model) {
 							A2(
 								$elm$core$List$sortBy,
 								function (u) {
-									return -u.a8;
+									return -u.a7;
 								},
 								A2(
 									$elm$core$List$sortBy,
@@ -8059,16 +8049,16 @@ var $author$project$Main$view = function (model) {
 									A2(
 										$elm$core$List$filter,
 										function ($) {
-											return $.T;
+											return $.S;
 										},
-										state.N))))),
+										state.M))))),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$p,
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Ort dieses Tablets: ' + state.e.Z)
+								$elm$html$Html$text('Ort dieses Tablets: ' + state.e.Y)
 							]))
 					]));
 		case 0:
@@ -8165,7 +8155,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$img,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$src(buyState.a2.af),
+										$elm$html$Html$Attributes$src(buyState.a1.ae),
 										A2($elm$html$Html$Attributes$style, 'border-radius', '50%'),
 										A2($elm$html$Html$Attributes$style, 'width', '100px'),
 										A2($elm$html$Html$Attributes$style, 'height', '100px')
@@ -8183,7 +8173,7 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(buyState.a2.B)
+										$elm$html$Html$text(buyState.a1.B)
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -8228,7 +8218,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										A2($myrho$elm_round$Round$round, 2, buyState.a2.bd) + '€')
+										A2($myrho$elm_round$Round$round, 2, buyState.a1.bc) + '€')
 									])),
 								A2(
 								$elm$html$Html$h2,
@@ -8243,7 +8233,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										A2($myrho$elm_round$Round$round, 2, buyState.a2.bf) + '€')
+										A2($myrho$elm_round$Round$round, 2, buyState.a1.be) + '€')
 									])),
 								A2(
 								$elm$html$Html$h2,
@@ -8258,7 +8248,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										A2($myrho$elm_round$Round$round, 2, buyState.a2.be) + '€')
+										A2($myrho$elm_round$Round$round, 2, buyState.a1.bd) + '€')
 									])),
 								A2(
 								$elm$html$Html$h2,
@@ -8273,14 +8263,14 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										A2($myrho$elm_round$Round$round, 2, (buyState.a2.a8 / 0.05) / 1000))
+										A2($myrho$elm_round$Round$round, 2, (buyState.a1.a7 / 0.05) / 1000))
 									]))
 							]))
 					]));
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{bm: $author$project$Main$init, bw: $author$project$Main$subscriptions, bz: $author$project$Main$update, bA: $author$project$Main$view});
+	{bl: $author$project$Main$init, bv: $author$project$Main$subscriptions, by: $author$project$Main$update, bz: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	A2(
 		$elm$json$Json$Decode$andThen,
@@ -8298,7 +8288,7 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 										$elm$json$Json$Decode$andThen,
 										function (device_id) {
 											return $elm$json$Json$Decode$succeed(
-												{ag: device_id, l: jwtToken, Z: location, J: order_counter, f: orders});
+												{af: device_id, l: jwtToken, Y: location, G: order_counter, f: orders});
 										},
 										A2($elm$json$Json$Decode$field, 'device_id', $elm$json$Json$Decode$string));
 								},
@@ -8322,7 +8312,7 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 									$elm$json$Json$Decode$andThen,
 									function (amount) {
 										return $elm$json$Json$Decode$succeed(
-											{ai: amount, aO: product, a2: user});
+											{ah: amount, aN: product, a1: user});
 									},
 									A2($elm$json$Json$Decode$field, 'amount', $elm$json$Json$Decode$int));
 							},
@@ -8357,7 +8347,7 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 																									$elm$json$Json$Decode$andThen,
 																									function (active) {
 																										return $elm$json$Json$Decode$succeed(
-																											{T: active, U: alcohol_content, W: description, t: id, X: image, Z: location, B: name, _: price, ae: volume_in_ml});
+																											{S: active, T: alcohol_content, V: description, t: id, W: image, Y: location, B: name, Z: price, ad: volume_in_ml});
 																									},
 																									A2($elm$json$Json$Decode$field, 'active', $elm$json$Json$Decode$bool));
 																							},
@@ -8405,7 +8395,7 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 																					$elm$json$Json$Decode$andThen,
 																					function (active) {
 																						return $elm$json$Json$Decode$succeed(
-																							{T: active, a8: alc_ml_last_30_days, af: avatar, bd: cost_last_30_days, be: cost_last_month, bf: cost_this_month, t: id, B: name});
+																							{S: active, a7: alc_ml_last_30_days, ae: avatar, bc: cost_last_30_days, bd: cost_last_month, be: cost_this_month, t: id, B: name});
 																					},
 																					A2($elm$json$Json$Decode$field, 'active', $elm$json$Json$Decode$bool));
 																			},

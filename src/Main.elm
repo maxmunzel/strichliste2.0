@@ -318,7 +318,7 @@ update msg model =
                                     ]
                                 , body = Http.jsonBody <| packNewOrder state.persistance <| order
                                 , expect = Http.expectWhatever (SentNewOrder state.persistance.order_counter)
-                                , timeout = Just 1000.0
+                                , timeout = Just 900.0
                                 , tracker = Nothing
                                 }
                             )

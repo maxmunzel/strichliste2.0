@@ -1,4 +1,4 @@
-port module Main exposing (BuyState, Model(..), Msg(..), Persistance, State, SyncState(..), areNewOrdersEmpty, init, main, productView, setPersistance, subscriptions, update, userView, view)
+port module Main exposing (BuyState, Model(..), Msg(..), Persistance, State, areNewOrdersEmpty, init, main, productView, setPersistance, subscriptions, update, userView, view)
 
 import Browser
 import Common exposing (NewOrder, Product, User, UserName, getProducts, getUsers, get_jwt_token, hostname, product2order, resetAmount, user2str, userDecoder)
@@ -37,15 +37,7 @@ type alias State =
     , products : List Product
     , offline : Bool
     , persistance : Persistance
-    , sync : SyncState
     }
-
-
-type
-    SyncState
-    -- Tracks, if we are currently attempting to commit an order
-    = Idle -- no, we are not
-    | Sending -- yes, we are
 
 
 type alias BuyState =
@@ -106,7 +98,7 @@ type Msg
     | AskForJwtTextUpdate String
     | AskForJwtLocationUpdate String
     | SetPersistance Persistance
-    | SentNewOrder (Result Http.Error ())
+    | SentNewOrder Int (Result Http.Error ())
     | GetJwt
     | GotJwt (Result Http.Error String)
 
@@ -185,7 +177,6 @@ update msg model =
                                 , products = products
                                 , persistance = persistance
                                 , offline = False
-                                , sync = Idle -- we start idle – the next SyncTick may begin working on old orders
                                 }
                             , Cmd.none
                             )
@@ -312,31 +303,25 @@ update msg model =
 
                 updateSync : State -> ( State, Cmd Msg )
                 updateSync state =
-                    case state.sync of
-                        Sending ->
+                    case state.persistance.orders of
+                        [] ->
                             ( state, Cmd.none )
 
-                        -- wait for the current order to finish
-                        Idle ->
-                            case state.persistance.orders of
-                                [] ->
-                                    ( state, Cmd.none )
-
-                                order :: _ ->
-                                    ( { state | sync = Sending }
-                                    , Http.request
-                                        { url = hostname ++ "/orders?on_conflict=idempotence_token"
-                                        , method = "POST"
-                                        , headers =
-                                            [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken)
-                                            , Http.header "Prefer" "resolution=ignore-duplicates"
-                                            ]
-                                        , body = Http.jsonBody <| packNewOrder state.persistance <| order
-                                        , expect = Http.expectWhatever SentNewOrder
-                                        , timeout = Just 1000.0
-                                        , tracker = Nothing
-                                        }
-                                    )
+                        order :: _ ->
+                            ( state
+                            , Http.request
+                                { url = hostname ++ "/orders?on_conflict=idempotence_token"
+                                , method = "POST"
+                                , headers =
+                                    [ Http.header "Authorization" ("Bearer " ++ state.persistance.jwtToken)
+                                    , Http.header "Prefer" "resolution=ignore-duplicates"
+                                    ]
+                                , body = Http.jsonBody <| packNewOrder state.persistance <| order
+                                , expect = Http.expectWhatever (SentNewOrder state.persistance.order_counter)
+                                , timeout = Just 1000.0
+                                , tracker = Nothing
+                                }
+                            )
 
                 -- are we in a model with a `State`? If not, ignore this tick...
             in
@@ -399,70 +384,59 @@ update msg model =
         SetPersistance persistance ->
             ( LoadingUsers persistance, Cmd.batch [ setPersistance persistance, getUsers persistance.jwtToken GotUsers ] )
 
-        SentNewOrder result ->
-            let
-                persistance =
-                    get_persistance model
+        SentNewOrder _ (Err (Http.BadStatus 401)) ->
+            -- 401: Unauthorized
+            ( AskForJwt { persistance = get_persistance model, password = "" }, Cmd.none )
 
-                new_orders =
-                    case result of
-                        Ok _ ->
-                            case persistance.orders of
-                                [] ->
-                                    []
+        SentNewOrder count result ->
+            if count /= (model |> get_persistance |> .order_counter) then
+                ( model, Cmd.none )
 
-                                _ :: tail ->
-                                    tail
+            else
+                case result of
+                    Err _ ->
+                        ( model, Cmd.none )
 
-                        Err _ ->
-                            persistance.orders
+                    Ok _ ->
+                        let
+                            persistance =
+                                get_persistance model
 
-                new_order_count =
-                    case result of
-                        Ok _ ->
-                            persistance.order_counter + 1
+                            new_orders =
+                                case persistance.orders of
+                                    [] ->
+                                        []
 
-                        Err _ ->
-                            persistance.order_counter
+                                    _ :: tail ->
+                                        tail
 
-                new_persistance =
-                    { persistance | orders = new_orders, order_counter = new_order_count }
+                            new_order_count =
+                                persistance.order_counter + 1
 
-                offline =
-                    case result of
-                        Ok _ ->
-                            False
+                            new_persistance =
+                                { persistance | orders = new_orders, order_counter = new_order_count }
+                        in
+                        case model of
+                            Failure _ ->
+                                ( Failure new_persistance, setPersistance new_persistance )
 
-                        Err _ ->
-                            True
-            in
-            case result of
-                Err (Http.BadStatus 401) ->
-                    -- 401: Unauthorized
-                    ( AskForJwt { persistance = new_persistance, password = "" }, setPersistance new_persistance )
+                            AskForJwt state ->
+                                ( AskForJwt { state | persistance = new_persistance }, setPersistance new_persistance )
 
-                _ ->
-                    case model of
-                        Failure _ ->
-                            ( Failure new_persistance, setPersistance new_persistance )
+                            LoadingUsers _ ->
+                                ( LoadingUsers new_persistance, setPersistance new_persistance )
 
-                        AskForJwt state ->
-                            ( AskForJwt { state | persistance = new_persistance }, setPersistance new_persistance )
+                            LoadingProducts _ users ->
+                                ( LoadingProducts new_persistance users, setPersistance new_persistance )
 
-                        LoadingUsers _ ->
-                            ( LoadingUsers new_persistance, setPersistance new_persistance )
+                            Blank state ->
+                                ( Loaded { state | persistance = new_persistance }, setPersistance new_persistance )
 
-                        LoadingProducts _ users ->
-                            ( LoadingProducts new_persistance users, setPersistance new_persistance )
+                            Loaded state ->
+                                ( Loaded { state | persistance = new_persistance }, setPersistance new_persistance )
 
-                        Blank state ->
-                            ( Loaded { state | persistance = new_persistance, sync = Idle }, setPersistance new_persistance )
-
-                        Loaded state ->
-                            ( Loaded { state | persistance = new_persistance, sync = Idle }, setPersistance new_persistance )
-
-                        ProductView state buyState ->
-                            ( ProductView { state | persistance = new_persistance, sync = Idle } buyState, setPersistance new_persistance )
+                            ProductView state buyState ->
+                                ( ProductView { state | persistance = new_persistance } buyState, setPersistance new_persistance )
 
 
 
@@ -472,7 +446,7 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Time.every 10000 Tick
+        [ Time.every 1100 Tick
         , Time.every 1000 SyncTick
         ]
 

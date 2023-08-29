@@ -46,7 +46,7 @@ and provides auth as well as a REST API.
 
 All non-database api's are implemented in go. First, there's an `/auth` enpoint that trades passwords for jwts and also validates jwts.
 A second endpoint `/api` is used to process images and serve some protected files like reports. Go is not nessessarily the best language for this
-kind of use-case, but its robust standard library gives me confidence that I the code will compile and run for the forseeable future.
+kind of use-case, but its robust standard library gives me confidence that the code will compile and run for the forseeable future.
 
 ### Web Server
 

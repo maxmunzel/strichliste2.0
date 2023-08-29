@@ -93,7 +93,8 @@ type Msg
     | GetUsers Persistance
     | ResetAmounts State BuyState
     | CommitNewOrder State BuyState
-    | Tick Time.Posix
+    | UserTick Time.Posix
+    | ProductTick Time.Posix
     | SyncTick Time.Posix
     | AskForJwtTextUpdate String
     | AskForJwtLocationUpdate String
@@ -278,13 +279,24 @@ update msg model =
             in
             ( Loaded { state | persistance = new_persistance, users = users_updates }, setPersistance new_persistance )
 
-        Tick timestamp ->
+        UserTick timestamp ->
             case model of
                 ProductView _ _ ->
-                    ( model, Cmd.batch [ getUsers (get_persistance model).jwtToken GotUsers, getProducts (get_persistance model).jwtToken GotProducts ] )
+                    ( model, getUsers (get_persistance model).jwtToken GotUsers )
 
                 Loaded _ ->
-                    ( model, Cmd.batch [ getUsers (get_persistance model).jwtToken GotUsers, getProducts (get_persistance model).jwtToken GotProducts ] )
+                    ( model, getUsers (get_persistance model).jwtToken GotUsers )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        ProductTick timestamp ->
+            case model of
+                ProductView _ _ ->
+                    ( model, getProducts (get_persistance model).jwtToken GotProducts )
+
+                Loaded _ ->
+                    ( model, getProducts (get_persistance model).jwtToken GotProducts )
 
                 _ ->
                     ( model, Cmd.none )
@@ -446,7 +458,8 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Time.every 1100 Tick
+        [ Time.every 10020 UserTick -- getting the users and costs is pretty expensive, so do it less often
+        , Time.every 1100 ProductTick
         , Time.every 1000 SyncTick
         ]
 

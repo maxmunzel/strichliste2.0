@@ -20,7 +20,6 @@ create table products
     active          boolean not null default true,
     location        text    not null default 'Bar, Kühlschrank EG'
 );
---  ALTER TABLE products ADD location text not null default 'Bar, Kühlschrank EG';
 
 create table orders
 (
@@ -33,6 +32,8 @@ create table orders
     location      TEXT    not null,
     idempotence_token TEXT UNIQUE
 );
+
+create index orders_undone_name on strichliste.orders (undone, creation_date);
 
 create or replace view history as
 select u.name                       as "user_name",

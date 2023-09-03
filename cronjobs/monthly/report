@@ -3,3 +3,5 @@
 
 psql -d postgres://db:5432 -U postgres --csv -c "select * from strichliste.users_and_costs order by name;" > /reports/`date +%Y-%m-%dT%H:%M:%S`.csv
 psql -d postgres://db:5432 -U postgres --csv -c "select * from (select foo.user, product , (select sum(cost) from strichliste.history h where h.user_name = foo.user and h.product_name = foo.product and creation_date between date_trunc('month', now()) - interval '1 month' and date_trunc('month', now())) as Kosten from (select distinct u.name as user, p.name as product from strichliste.users u, strichliste.products p) foo order by foo.user, foo.product  asc) bar where bar.kosten > 0;" > /reports/`date +%Y-%m-%d`_einzelposten.csv
+psql -d postgres://db:5432 -U postgres --csv -c "select * from strichliste.history;" > /reports/`date +%Y-%m-%dT%H:%M:%S`_history.csv
+

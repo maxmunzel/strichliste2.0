@@ -8046,20 +8046,15 @@ var $author$project$Main$view = function (model) {
 							},
 							A2(
 								$elm$core$List$sortBy,
-								function (u) {
-									return -u.a7;
+								function ($) {
+									return $.B;
 								},
 								A2(
-									$elm$core$List$sortBy,
+									$elm$core$List$filter,
 									function ($) {
-										return $.B;
+										return $.S;
 									},
-									A2(
-										$elm$core$List$filter,
-										function ($) {
-											return $.S;
-										},
-										state.M))))),
+									state.M)))),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$p,

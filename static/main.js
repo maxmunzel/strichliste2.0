@@ -8059,7 +8059,7 @@ var $author$project$Main$view = function (model) {
 								A2(
 									$elm$core$List$filter,
 									function (u) {
-										return _Utils_cmp(20 * 0.05, u.a7) < 0;
+										return _Utils_cmp((20 * 1000) * 0.05, u.a7) < 0;
 									},
 									A2(
 										$elm$core$List$filter,

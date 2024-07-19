@@ -495,6 +495,14 @@ view model =
             in
             div [ style "margin" "10px 10px 10px 10px " ]
                 [ h1 [] [ text title ]
+                , h2 [] [ text "Bedenklicher Alkoholkonsum" ]
+                , state.users
+                    |> List.filter .active
+                    |> List.filter (\u -> (20 * 0.05) < u.alc_ml_last_30_days)
+                    |> List.sortBy (\u -> -u.alc_ml_last_30_days)
+                    |> List.map (\u -> ( user2str u, userView state u ))
+                    |> Html.Keyed.node "div" Design.gridStyle
+                , br [] []
                 , h2 [] [ text "Aktive Nutzer" ]
                 , state.users
                     |> List.filter .active

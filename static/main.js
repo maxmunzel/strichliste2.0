@@ -2704,7 +2704,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		E: func(record.E),
+		F: func(record.F),
 		an: record.an,
 		ak: record.ak
 	}
@@ -2974,7 +2974,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.E;
+		var message = !tag ? value : tag < 3 ? value.a : value.F;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.an;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -6800,7 +6800,7 @@ var $author$project$Main$setPersistance = _Platform_outgoingPort(
 					$elm$json$Json$Encode$string($.Y)),
 					_Utils_Tuple2(
 					'order_counter',
-					$elm$json$Json$Encode$int($.G)),
+					$elm$json$Json$Encode$int($.H)),
 					_Utils_Tuple2(
 					'orders',
 					$elm$json$Json$Encode$list(
@@ -7000,7 +7000,7 @@ var $author$project$Main$update = F2(
 								$author$project$Main$Loaded(
 									_Utils_update(
 										state,
-										{F: false, J: users})),
+										{G: false, C: users})),
 								$elm$core$Platform$Cmd$none);
 						case 6:
 							var state = model.a;
@@ -7010,7 +7010,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$ProductView,
 									_Utils_update(
 										state,
-										{F: false, J: users}),
+										{G: false, C: users}),
 									buyState),
 								$elm$core$Platform$Cmd$none);
 						default:
@@ -7029,7 +7029,7 @@ var $author$project$Main$update = F2(
 								$author$project$Main$Loaded(
 									_Utils_update(
 										state,
-										{F: true})),
+										{G: true})),
 								$elm$core$Platform$Cmd$none);
 						default:
 							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -7045,7 +7045,7 @@ var $author$project$Main$update = F2(
 								$author$project$Main$Loaded(
 									_Utils_update(
 										state,
-										{F: true})),
+										{G: true})),
 								$elm$core$Platform$Cmd$none);
 						case 3:
 							var persistance = model.a;
@@ -7063,7 +7063,7 @@ var $author$project$Main$update = F2(
 							var users = model.b;
 							return _Utils_Tuple2(
 								$author$project$Main$Loaded(
-									{F: false, e: persistance, ag: products, J: users}),
+									{G: false, e: persistance, ag: products, C: users}),
 								$elm$core$Platform$Cmd$none);
 						case 4:
 							var state = model.a;
@@ -7071,7 +7071,7 @@ var $author$project$Main$update = F2(
 								$author$project$Main$Loaded(
 									_Utils_update(
 										state,
-										{F: false, ag: products})),
+										{G: false, ag: products})),
 								$elm$core$Platform$Cmd$none);
 						case 6:
 							var state = model.a;
@@ -7197,12 +7197,12 @@ var $author$project$Main$update = F2(
 					function (u) {
 						return _Utils_eq(u.t, user.t) ? user_updated : u;
 					},
-					state.J);
+					state.C);
 				return _Utils_Tuple2(
 					$author$project$Main$Loaded(
 						_Utils_update(
 							state,
-							{e: new_persistance, J: users_updates})),
+							{e: new_persistance, C: users_updates})),
 					$author$project$Main$setPersistance(new_persistance));
 			case 7:
 				var timestamp = msg.a;
@@ -7266,7 +7266,7 @@ var $author$project$Main$update = F2(
 									_Utils_Tuple2(
 									'idempotence_token',
 									$elm$json$Json$Encode$string(
-										persistance.af + ('_' + $elm$core$String$fromInt(persistance.G))))
+										persistance.af + ('_' + $elm$core$String$fromInt(persistance.H))))
 								]));
 					});
 				var updateSync = function (state) {
@@ -7282,7 +7282,7 @@ var $author$project$Main$update = F2(
 									q: $elm$http$Http$jsonBody(
 										A2(packNewOrder, state.e, order)),
 									r: $elm$http$Http$expectWhatever(
-										$author$project$Main$SentNewOrder(state.e.G)),
+										$author$project$Main$SentNewOrder(state.e.H)),
 									s: _List_fromArray(
 										[
 											A2($elm$http$Http$header, 'Authorization', 'Bearer ' + state.e.l),
@@ -7380,7 +7380,7 @@ var $author$project$Main$update = F2(
 					var result = msg.b;
 					if (!_Utils_eq(
 						count,
-						$author$project$Main$get_persistance(model).G)) {
+						$author$project$Main$get_persistance(model).H)) {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
 						if (result.$ === 1) {
@@ -7396,10 +7396,10 @@ var $author$project$Main$update = F2(
 									return tail;
 								}
 							}();
-							var new_order_count = persistance.G + 1;
+							var new_order_count = persistance.H + 1;
 							var new_persistance = _Utils_update(
 								persistance,
-								{G: new_order_count, f: new_orders});
+								{H: new_order_count, f: new_orders});
 							switch (model.$) {
 								case 0:
 									return _Utils_Tuple2(
@@ -8017,7 +8017,7 @@ var $author$project$Main$view = function (model) {
 					]));
 		case 4:
 			var state = model.a;
-			var title = state.F ? 'Strichliste *' : 'Strichliste';
+			var title = state.G ? 'Strichliste *' : 'Strichliste';
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -8033,6 +8033,41 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$text(title)
 							])),
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Bedenklicher Alkoholkonsum')
+							])),
+						A3(
+						$elm$html$Html$Keyed$node,
+						'div',
+						$author$project$Design$gridStyle,
+						A2(
+							$elm$core$List$map,
+							function (u) {
+								return _Utils_Tuple2(
+									$author$project$Common$user2str(u),
+									A2($author$project$Main$userView, state, u));
+							},
+							A2(
+								$elm$core$List$sortBy,
+								function (u) {
+									return -u.a7;
+								},
+								A2(
+									$elm$core$List$filter,
+									function (u) {
+										return _Utils_cmp(20 * 0.05, u.a7) < 0;
+									},
+									A2(
+										$elm$core$List$filter,
+										function ($) {
+											return $.S;
+										},
+										state.C))))),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$h2,
 						_List_Nil,
@@ -8066,7 +8101,7 @@ var $author$project$Main$view = function (model) {
 										function ($) {
 											return $.S;
 										},
-										state.J))))),
+										state.C))))),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$h2,
@@ -8101,7 +8136,7 @@ var $author$project$Main$view = function (model) {
 										function ($) {
 											return $.S;
 										},
-										state.J))))),
+										state.C))))),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$p,
@@ -8338,7 +8373,7 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 										$elm$json$Json$Decode$andThen,
 										function (device_id) {
 											return $elm$json$Json$Decode$succeed(
-												{af: device_id, l: jwtToken, Y: location, G: order_counter, f: orders});
+												{af: device_id, l: jwtToken, Y: location, H: order_counter, f: orders});
 										},
 										A2($elm$json$Json$Decode$field, 'device_id', $elm$json$Json$Decode$string));
 								},

@@ -7000,7 +7000,7 @@ var $author$project$Main$update = F2(
 								$author$project$Main$Loaded(
 									_Utils_update(
 										state,
-										{F: false, M: users})),
+										{F: false, J: users})),
 								$elm$core$Platform$Cmd$none);
 						case 6:
 							var state = model.a;
@@ -7010,7 +7010,7 @@ var $author$project$Main$update = F2(
 									$author$project$Main$ProductView,
 									_Utils_update(
 										state,
-										{F: false, M: users}),
+										{F: false, J: users}),
 									buyState),
 								$elm$core$Platform$Cmd$none);
 						default:
@@ -7063,7 +7063,7 @@ var $author$project$Main$update = F2(
 							var users = model.b;
 							return _Utils_Tuple2(
 								$author$project$Main$Loaded(
-									{F: false, e: persistance, ag: products, M: users}),
+									{F: false, e: persistance, ag: products, J: users}),
 								$elm$core$Platform$Cmd$none);
 						case 4:
 							var state = model.a;
@@ -7197,12 +7197,12 @@ var $author$project$Main$update = F2(
 					function (u) {
 						return _Utils_eq(u.t, user.t) ? user_updated : u;
 					},
-					state.M);
+					state.J);
 				return _Utils_Tuple2(
 					$author$project$Main$Loaded(
 						_Utils_update(
 							state,
-							{e: new_persistance, M: users_updates})),
+							{e: new_persistance, J: users_updates})),
 					$author$project$Main$setPersistance(new_persistance));
 			case 7:
 				var timestamp = msg.a;
@@ -8033,6 +8033,13 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$text(title)
 							])),
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Aktive Nutzer')
+							])),
 						A3(
 						$elm$html$Html$Keyed$node,
 						'div',
@@ -8051,10 +8058,50 @@ var $author$project$Main$view = function (model) {
 								},
 								A2(
 									$elm$core$List$filter,
-									function ($) {
-										return $.S;
+									function (u) {
+										return 0 < u.bc;
 									},
-									state.M)))),
+									A2(
+										$elm$core$List$filter,
+										function ($) {
+											return $.S;
+										},
+										state.J))))),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Inaktive Nutzer')
+							])),
+						A3(
+						$elm$html$Html$Keyed$node,
+						'div',
+						$author$project$Design$gridStyle,
+						A2(
+							$elm$core$List$map,
+							function (u) {
+								return _Utils_Tuple2(
+									$author$project$Common$user2str(u),
+									A2($author$project$Main$userView, state, u));
+							},
+							A2(
+								$elm$core$List$sortBy,
+								function ($) {
+									return $.B;
+								},
+								A2(
+									$elm$core$List$filter,
+									function (u) {
+										return !u.bc;
+									},
+									A2(
+										$elm$core$List$filter,
+										function ($) {
+											return $.S;
+										},
+										state.J))))),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$p,

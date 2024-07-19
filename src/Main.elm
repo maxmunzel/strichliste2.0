@@ -495,8 +495,18 @@ view model =
             in
             div [ style "margin" "10px 10px 10px 10px " ]
                 [ h1 [] [ text title ]
+                , h2 [] [ text "Aktive Nutzer" ]
                 , state.users
                     |> List.filter .active
+                    |> List.filter (\u -> 0 < u.cost_last_30_days)
+                    |> List.sortBy .name
+                    |> List.map (\u -> ( user2str u, userView state u ))
+                    |> Html.Keyed.node "div" Design.gridStyle
+                , br [] []
+                , h2 [] [ text "Inaktive Nutzer" ]
+                , state.users
+                    |> List.filter .active
+                    |> List.filter (\u -> 0 == u.cost_last_30_days)
                     |> List.sortBy .name
                     |> List.map (\u -> ( user2str u, userView state u ))
                     |> Html.Keyed.node "div" Design.gridStyle
